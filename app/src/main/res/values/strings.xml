@@ -166,7 +166,7 @@
     <string name="sign_in_method_text">You have signed in with this way:</string>
     <string name="auth_header">Sign in or Log in</string>
     <string name="auth_subtext">By logging in, you will be able to add your favorites in the application.</string>
-    <string name="skip_now_text">Skip Now</string>
+    <string name="skip_now_text">SkIp Now</string>
     <string name="log_out_subtext">Log out</string>
 
 
@@ -364,7 +364,7 @@
     <string name="copy_right" translatable="false">Trippo © %1$d - All rights reserved.</string>
     <string name="about_description">Trippo is your smart travel guide - it’s free and works offline! Our awesome algorithms crunch through millions of websites and reviews to deliver unique recommendations across 50,000 destinations worldwide! Personalize your trip by picking your favorite hotels, sights, activities and restaurants and book them seamlessly in our app! That’s not all, our city maps helps you find unique and exotic places around you so you can wander freely. <b>This app is powered by Triposo API.</b></string>
 
-    <string name="app_version">Version: %1$s</string>
+    <string name="app_version">Version: %s</string>
 
     <string name="connect_with_me" translatable="false">Connect with me</string>
     <string name="email" translatable="false">nuhkocaa@gmail.com</string>

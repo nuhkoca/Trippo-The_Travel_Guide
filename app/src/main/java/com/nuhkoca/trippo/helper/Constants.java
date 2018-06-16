@@ -64,6 +64,7 @@ public class Constants {
     public static final int TTS_REQ_CODE = 4532;
     public static final int RC_SIGN_IN = 6749;
     public static final String TRIPPO_UTTRANCE_ID = "trippo-uttrance-id";
+    public static int MAP_INTERVAL = 1000;
 
     private Constants() {
         throw new AssertionError();

@@ -43,6 +43,7 @@
             android:parentActivityName=".ui.MainActivity" />
         <activity
             android:name=".ui.nearby.NearbyActivity"
+            android:launchMode="singleTop"
             android:keepScreenOn="true"
             android:parentActivityName=".ui.MainActivity" />
         <activity

@@ -39,13 +39,11 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void setupAboutPage() {
-        String version = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME);
-
         View aboutPage = new AboutPage(this)
                 .isRTL(false)
                 .setDescription(getString(R.string.about_description))
-                .setImage(R.drawable.logo_vector)
-                .addItem(new Element().setTitle(version))
+                .setImage(R.drawable.ic_launcher_round)
+                .addItem(getVersionElement())
                 .addGroup(getString(R.string.connect_with_me))
                 .addEmail(getString(R.string.email), getString(R.string.email_me))
                 .addWebsite(getString(R.string.personal_website), getString(R.string.visit_my_website))
@@ -60,6 +58,16 @@ public class AboutActivity extends AppCompatActivity {
                 .create();
 
         mActivityAboutBinding.clAbout.addView(aboutPage, 0);
+    }
+
+    private Element getVersionElement(){
+        Element versionElement = new Element();
+
+        String version = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME);
+
+        versionElement.setTitle(version);
+
+        return versionElement;
     }
 
     private Element getCopyRightsElement() {

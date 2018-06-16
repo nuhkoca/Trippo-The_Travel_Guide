@@ -69,10 +69,10 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
         super.onDonePressed(currentFragment);
         mEditor = mSharedPreferences.edit();
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(OnboardingActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(OnboardingActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    && ContextCompat.checkSelfPermission(OnboardingActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
                 locationPermissionsTask();
             } else {

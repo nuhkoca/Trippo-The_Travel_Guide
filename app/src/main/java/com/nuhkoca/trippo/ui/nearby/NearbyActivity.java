@@ -63,6 +63,7 @@ import java.util.Objects;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
+import timber.log.Timber;
 
 public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -285,7 +286,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
             if (mMapZoom == 0)
                 mMapZoom = Constants.DEFAULT_ZOOM_LEVEL;
 
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     locationPermissionsTask();
                 } else {
@@ -408,20 +409,15 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
     public void onConnected(@Nullable Bundle bundle) {
         LocationRequest locationRequest = new LocationRequest();
 
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(1000);
+        locationRequest.setInterval(Constants.MAP_INTERVAL);
+        locationRequest.setFastestInterval(Constants.MAP_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
             LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, getLocationCallback(), Looper.myLooper());
         } else {
             locationPermissionsTask();
-
-            if (hasLocationPermissions()) {
-                LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, getLocationCallback(), Looper.myLooper());
-            }
         }
     }
 
@@ -444,7 +440,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-
+        Timber.d("Permission granted: %s", String.valueOf(requestCode));
     }
 
     @Override
@@ -461,12 +457,12 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onRationaleAccepted(int requestCode) {
-
+        Timber.d("Rationale accepted: %s", String.valueOf(requestCode));
     }
 
     @Override
     public void onRationaleDenied(int requestCode) {
-
+        Timber.d("Rationale denied: %s", String.valueOf(requestCode));
     }
 
     @Override
