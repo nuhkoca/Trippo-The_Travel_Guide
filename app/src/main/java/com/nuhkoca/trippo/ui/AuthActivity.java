@@ -190,7 +190,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
 
             Timber.d("account name: %s", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail());
 
-            if (mReqCode == 0) {
+            if (mReqCode != Constants.PARENT_ACTIVITY_REQ_CODE) {
                 startActivity(new Intent(AuthActivity.this, MainActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
