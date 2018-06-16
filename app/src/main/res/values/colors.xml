@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#212121</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#00796b</color>
+    <color name="colorLight">#484848</color>
+    <color name="colorTint">#82212121</color>
+    <color name="windowBackground">#f7f7f7</color>
+    <color name="tabletColorTint">#5000796b</color>
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#757575</color>
+    <color name="transparentButtonColor">#82ffffff</color>
+    <color name="fabPressedColor">#00695c</color>
+    <color name="tagGroupBorderColor">#e65100</color>
+    <color name="transparentBackground">#82000000</color>
+    <color name="moneyBackground">#8bc34a</color>
+    <color name="swipeColor1">#f44336</color>
+    <color name="swipeColor2">#ff9800</color>
+    <color name="swipeColor3">#00796b</color>
+
+</resources>

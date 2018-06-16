@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- CardView Theme -->
+    <style name="CardViewTheme">
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <!-- Layout Theme -->
+    <style name="LayoutTheme">
+        <item name="android:background">@drawable/layout_border</item>
+        <item name="android:layout_marginStart">@dimen/layout_margin_start_port</item>
+        <item name="android:layout_marginEnd">@dimen/layout_margin_end_port</item>
+        <item name="android:layout_marginTop">@dimen/layout_margin_top_port</item>
+        <item name="android:layout_marginBottom">@dimen/layout_margin_bottom_port</item>
+    </style>
+
+    <!-- Nearby Button Theme -->
+    <style name="NearbyButtonTheme">
+        <item name="android:text">@string/nearby_button_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:background">@color/colorBlack</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginStart">128dp</item>
+        <item name="android:layout_marginEnd">128dp</item>
+    </style>
+
+</resources>

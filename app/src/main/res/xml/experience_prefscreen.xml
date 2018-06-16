@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:layout="@layout/custom_experience_preference_category">
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/tours_key"
+            android:title="@string/tours_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/activities_key"
+            android:title="@string/activities_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/multi_day_tours_key"
+            android:title="@string/multi_day_tours_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/day_trips_key"
+            android:title="@string/day_trips_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/city_walking_key"
+            android:title="@string/city_walking_title" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

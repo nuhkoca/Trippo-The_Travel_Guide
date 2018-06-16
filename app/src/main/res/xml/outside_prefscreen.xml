@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:layout="@layout/custom_outside_preference_category">
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/sightseeing_key"
+            android:title="@string/sightseeing_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/eat_drink_key"
+            android:title="@string/eat_and_drink_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/nightlife_key"
+            android:title="@string/nightlife_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/hotel_key"
+            android:title="@string/hotel_score_title" />
+
+        <SwitchPreference android:title="@string/bookable_title"
+            android:key="@string/bookable_key"
+            android:summary="@string/bookable_summary"
+            android:defaultValue="@string/bookable_disabled_value"
+            android:checked="false" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

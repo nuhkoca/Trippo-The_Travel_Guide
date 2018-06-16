@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/clCountryDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            android:fitsSystemWindows="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/aplCountryDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                <android.support.design.widget.CollapsingToolbarLayout
+                    android:id="@+id/ctlCountryDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    app:contentScrim="?colorPrimary"
+                    app:expandedTitleMarginBottom="47dp"
+                    app:expandedTitleTextAppearance="@style/CollapsingTextTheme.Inverse"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    app:title="@string/app_name">
+
+                    <ImageView
+                        android:id="@+id/ivCountryPoster"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/detail_image_view_content_description"
+                        android:fitsSystemWindows="true"
+                        android:tint="@color/colorTint" />
+
+                    <android.support.v7.widget.Toolbar
+                        android:id="@+id/toolbarDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@null"
+                        app:layout_collapseMode="pin" />
+
+                </android.support.design.widget.CollapsingToolbarLayout>
+            </android.support.design.widget.AppBarLayout>
+
+            <android.support.v4.widget.NestedScrollView
+                android:id="@+id/nsvCountryDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:scrollbars="none">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/detailContentFirst"
+                        layout="@layout/country_detail_first_content" />
+
+                    <include
+                        android:id="@+id/detailContentSecond"
+                        layout="@layout/country_detail_second_content" />
+
+                    <include
+                        android:id="@+id/detailContentThird"
+                        layout="@layout/country_detail_third_content" />
+
+                     <include
+                         android:id="@+id/detailContentFourth"
+                         layout="@layout/country_detail_fourth_content" />
+
+                     <include
+                         android:id="@+id/detailContentFifth"
+                         layout="@layout/country_detail_fifth_content" />
+
+                    </LinearLayout>
+
+                </android.support.v7.widget.CardView>
+
+            </android.support.v4.widget.NestedScrollView>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fabCountryDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_anchor="@id/ivCountryPoster"
+                style="@style/FloatingActionButtonTheme"/>
+
+            <include
+                android:id="@+id/detailContentAd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                layout="@layout/banner_ads_layout"/>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <LinearLayout
+            android:id="@+id/llLoadingInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ProgressBarTheme"
+            style="?android:attr/progressBarStyle"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            style="@style/CountryDetailInfoTextTheme"/>
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

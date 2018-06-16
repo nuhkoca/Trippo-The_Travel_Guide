@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="SearchButtonTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableStart">@drawable/ic_search_location</item>
+        <item name="android:hint">@string/main_button_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/search_button_selector</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:drawableTint">@color/primaryText</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+</resources>

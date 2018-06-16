@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="experienceContentResult"
+            type="com.nuhkoca.trippo.model.remote.content.third.ExperienceResult" />
+
+        <variable
+            name="experienceContentImage"
+            type="String" />
+
+        <variable
+            name="adapterPosition"
+            type="Integer" />
+
+        <variable
+            name="duration"
+            type="Object[]" />
+
+        <variable
+            name="price"
+            type="String[]" />
+
+        <variable
+            name="popupMenuItemClickListener"
+            type="com.nuhkoca.trippo.callback.IPopupMenuClickListener" />
+
+    </data>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/CardViewTheme">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+
+            <ImageView
+                android:id="@+id/ivExperienceContentThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:imageSrc="@{experienceContentImage}"
+                android:contentDescription="@string/parts_of_country_image_view_content_description" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/transparentBackground"
+            android:layout_gravity="bottom"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorWhite"
+                android:layout_gravity="bottom|start"
+                score="@{experienceContentResult.score}"
+                style="@style/ContentInfoTextTheme"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorWhite"
+                android:layout_gravity="center"
+                duration="@{duration}"
+                style="@style/ContentInfoTextTheme"/>
+
+            <TextView
+                android:id="@+id/tvExperienceMoneyInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:textColor="@color/moneyBackground"
+                android:layout_marginEnd="44dp"
+                priceText="@{price}"
+                suffix="@{tvExperienceMoneyInfoSuffix}"
+                style="@style/ContentInfoTextTheme"/>
+
+            <TextView
+                android:id="@+id/tvExperienceMoneyInfoSuffix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/ContentInfoAssistantTextTheme"/>
+
+        </FrameLayout>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvExperienceContentName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{experienceContentResult.name}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    style="@style/CountryNameTheme"/>
+
+                <ImageView
+                    android:id="@+id/ivOverflow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/overflow_image_view_content_description"
+                    android:onClick="@{()-> popupMenuItemClickListener.onPopupMenuItemClick(ivOverflow, adapterPosition)}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    style="@style/OverflowMenuTheme"/>
+
+            </android.support.constraint.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tvExperienceContentIntro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{experienceContentResult.intro}"
+                style="@style/ContentDescriptionTheme" />
+
+            <co.lujun.androidtagview.TagContainerLayout
+                android:id="@+id/tgExperienceContentTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tags="@{experienceContentResult.tagLabels}"
+                style="@style/TagGroupTheme"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+    </android.support.v7.widget.CardView>
+</layout>

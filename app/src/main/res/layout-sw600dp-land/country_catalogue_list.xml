@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="countryResult"
+            type="com.nuhkoca.trippo.model.remote.country.CountryResult" />
+
+        <variable
+            name="countryImageMedium"
+            type="com.nuhkoca.trippo.model.remote.country.CountryImageMediumSize" />
+
+        <variable
+            name="catalogueItemClickListener"
+            type="com.nuhkoca.trippo.callback.ICatalogueItemClickListener" />
+
+        <variable
+            name="popupMenuItemClickListener"
+            type="com.nuhkoca.trippo.callback.IPopupMenuClickListener" />
+
+        <variable
+            name="adapterPosition"
+            type="Integer" />
+
+    </data>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/CardViewTheme">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:onClick="@{()-> catalogueItemClickListener.onItemClick(countryResult, ivCatalogueThumbnail, adapterPosition)}">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:id="@+id/ivCatalogueThumbnail"
+                    android:layout_width="120dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:imageSrc="@{countryImageMedium.url}"
+                    android:contentDescription="@string/catalogue_image_view_content_description"  />
+
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvCatalogueCountryName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{countryResult.name}"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/CountryNameTheme"/>
+
+                    <ImageView
+                        android:id="@+id/ivOverflow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/overflow_image_view_content_description"
+                        android:onClick="@{()-> popupMenuItemClickListener.onPopupMenuItemClick(ivOverflow, adapterPosition)}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        style="@style/OverflowMenuTheme"/>
+
+                </android.support.constraint.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/tvCatalogueCountrySnippet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{countryResult.snippet}"
+                    style="@style/CountryDescriptionTheme" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</layout>

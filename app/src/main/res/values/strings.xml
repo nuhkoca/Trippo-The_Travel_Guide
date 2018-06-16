@@ -1,0 +1,401 @@
+<resources>
+    <string name="app_name">Trippo</string>
+    <string name="catalogue_name">Catalogue</string>
+    <string name="nearby_name">Nearby Places</string>
+    <string name="open_source_name">Open Source Libraries</string>
+    <string name="settings_name">Settings</string>
+    <string name="auth_name">Login</string>
+
+    <string name="main_button_text">Where do you want to go?</string>
+    <string name="browse_button_text">Browse guides</string>
+    <string name="nearby_button_text">Nearby Places</string>
+
+    <!-- Customized Title Texts -->
+    <string name="cities_of">Cities of %s</string>
+    <string name="regions_of">Regions of %s</string>
+    <string name="national_parks_of">National parks of %s</string>
+    <string name="islands_of">Islands of %s</string>
+    <string name="sightseeing_in">Sightseeing venues in %s</string>
+    <string name="eat_and_drink_in">Eat &amp; drink venues in %s</string>
+    <string name="nightlife_in">Nightlife venues in %s</string>
+    <string name="hotel_in">Hotel venues in %s</string>
+    <string name="tours_in">Tours in %s</string>
+    <string name="activities_in">Activities in %s</string>
+    <string name="multi_day_tours_in">Multi day tours in %s</string>
+    <string name="day_trips_in">Day trips in %s</string>
+    <string name="city_walking_in">City walking in %s</string>
+    <string name="in_country">%s in %s</string>
+    <string name="of_country">%s of %s</string>
+
+    <!-- Content Placeholders -->
+    <string name="city_placeholder" translatable="false">city</string>
+    <string name="region_placeholder" translatable="false">region</string>
+    <string name="national_park_placeholder" translatable="false">national_park</string>
+    <string name="island_placeholder" translatable="false">island</string>
+    <string name="sightseeing_placeholder" translatable="false">sightseeing</string>
+    <string name="eat_and_drink_placeholder" translatable="false">eatingout</string>
+    <string name="nightlife_placeholder" translatable="false">nightlife</string>
+    <string name="hotel_placeholder" translatable="false">hotels</string>
+    <string name="tours_placeholder" translatable="false">private_tours</string>
+    <string name="activities_placeholder" translatable="false">do</string>
+    <string name="multi_day_tours_placeholder" translatable="false">multiday</string>
+    <string name="day_trips_placeholder" translatable="false">daytrips</string>
+    <string name="city_walking_placeholder" translatable="false">walkingtours</string>
+
+    <!-- Menu/Toast/Alert Strings -->
+    <string name="about_menu_text">About</string>
+    <string name="settings_menu_text">Settings</string>
+    <string name="feedback_menu_text">Send feedback</string>
+    <string name="share_menu_text">Share</string>
+    <string name="back_press_text">Press back once more to exit.</string>
+    <string name="search_hint">Search Trippo</string>
+    <string name="search_title">Search</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="sensor_warning_text">This option is not available in this version.</string>
+    <string name="image_cache_info_text">Image cache successfully deleted.</string>
+    <string name="db_remove_info_text">Application database successfully removed.</string>
+    <string name="add_to_favorites_menu_text">Add to favorites</string>
+    <string name="remove_from_favorites_menu_text">Remove from favorites</string>
+    <string name="delete_all_favorites_menu_text">Delete all</string>
+    <string name="show_in_map_menu_text">Show in map</string>
+    <string name="book_menu_text">Book</string>
+    <string name="map_only_mode_warning_text">This option is not available in Map-only mode.</string>
+    <string name="dismiss_action_text">DIsmIss</string>
+    <string name="settings_action_text">SettIngs</string>
+    <string name="action_back">Back</string>
+    <string name="action_forward">Forward</string>
+    <string name="book_via">Book via %s</string>
+    <string name="content_settings_title">Content settings</string>
+    <string name="map_settings_title">Map settings</string>
+    <string name="article_settings_title">Article settings</string>
+    <string name="constraint_exception_text">You have already added %s to your favorite list.</string>
+    <string name="database_adding_info_text">You have successfully added %s to your favorite list.</string>
+    <string name="item_deleted_info_text">You have successfully removed %s from your favorite list.</string>
+    <string name="all_item_deleted_info_text">You have successfully removed all items from your favorite list.</string>
+    <string name="no_tts_found_title">No TTS found</string>
+    <string name="no_tts_found_text">You need to download English TTS in order to continue.</string>
+    <string name="tts_lang_not_supported_warning_text">Language is not supported. Please select a valid language.</string>
+    <string name="tts_init_failed_warning_text">TTS couldn\'t be initialized. Please try again later.</string>
+    <string name="my_account_menu_text">My Account</string>
+    <string name="sign_in_alert">Please sign in first in order to continue.</string>
+    <string name="sign_in_action_text">sIgn In</string>
+    <string name="coming_soon_text">Community is coming soon. Stay tuned!</string>
+    <string name="license_dialog">Author: %s\nLicense: %s</string>
+
+
+    <!-- Content Descriptions -->
+    <string name="catalogue_image_view_content_description">This ImageView represents images for each country.</string>
+    <string name="parts_of_country_image_view_content_description">This ImageView represents images for each part of selected country.</string>
+    <string name="main_image_view_content_description">This ImageView represents the background for Main Activity.</string>
+    <string name="onboarding_image_view_content_description">This ImageView represents icons for Onboarding Activity.</string>
+    <string name="overflow_image_view_content_description">This ImageView represents overflow menu for some actions.</string>
+    <string name="tablet_bg_image_view_content_description">This ImageView represents background image for tablets.</string>
+    <string name="detail_image_view_content_description">This ImageView represents image for collapsing toolbar layout.</string>
+
+    <!-- Onboarding Strings -->
+    <string name="onboarding_first_title">Welcome to Trippo</string>
+    <string name="onboarding_first_desc">If you love traveling, Trippo will be your best friend!</string>
+
+    <string name="onboarding_second_title">POIs</string>
+    <string name="onboarding_second_desc">Have plenty of POIs for selected locations to join in an activity immediately!</string>
+
+    <string name="onboarding_third_title">Nearby Places</string>
+    <string name="onboarding_third_desc">Discover new and unique places around you!</string>
+
+    <string name="onboarding_fourth_title">Country Catalogue</string>
+    <string name="onboarding_fourth_desc">View the country catalogue and save what you like in order to access later!</string>
+
+    <!-- Permission Strings -->
+    <string name="rationale_location_permission">This app needs access to your location to know where you are and also nearby places around you.</string>
+
+    <!-- Error Texts -->
+    <string name="response_error_text">An error occurred. Check your internet connection or try again in a few minutes.</string>
+    <string name="response_list_error_text">An error occurred.</string>
+    <string name="country_detil_info_text">Page is being prepared. It may take a while.</string>
+    <string name="no_result_error_text">Opps! As it seems, we didn\'t find anything for your request. Sorry!</string>
+
+    <!-- Button/TextView Strings -->
+    <string name="retry_text">Retry</string>
+    <string name="explore_this_area">Search Nearby</string>
+    <string name="restaurants">Restaurants</string>
+    <string name="cafes">Cafes</string>
+    <string name="gas_stations">Gas stations</string>
+    <string name="atms">ATMs</string>
+    <string name="pharmacies">Pharmacies</string>
+    <string name="groceries">Groceries</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="positive_button">OK</string>
+    <string name="negative_button">Cancel</string>
+    <string name="open_button">Open</string>
+    <string name="gps_warning_text">To continue, turn on device location which uses Google\'s, location service.</string>
+    <string name="cache_warning_text">If clear, all the contents will be loaded from scratch.</string>
+    <string name="cache_warning_title">Are you sure you want to delete image cache?</string>
+    <string name="cities_button_text">Cities</string>
+    <string name="regions_button_text">Regions</string>
+    <string name="national_parks_button_text">National parks</string>
+    <string name="islands_button_text">Islands</string>
+    <string name="country_details_second_header_text">Outside of the cities</string>
+    <string name="sightseeing_button_text">Sightseeing</string>
+    <string name="eat_drink_button_text">Eat &amp; drink</string>
+    <string name="hotels_button_text">Hotels</string>
+    <string name="nightlife_button_text">Nightlife</string>
+    <string name="tours_button_text">Tours</string>
+    <string name="activities_button_text">Activities</string>
+    <string name="multi_day_tours_button_text">Multi day tours</string>
+    <string name="city_walking_button_text">City walking</string>
+    <string name="day_trips_button_text">Day trips</string>
+    <string name="country_details_third_header_text">Experience</string>
+    <string name="country_details_fourth_header_text">Mini Travel Guide</string>
+    <string name="community_button_text">Community</string>
+    <string name="country_details_fifth_header_text">Travel Reference</string>
+    <string name="background_button_text">Background</string>
+    <string name="practicalities_button_text">Practicalities</string>
+    <string name="distance_from_text">Distance is from %s</string>
+    <string name="and_up_suffix">and up</string>
+    <string name="score_prefix">Score: %.2f</string>
+    <string name="money_suffix">%s%s</string>
+    <string name="distance_format">%.2f km</string>
+    <string name="duration_format">%.0f %s(s)</string>
+    <string name="item_removing_warning_text">This process won\'t be recoverable.</string>
+    <string name="item_removing_warning_title">Are you sure you want to delete %s from your favorite list?</string>
+    <string name="all_item_removing_warning_title">Are you sure you want to delete all items from your favorite list?</string>
+    <string name="no_item_in_db_warning_text">You don\'t have any item in your favorite list. First add some items!</string>
+    <string name="app_db_removing_warning_title">Are you sure you want to delete application database from your phone?</string>
+    <string name="app_db_removing_warning_text">This process won\'t be recoverable. Database will be recreated after you add or download some items.</string>
+    <string name="ad_loading_text">Ad is loading…</string>
+    <string name="sign_in_method_text">You have signed in with this way:</string>
+    <string name="auth_header">Sign in or Log in</string>
+    <string name="auth_subtext">By logging in, you will be able to add your favorites in the application.</string>
+    <string name="skip_now_text">Skip Now</string>
+    <string name="log_out_subtext">Log out</string>
+
+
+    <!-- Places Holders-->
+    <string name="restaurant_holder">restaurant</string>
+    <string name="cafe_holder">cafe</string>
+    <string name="gas_station_holder">gas_station</string>
+    <string name="atm_holder">atm</string>
+    <string name="pharmacy_holder">pharmacy</string>
+    <string name="grocery_holder">supermarket</string>
+    <string name="my_position_text">You are here</string>
+
+
+    <!-- Preference Category Headers -->
+    <string name="nearby_places_header">Nearby Places</string>
+    <string name="notifications_places_header">Notifications</string>
+
+    <!-- Nearby Places Values/Labels -->
+    <string name="radius_title">Radius</string>
+    <string name="radius_key" translatable="false">radius</string>
+
+    <string name="mt_500_radius_label" translatable="false">500 mt</string>
+    <string name="mt_500_radius_value" translatable="false">500</string>
+
+    <string name="km_1000_radius_label" translatable="false">1 km</string>
+    <string name="km_1000_radius_value" translatable="false">1000</string>
+
+    <string name="km_1500_radius_label" translatable="false">1,5 km(default)</string>
+    <string name="km_1500_radius_value" translatable="false">1500</string>
+
+    <string name="km_2000_radius_label" translatable="false">2 km</string>
+    <string name="km_2000_radius_value" translatable="false">2000</string>
+
+    <string name="km_2500_radius_label" translatable="false">2,5 km</string>
+    <string name="km_2500_radius_value" translatable="false">2500</string>
+
+    <string name="km_3000_radius_label" translatable="false">3 km</string>
+    <string name="km_3000_radius_value" translatable="false">3000</string>
+
+    <string name="km_3500_radius_label" translatable="false">3,5 km</string>
+    <string name="km_3500_radius_value" translatable="false">3500</string>
+
+    <string name="km_4000_radius_label" translatable="false">4 km</string>
+    <string name="km_4000_radius_value" translatable="false">4000</string>
+
+    <string name="km_4500_radius_label" translatable="false">4,5 km</string>
+    <string name="km_4500_radius_value" translatable="false">4500</string>
+
+    <string name="km_5000_radius_label" translatable="false">5 km</string>
+    <string name="km_5000_radius_value" translatable="false">5000</string>
+
+
+    <string name="sensor_title">Sensor</string>
+    <string name="sensor_subtext">It is to indicate if your phone uses sensor to determine your location.</string>
+    <string name="sensor_key">sensor</string>
+
+
+    <!-- Notifications Values/Labels -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_key" translatable="false">notifications</string>
+
+    <string name="notification_disabled_value" translatable="false">0</string>
+    <string name="notification_enabled_value" translatable="false">1</string>
+
+
+    <string name="notifications_enabled_text">This device will receive notifications.</string>
+    <string name="notifications_disabled_text">This device will not receive notifications.</string>
+
+
+    <!-- Outside Values/Labels -->
+    <string name="outside_header">Outside Content Preferences</string>
+    <string name="outside_summary">Changes will be reflected right away after any selection.</string>
+    <string name="sightseeing_key" translatable="false">sightseeing</string>
+    <string name="eat_drink_key" translatable="false">eat_and_drink</string>
+    <string name="nightlife_key" translatable="false">nightlife</string>
+    <string name="hotel_key" translatable="false">hotel</string>
+    <string name="bookable_key" translatable="false">bookable</string>
+
+
+    <string name="bookable_title">Bookable venues</string>
+    <string name="bookable_summary">Show only bookable venues(Price info is subject to providers.)</string>
+
+    <string name="bookable_enabled_value">1</string>
+    <string name="bookable_disabled_value">0</string>
+
+
+    <string name="sightseeing_score_title">Sightseeing score</string>
+    <string name="eat_and_drink_score_title">Eat &amp; drink score</string>
+    <string name="nightlife_score_title">Nightlife score</string>
+    <string name="hotel_score_title">Hotel score</string>
+    <string name="score_summary">Show venues which are greater than and equal to the selected option.</string>
+
+    <string name="one_and_greater_label" translatable="false">greater than or equal to 1</string>
+    <string name="one_and_greater_value" translatable="false">>=1</string>
+
+    <string name="two_and_greater_label" translatable="false">greater than or equal to 2</string>
+    <string name="two_and_greater_value" translatable="false">>=2</string>
+
+    <string name="three_and_greater_label" translatable="false">greater than or equal to 3</string>
+    <string name="three_and_greater_value" translatable="false">>=3</string>
+
+    <string name="four_and_greater_label" translatable="false">greater than or equal to 4</string>
+    <string name="four_and_greater_value" translatable="false">>=4</string>
+
+    <string name="five_and_greater_label" translatable="false">greater than or equal to 5</string>
+    <string name="five_and_greater_value" translatable="false">>=5</string>
+
+    <string name="six_and_greater_label" translatable="false">greater than or equal to 6</string>
+    <string name="six_and_greater_value" translatable="false">>=6</string>
+
+    <string name="seven_and_greater_label" translatable="false">greater than or equal to 7(default)</string>
+    <string name="seven_and_greater_value" translatable="false">>=7</string>
+
+    <string name="eight_and_greater_label" translatable="false">greater than or equal to 8</string>
+    <string name="eight_and_greater_value" translatable="false">>=8</string>
+
+    <string name="nine_and_greater_label" translatable="false">greater than or equal to 9</string>
+    <string name="nine_and_greater_value" translatable="false">>=9</string>
+
+    <string name="ten_and_greater_label" translatable="false">greater than or equal to 10</string>
+    <string name="ten_and_greater_value" translatable="false">>=10</string>
+
+
+    <!-- Experience Values/Labels -->
+    <string name="experience_header">Experience Content Preferences</string>
+    <string name="tours_key" translatable="false">private_tours</string>
+    <string name="activities_key" translatable="false">do</string>
+    <string name="multi_day_tours_key" translatable="false">multi_day_tours</string>
+    <string name="day_trips_key" translatable="false">day_trips</string>
+    <string name="city_walking_key" translatable="false">city_walking</string>
+
+    <string name="tours_score_title">Tours score</string>
+    <string name="activities_score_title">Activities score</string>
+    <string name="multi_day_tours_score_title">Multi day tours score</string>
+    <string name="day_trips_title">Day trips score</string>
+    <string name="city_walking_title">City walking score</string>
+
+
+    <!-- WebView Values/Labels -->
+    <string name="webview_title">External browser implementation</string>
+    <string name="webview_header">Browser settings</string>
+    <string name="webview_summary">If external browser is not enabled, internal one will be used instead.</string>
+    <string name="webview_key" translatable="false">internal-webview</string>
+
+    <string name="external_browser_disabled_value" translatable="false">0</string>
+    <string name="external_browser_enabled_value" translatable="false">1</string>
+
+
+    <string name="external_browser_enabled_text">External browser enabled.</string>
+    <string name="external_browser_disabled_text">External browser disabled.</string>
+
+
+    <!-- TTS Values/Labels -->
+    <string name="tts_header">Text-to-speech output</string>
+    <string name="tts_title">Language</string>
+    <string name="tts_key" translatable="false">tts</string>
+
+    <string name="tts_intent_title">Text-to-speech options</string>
+    <string name="tts_intent_summary">It allows to equalize different settings.</string>
+    <string name="tts_intent_key">tts-intent</string>
+
+    <string name="tts_us_language_label">English(United States)</string>
+    <string name="tts_us_language_value">us</string>
+
+    <string name="tts_en_language_label">English(United Kingdom)</string>
+    <string name="tts_en_language_value">en</string>
+
+    <!-- About Values -->
+    <string name="about_key" translatable="false">about</string>
+    <string name="open_source_key" translatable="false">open-source-libs</string>
+    <string name="updates_key" translatable="false">updates</string>
+    <string name="cache_key" translatable="false">cache</string>
+    <string name="database_key" translatable="false">database</string>
+
+    <string name="about_us_header">About us</string>
+    <string name="open_source_header">Open Source Libraries</string>
+    <string name="open_source_subtext">Libraries that we inspire!</string>
+    <string name="updates_header">Check for Updates</string>
+    <string name="delete_cache_header">Delete image cache</string>
+    <string name="delete_cache_subtext">Application will try loading all the contents again.</string>
+    <string name="danger_zone_header">Danger Zone</string>
+    <string name="danger_zone_summary">It is not recommended that you delete some important files for application.</string>
+    <string name="delete_entire_database_title">Delete entire database</string>
+    <string name="delete_entire_database_subtext">If so, all of your favorite and offline items will be removed permanently.</string>
+
+
+    <!-- Intent texts -->
+    <string name="mail_address">nuhkocaa@gmail.com</string>
+    <string name="send_with">Send with…</string>
+    <string name="share_with">Share with…</string>
+    <string name="open_with">Open with…</string>
+    <string name="share_exra_text">Hey traveler! Now download Trippo and plan your exciting trip! https://play.google.com/store/apps/details?id=%s</string>
+
+    <!-- About Page Texts -->
+    <string name="copy_right" translatable="false">Trippo © %1$d - All rights reserved.</string>
+    <string name="about_description">Trippo is your smart travel guide - it’s free and works offline! Our awesome algorithms crunch through millions of websites and reviews to deliver unique recommendations across 50,000 destinations worldwide! Personalize your trip by picking your favorite hotels, sights, activities and restaurants and book them seamlessly in our app! That’s not all, our city maps helps you find unique and exotic places around you so you can wander freely. <b>This app is powered by Triposo API.</b></string>
+
+    <string name="app_version">Version: %1$s</string>
+
+    <string name="connect_with_me" translatable="false">Connect with me</string>
+    <string name="email" translatable="false">nuhkocaa@gmail.com</string>
+    <string name="email_me">Email me</string>
+
+    <string name="personal_website" translatable="false">http://www.nuhkoca.com/</string>
+    <string name="visit_my_website">Visit my website</string>
+
+    <string name="follow_me_on_social_media">Follow me on social media</string>
+    <string name="personal_facebook" translatable="false">nuhkocaa</string>
+    <string name="add_me_on_facebook">Add me on Facebook</string>
+
+    <string name="personal_twitter" translatable="false">nuhkocaa_</string>
+    <string name="follow_me_on_twitter">Follow me on Twitter</string>
+
+    <string name="personal_youtube" translatable="false">UCigh7hafmSrsQZvv6PKQptw</string>
+    <string name="follow_me_on_youtube">Follow me on Youtube</string>
+
+    <string name="personal_play_store" translatable="false">9011472759199976374</string>
+    <string name="rate_me_on_google_play_store">Rate me on Google Play Store</string>
+
+    <string name="personal_instagram" translatable="false">nuhkocaa</string>
+    <string name="follow_me_on_instagram">Follow me on Instagram</string>
+
+    <string name="github" translatable="false">nuhkoca</string>
+    <string name="fork_me_on_github">Fork me on Github</string>
+
+    <string name="widget_go_text">Go</string>
+    <string name="widget_empty_view_text">As it seems you don\'t have any favorite item. Now open the app and add some items!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/nearby_places_header">
+
+        <ListPreference
+            android:defaultValue="@string/km_1500_radius_value"
+            android:entries="@array/radius_labels"
+            android:entryValues="@array/radius_values"
+            android:key="@string/radius_key"
+            android:title="@string/radius_title" />
+
+        <SwitchPreference
+            android:key="@string/sensor_key"
+            android:summary="@string/sensor_subtext"
+            android:title="@string/sensor_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/custom_outside_preference_category">
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/sightseeing_key"
+            android:title="@string/sightseeing_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/eat_drink_key"
+            android:title="@string/eat_and_drink_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/nightlife_key"
+            android:title="@string/nightlife_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/hotel_key"
+            android:title="@string/hotel_score_title" />
+
+        <SwitchPreference android:title="@string/bookable_title"
+            android:key="@string/bookable_key"
+            android:summary="@string/bookable_summary"
+            android:defaultValue="@string/bookable_disabled_value" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/custom_experience_preference_category">
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/tours_key"
+            android:title="@string/tours_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/activities_key"
+            android:title="@string/activities_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/multi_day_tours_key"
+            android:title="@string/multi_day_tours_score_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/day_trips_key"
+            android:title="@string/day_trips_title" />
+
+        <ListPreference
+            android:defaultValue="@string/seven_and_greater_value"
+            android:entries="@array/score_labels"
+            android:entryValues="@array/score_values"
+            android:key="@string/city_walking_key"
+            android:title="@string/city_walking_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/notifications_places_header" >
+
+        <SwitchPreference android:title="@string/notifications_places_header"
+            android:key="@string/notifications_key"
+            android:defaultValue="@string/notification_enabled_value" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/custom_browser_preference_category">
+
+        <SwitchPreference android:title="@string/webview_title"
+            android:key="@string/webview_key"
+            android:defaultValue="@string/external_browser_disabled_value" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/tts_header" >
+
+        <ListPreference android:title="@string/tts_title"
+            android:entries="@array/tts_lang_labels"
+            android:entryValues="@array/tts_lang_values"
+            android:key="@string/tts_key"
+            android:defaultValue="@string/tts_us_language_value" />
+
+        <Preference android:title="@string/tts_intent_title"
+            android:key="@string/tts_intent_key"
+            android:summary="@string/tts_intent_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/about_menu_text">
+
+        <Preference android:title="@string/about_us_header"
+            android:key="@string/about_key" />
+
+        <Preference android:title="@string/open_source_header"
+            android:summary="@string/open_source_subtext"
+            android:key="@string/open_source_key" />
+
+        <Preference android:title="@string/updates_header"
+            android:key="@string/updates_key" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/custom_danger_zone_preference_category" >
+
+        <Preference
+            android:layout="@layout/delete_cache_red_layout"
+            android:key="@string/cache_key" />
+
+        <Preference
+            android:layout="@layout/delete_database_red_layout"
+            android:key="@string/database_key" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

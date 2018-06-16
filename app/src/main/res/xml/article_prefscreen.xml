@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/tts_header" >
+
+        <ListPreference android:title="@string/tts_title"
+            android:entries="@array/tts_lang_labels"
+            android:entryValues="@array/tts_lang_values"
+            android:key="@string/tts_key"
+            android:defaultValue="@string/tts_us_language_value" />
+
+        <Preference android:title="@string/tts_intent_title"
+            android:key="@string/tts_intent_key"
+            android:summary="@string/tts_intent_summary" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

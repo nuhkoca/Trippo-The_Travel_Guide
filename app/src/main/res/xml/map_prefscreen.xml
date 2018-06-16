@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/nearby_places_header">
+
+        <ListPreference
+            android:defaultValue="@string/km_1500_radius_value"
+            android:entries="@array/radius_labels"
+            android:entryValues="@array/radius_values"
+            android:key="@string/radius_key"
+            android:title="@string/radius_title" />
+
+        <SwitchPreference
+            android:checked="true"
+            android:key="@string/sensor_key"
+            android:summary="@string/sensor_subtext"
+            android:title="@string/sensor_title" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,438 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="android:windowActivityTransitions">true</item>
+    </style>
+
+    <!-- Splash Theme -->
+    <style name="AppTheme.Launcher" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowBackground">@drawable/splash_screen_bg</item>
+    </style>
+
+    <!-- Country Details Theme -->
+    <style name="AppTheme.Details" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+    <!-- Search Button Theme -->
+    <style name="SearchButtonTheme">
+        <item name="android:drawableStart">@drawable/ic_search_location</item>
+        <item name="android:text">@string/main_button_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/search_button_selector</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <!-- Browse Button Theme -->
+    <style name="BrowseButtonTheme">
+        <item name="android:text">@string/browse_button_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@drawable/browse_button_selector</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+    </style>
+
+    <!-- Nearby Button Theme -->
+    <style name="NearbyButtonTheme">
+        <item name="android:text">@string/nearby_button_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:background">@color/colorBlack</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Main Background Theme -->
+    <style name="MainBackgroundTheme">
+        <item name="android:src">@drawable/main_bg</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <!-- Country Name Theme -->
+    <style name="CountryNameTheme">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:paddingEnd">56dp</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Country Description Theme -->
+    <style name="CountryDescriptionTheme">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/secondaryText</item>
+        <item name="android:lines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <!-- Catalogue RecyclerView Theme -->
+    <style name="CatalogueRecyclerViewTheme">
+        <item name="android:visibility">visible</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:scrollbarSize">@dimen/scrollbar_size</item>
+        <item name="android:clipToPadding">false</item>
+    </style>
+
+    <!-- Catalogue Error Text Theme -->
+    <style name="CatalogueErrorTextTheme">
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTop">@drawable/ic_no_connection</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:text">@string/response_error_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/primaryText</item>
+    </style>
+
+    <!-- Catalogue Error Button Theme-->
+    <style name="CatalogueErrorButtonTheme">
+        <item name="android:padding">8dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:text">@string/retry_text</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Catalogue List Error Text Theme -->
+    <style name="CatalogueListErrorTextTheme">
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:text">@string/response_list_error_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/primaryText</item>
+    </style>
+
+    <!-- Nearby Explore Header Text Theme -->
+    <style name="NearbyExploreHeaderTextTheme">
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:text">@string/explore_this_area</item>
+    </style>
+
+    <!-- Nearby Items Theme -->
+    <style name="NearbyItemsTheme">
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Collapsing Title Theme -->
+    <style name="CollapsingTextTheme" parent="Base.TextAppearance.AppCompat.Widget.ActionBar.Title"/>
+    <style name="CollapsingTextTheme.Inverse">
+        <item name="android:textSize">30sp</item>
+    </style>
+
+    <!-- FloatingActionButton Theme -->
+    <style name="FloatingActionButtonTheme">
+        <item name="android:elevation">@dimen/fab_elevation</item>
+        <item name="pressedTranslationZ">@dimen/fab_press_translation_z</item>
+        <item name="android:layout_margin">@dimen/fab_margin</item>
+        <item name="layout_anchorGravity">bottom|right|end</item>
+        <item name="android:backgroundTint">@color/colorAccent</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="fabSize">normal</item>
+        <item name="rippleColor">@color/fabPressedColor</item>
+        <item name="borderWidth">0dp</item>
+        <item name="android:src">@drawable/ic_favorite_white_48dp</item>
+    </style>
+
+    <!-- ProgressBar Theme -->
+    <style name="ProgressBarTheme">
+        <item name="android:visibility">visible</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:indeterminateTint">@color/secondaryText</item>
+    </style>
+
+    <!-- Country Detail Info Text Theme -->
+    <style name="CountryDetailInfoTextTheme">
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:visibility">visible</item>
+        <item name="android:text">@string/country_detil_info_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/primaryText</item>
+    </style>
+
+    <!-- Country Detail Button Theme -->
+    <style name="CountryDetailButtonTheme">
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/secondaryText</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:background">@drawable/country_detail_button_selector</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <!-- Country Details Desc Theme-->
+    <style name="CountryDetailDescTheme">
+        <item name="android:layout_marginBottom">32dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- Country Detail Content Header Theme -->
+    <style name="CountryDetailContentHeaderTheme">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
+
+    <!-- Overflow Menu Theme -->
+    <style name="OverflowMenuTheme">
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:focusable">true</item>
+        <item name="android:scaleType">centerCrop</item>
+        <item name="android:src">@drawable/ic_more</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+
+    <!-- City Description Theme -->
+    <style name="CityDescriptionTheme">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/secondaryText</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <!-- City Distance Theme -->
+    <style name="CityDistanceTheme">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/secondaryText</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Distance Info Text Theme -->
+    <style name="DistanceInfoTextTheme">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/secondaryText</item>
+        <item name="android:background">#c9c8c8</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:visibility">visible</item>
+    </style>
+
+    <!-- Tag Group Theme -->
+    <style name="TagGroupTheme">
+        <item name="android:paddingEnd">8dp</item>
+        <item name="container_enable_drag">false</item>
+        <item name="horizontal_interval">3dp</item>
+        <item name="vertical_interval">3dp</item>
+        <item name="tag_clickable">false</item>
+        <item name="container_background_color">@android:color/transparent</item>
+        <item name="container_border_color">@color/windowBackground</item>
+        <item name="tag_background_color">@color/colorWhite</item>
+        <item name="tag_border_color">@color/tagGroupBorderColor</item>
+        <item name="tag_text_color">@color/tagGroupBorderColor</item>
+        <item name="tag_text_size">11sp</item>
+        <item name="tag_border_width">0.5dp</item>
+        <item name="tag_horizontal_padding">8dp</item>
+        <item name="tag_vertical_padding">8dp</item>
+        <item name="tag_theme">none</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="container_max_lines">1</item>
+    </style>
+
+    <!-- Content Info Text Theme -->
+    <style name="ContentInfoTextTheme">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- Content Info Assistant Text Theme -->
+    <style name="ContentInfoAssistantTextTheme">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:layout_gravity">bottom|end</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:text">@string/and_up_suffix</item>
+    </style>
+
+    <!-- Content Description Theme -->
+    <style name="ContentDescriptionTheme">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/secondaryText</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <!-- Widget Error Button Theme -->
+    <style name="WidgetErrorButtonTheme" >
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:background">@drawable/empty_view_button_background</item>
+        <item name="android:text">@string/widget_go_text</item>
+    </style>
+
+    <!-- Article Detail Text Theme -->
+    <style name="ArticleDetailTextTheme">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:paddingTop">56dp</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
+
+    <!-- TextView Sign Method Theme -->
+    <style name="TextViewSignMethodTheme">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:text">@string/sign_in_method_text</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:paddingTop">24dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- TextView Current User Theme -->
+    <style name="TextViewCurrentUserTheme">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+
+    <!-- TextView Sign in Header Theme -->
+    <style name="TextViewSignInTheme">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:text">@string/auth_header</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:paddingTop">24dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- TextView Sign in Subtext Theme -->
+    <style name="TextViewSubtextTheme">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:text">@string/auth_subtext</item>
+        <item name="android:textColor">@color/primaryText</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <!-- TextView Link Theme -->
+    <style name="TextViewLinkTheme">
+        <item name="android:padding">14dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+</resources>

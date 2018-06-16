@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/add_to_favorites_menu"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="@string/add_to_favorites_menu_text" />
+
+    <item
+        android:id="@+id/show_in_map_menu"
+        android:orderInCategory="101"
+        app:showAsAction="never"
+        android:title="@string/show_in_map_menu_text" />
+</menu>

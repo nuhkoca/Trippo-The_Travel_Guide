@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menuCommonSettings"
+        android:title="@string/settings_menu_text"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menuCommonFeedback"
+        android:title="@string/feedback_menu_text"
+        app:showAsAction="never" />
+
+</menu>

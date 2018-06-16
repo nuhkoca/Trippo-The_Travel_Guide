@@ -1,0 +1,142 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.nuhkoca.trippo"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "BASE_URL", BASE_URL
+        buildConfigField "String", "ACCOUNT_ID", ACCOUNT_ID
+        buildConfigField "String", "API_TOKEN", API_TOKEN
+        buildConfigField "String", "GOOGLE_PLACES_BASE_URL", GOOGLE_PLACES_BASE_URL
+    }
+
+    signingConfigs {
+        releaseConfig {
+            keyAlias 'Mobile Movement Team'
+            keyPassword 'nuhkoca'
+            storeFile file("$rootDir/keystore/trippo_keystore.jks")
+            storePassword 'nuhkoca'
+        }
+        debugConfig {
+            keyAlias 'Mobile Movement Team'
+            keyPassword 'nuhkoca'
+            storeFile file("$rootDir/keystore/trippo_keystore.jks")
+            storePassword 'nuhkoca'
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.releaseConfig
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.debugConfig
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled true
+    }
+
+    allprojects {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    //Support Lib
+    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportVersion"
+    implementation "com.android.support:support-v4:$rootProject.ext.supportVersion"
+    implementation "com.android.support:design:$rootProject.ext.supportVersion"
+    implementation "com.android.support:cardview-v7:$rootProject.ext.supportVersion"
+    implementation "com.android.support:recyclerview-v7:$rootProject.ext.supportVersion"
+    implementation "com.android.support:preference-v14:$rootProject.ext.supportVersion"
+    implementation "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintVersion"
+
+    //Room
+    implementation "android.arch.persistence.room:runtime:$rootProject.ext.archVersion"
+    annotationProcessor "android.arch.persistence.room:compiler:$rootProject.ext.archVersion"
+
+    //Paging
+    implementation "android.arch.paging:runtime:$rootProject.ext.pagingVersion"
+
+    //Lifecycle
+    implementation "android.arch.lifecycle:extensions:$rootProject.ext.lifeCycleVersion"
+    annotationProcessor "android.arch.lifecycle:compiler:$rootProject.ext.lifeCycleVersion"
+    testImplementation "android.arch.core:core-testing:$rootProject.ext.lifeCycleVersion"
+
+    //Square Libs
+    implementation "com.jakewharton.timber:timber:$rootProject.ext.timberVersion"
+    implementation "com.github.bumptech.glide:glide:$rootProject.ext.glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.ext.glideVersion"
+    implementation("com.github.bumptech.glide:okhttp3-integration:$rootProject.ext.glideVersion") {
+        exclude group: 'glide-parent'
+    }
+
+    //Retrofit
+    implementation "com.squareup.retrofit2:adapter-rxjava:$rootProject.ext.rxJavaVersion"
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.rxJavaVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.ext.rxJavaVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okHttpVersion"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$rootProject.ext.leakCanaryVersion"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leakCanaryVersion"
+
+    //RxJava
+    implementation "io.reactivex:rxjava:$rootProject.ext.rxJavaLibVersion"
+    implementation "io.reactivex:rxandroid:$rootProject.ext.rxAndroidVersion"
+
+    //Stetho
+    implementation "com.facebook.stetho:stetho:$rootProject.ext.stethoVersion"
+    implementation "com.facebook.stetho:stetho-okhttp3:$rootProject.ext.stethoVersion"
+
+    //Firebase
+    implementation "com.google.firebase:firebase-messaging:$rootProject.ext.firebaseVersion"
+    implementation "com.google.firebase:firebase-core:$rootProject.ext.firebaseCoreVersion"
+    implementation "com.google.firebase:firebase-firestore:$rootProject.ext.firestoreVersion"
+    implementation "com.crashlytics.sdk.android:crashlytics:$rootProject.ext.crashlyticsVersion"
+    implementation "com.google.firebase:firebase-ads:$rootProject.ext.adsVersion"
+    implementation "com.google.firebase:firebase-auth:$rootProject.ext.firebaseAuthVersion"
+
+    //Google Play Services
+    implementation "com.google.android.gms:play-services-maps:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-location:$rootProject.ext.playServicesVersion"
+    implementation "com.google.maps.android:android-maps-utils:$rootProject.ext.googleMapsUtilsVersion"
+    implementation "com.google.android.gms:play-services-auth:$rootProject.ext.playServicesVersion"
+
+    //Other
+    implementation "com.github.apl-devs:appintro:$rootProject.ext.appIntroVersion"
+    implementation "pub.devrel:easypermissions:$rootProject.ext.easyPermissionVersion"
+    implementation "com.github.medyo:android-about-page:$rootProject.ext.aboutPageVersion"
+    implementation("com.mikepenz:aboutlibraries:$rootProject.ext.aboutLibrariesVersion") {
+        transitive = true
+    }
+    implementation "co.lujun:androidtagview:$rootProject.ext.tagGroupVersion"
+    implementation "de.hdodenhof:circleimageview:$rootProject.ext.circleImageViewVersion"
+
+    //Test
+    androidTestImplementation "com.android.support:support-annotations:$rootProject.ext.supportVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
+    androidTestImplementation "com.android.support.test:rules:$rootProject.ext.testVersion"
+    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.testVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$rootProject.ext.espressoVersion"
+    testImplementation "junit:junit:$rootProject.ext.JUnitVersion"
+    implementation "com.android.support.test.espresso:espresso-idling-resource:$rootProject.ext.espressoVersion"
+}
+
+apply plugin: 'com.google.gms.google-services'
