@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.ui.AuthActivity;
 import com.nuhkoca.trippo.ui.MainActivity;
 import com.nuhkoca.trippo.ui.OnboardingActivity;
 import com.nuhkoca.trippo.util.ScreenSizer;

@@ -120,7 +120,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
                 @Override
                 public void run() {
                     if (!TextUtils.isEmpty(mType)) {
-                        nearbyPlace(mType);
+                        nearbyPlace(mType, loadMapPreferencesFromSettings(mSharedPreferences));
                     }
                 }
             }, 1000);
@@ -345,7 +345,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(mMapZoom));
 
-        mActivityNearbyBinding.lBottomSheet.clBottomSheet.setEnabled(false);
+        Objects.requireNonNull(mActivityNearbyBinding.lBottomSheet).clBottomSheet.setEnabled(false);
     }
 
     private synchronized void buildGoogleAPIClient() {
@@ -414,10 +414,18 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, getLocationCallback(), Looper.myLooper());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, getLocationCallback(), Looper.myLooper());
+            } else {
+                locationPermissionsTask();
+
+                if (hasLocationPermissions()) {
+                    LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, getLocationCallback(), Looper.myLooper());
+                }
+            }
         } else {
-            locationPermissionsTask();
+            LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, getLocationCallback(), Looper.myLooper());
         }
     }
 
@@ -509,18 +517,18 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         if (!isGPSEnabled()) {
             showGPSAlert();
         } else {
-            nearbyPlace(placeHolder);
+            nearbyPlace(placeHolder, loadMapPreferencesFromSettings(mSharedPreferences));
         }
 
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
-    private void nearbyPlace(final String type) {
+    private void nearbyPlace(final String type, String radius) {
         String location = mLatitude + "," + mLongitude;
 
         mType = type;
 
-        mNearbyActivityViewModel.findNearbyPlaces(location, loadMapPreferencesFromSettings(mSharedPreferences), mType);
+        mNearbyActivityViewModel.findNearbyPlaces(location, radius, mType);
         mNearbyActivityViewModel.getNearbyPlaces().observe(this, new Observer<PlacesWrapper>() {
             @Override
             public void onChanged(@Nullable PlacesWrapper placesWrapper) {
@@ -582,7 +590,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         if (key.equals(getString(R.string.radius_key))) {
             if (!TextUtils.isEmpty(mType)) {
                 loadMapPreferencesFromSettings(sharedPreferences);
-                nearbyPlace(mType);
+                nearbyPlace(mType, loadMapPreferencesFromSettings(mSharedPreferences));
             }
         }
     }
@@ -601,31 +609,6 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
                         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
                 });
-    }
-
-    @Override
-    public void onPause() {
-        if (mGoogleAPIClient != null) {
-            mGoogleAPIClient.disconnect();
-        }
-
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        mNearbyActivityViewModel.onCleared();
-
-        if (mGoogleAPIClient != null)
-            mGoogleAPIClient.disconnect();
-
-        if (mMap != null)
-            mMap.clear();
-
-        if (mMarker != null)
-            mMarker.remove();
-
-        super.onStop();
     }
 
     @Override

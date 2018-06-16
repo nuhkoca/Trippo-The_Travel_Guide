@@ -52,7 +52,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
 
         mReqCode = getIntent().getIntExtra(Constants.PARENT_ACTIVITY_REQ_KEY, 0);
 
-        if (mReqCode > 0) {
+        if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
             ActionBar actionBar = getSupportActionBar();
 
             if (actionBar != null) {
@@ -235,7 +235,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
             case android.R.id.home:
                 supportFinishAfterTransition();
 
-                if (mReqCode > 0) {
+                if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
                     NavUtils.navigateUpFromSameTask(this);
                 } else {
                     super.onBackPressed();

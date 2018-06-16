@@ -111,11 +111,13 @@ public class TrippoApp extends Application {
         FirebaseApp.initializeApp(this);
         String token = FirebaseInstanceId.getInstance().getToken();
 
-        if (!TextUtils.isEmpty(token)) {
-            SharedPreferenceUtil.getInstance().addTokenToSharedPreference(token);
+        if (!BuildConfig.DEBUG) {
+            if (!TextUtils.isEmpty(token)) {
+                SharedPreferenceUtil.getInstance().addTokenToSharedPreference(token);
 
-            if (TextUtils.isEmpty(SharedPreferenceUtil.getInstance().getTokenFromSharedPreference())) {
-                SharedPreferenceUtil.getInstance(token, 1).checkAndSaveToken();
+                if (TextUtils.isEmpty(SharedPreferenceUtil.getInstance().getTokenFromSharedPreference())) {
+                    SharedPreferenceUtil.getInstance(token, 1).checkAndSaveToken();
+                }
             }
         }
     }

@@ -30,7 +30,6 @@ You also need browser and API keys in order to use Google Maps with Nearby Place
 - [x] Users can find nearby places up to 5km.
 - [x] 225 countries are available in total.
 - [x] Users can add any country to their favorite lists.
-- [x] Added Day/Night Mode.
 - [x] A comprehensive detail page for each of the countries helps you out to find everything.
 - [x] Users can book any activity by activating bookable option.
 - [x] Users can show any landmark/country in the map.

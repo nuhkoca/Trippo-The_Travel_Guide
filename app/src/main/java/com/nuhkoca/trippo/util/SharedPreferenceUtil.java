@@ -56,15 +56,17 @@ public class SharedPreferenceUtil {
     }
 
     public boolean isFirstRun() {
-        boolean isFirst = mSharedPref.getBoolean(Constants.FIRST_RUN_KEY, true); //false
-        boolean isOnboardingPassed = mSharedPref.getBoolean(Constants.ONBOARD_PASSED_KEY, false);
+        int savedVersionCode = mSharedPref.getInt(Constants.VERSION_CODE_KEY, -1);
 
-        if (isFirst && BuildConfig.VERSION_CODE == 1 && !isOnboardingPassed) {
-            mSharedPref.edit().putBoolean(Constants.FIRST_RUN_KEY, true).apply();
+        if (BuildConfig.VERSION_CODE == savedVersionCode) {
+            return false;
+        } else if (savedVersionCode == -1) {
             return true;
+        } else if (BuildConfig.VERSION_CODE > savedVersionCode) {
+            return false;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public void checkAndSaveToken() {

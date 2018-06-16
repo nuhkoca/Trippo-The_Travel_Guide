@@ -30,7 +30,6 @@ import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceResult;
 import com.nuhkoca.trippo.ui.WebViewActivity;
 import com.nuhkoca.trippo.ui.content.ExperienceContentType;
-import com.nuhkoca.trippo.ui.content.second.OutsideContentActivity;
 import com.nuhkoca.trippo.ui.content.third.paging.ExperienceContentResultDataSourceFactory;
 import com.nuhkoca.trippo.ui.settings.ActivityType;
 import com.nuhkoca.trippo.ui.settings.SettingsActivity;

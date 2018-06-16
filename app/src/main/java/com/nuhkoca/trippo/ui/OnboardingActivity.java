@@ -12,8 +12,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import com.github.paolorotolo.appintro.AppIntro;
+import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.helper.Constants;
+import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.List;
 
@@ -26,11 +28,14 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
     private SharedPreferences.Editor mEditor;
     private SharedPreferences mSharedPreferences;
 
+    private SharedPreferenceUtil mSharedPreferenceUtil;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mSharedPreferences = getSharedPreferences(Constants.TRIPPO_SHARED_PREF, MODE_PRIVATE);
+        mSharedPreferenceUtil = SharedPreferenceUtil.getInstance();
 
         addSlide(OnboardingFragment.newInstance(getString(R.string.onboarding_first_title),
                 getString(R.string.onboarding_first_desc),
@@ -76,12 +81,11 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
                     != PackageManager.PERMISSION_GRANTED) {
                 locationPermissionsTask();
             } else {
-                mEditor.putBoolean(Constants.ONBOARD_PASSED_KEY, true);
-                mEditor.putBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, false);
+                mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
 
                 Intent mainIntent;
 
-                if (mSharedPreferences.getBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, true)) {
+                if (mSharedPreferenceUtil.isFirstRun()) {
                     mainIntent = new Intent(OnboardingActivity.this, AuthActivity.class);
                 } else {
                     mainIntent = new Intent(OnboardingActivity.this, MainActivity.class);
@@ -95,8 +99,7 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
                 startActivity(mainIntent);
             }
         } else {
-            mEditor.putBoolean(Constants.ONBOARD_PASSED_KEY, true);
-            mEditor.putBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, false);
+            mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
 
             Intent mainIntent;
 
@@ -127,9 +130,6 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
 
     @AfterPermissionGranted(Constants.LOCATION_PERMISSIONS_REQ_CODE)
     public void locationPermissionsTask() {
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.TRIPPO_SHARED_PREF, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
         if (!hasLocationPermissions()) {
             EasyPermissions.requestPermissions(
                     this,
@@ -137,14 +137,12 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
                     Constants.LOCATION_PERMISSIONS_REQ_CODE,
                     Constants.LOCATION_PERMISSIONS);
 
-            editor.putBoolean(Constants.ONBOARD_PASSED_KEY, false);
-            editor.putBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, false);
+            mEditor.putInt(Constants.VERSION_CODE_KEY, -1);
         } else {
-            editor.putBoolean(Constants.ONBOARD_PASSED_KEY, true);
-            editor.putBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, true);
+            mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
         }
 
-        editor.apply();
+        mEditor.apply();
     }
 
     @Override
@@ -158,19 +156,16 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
         mEditor = mSharedPreferences.edit();
 
-        mEditor.putBoolean(Constants.ONBOARD_PASSED_KEY, true);
-        mEditor.putBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, true);
-        mEditor.apply();
+        mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
 
         Intent mainIntent;
 
-        if (mSharedPreferences.getBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, true)) {
+        if (mSharedPreferenceUtil.isFirstRun()) {
             mainIntent = new Intent(OnboardingActivity.this, AuthActivity.class);
-        }else {
+        } else {
             mainIntent = new Intent(OnboardingActivity.this, MainActivity.class);
         }
 
-        mEditor.putBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, false);
         mEditor.apply();
 
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
