@@ -70,7 +70,9 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         mActivityHandler.removeCallbacks(mRunnable);
-        mSplashActivityViewModel.onCleared();
+        if (mSplashActivityViewModel != null) {
+            mSplashActivityViewModel.onCleared();
+        }
         super.onDestroy();
     }
 }

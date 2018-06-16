@@ -59,10 +59,13 @@ public class SharedPreferenceUtil {
         int savedVersionCode = mSharedPref.getInt(Constants.VERSION_CODE_KEY, -1);
 
         if (BuildConfig.VERSION_CODE == savedVersionCode) {
+            // normal run
             return false;
         } else if (savedVersionCode == -1) {
+            // first run
             return true;
         } else if (BuildConfig.VERSION_CODE > savedVersionCode) {
+            //update
             return false;
         } else {
             return false;

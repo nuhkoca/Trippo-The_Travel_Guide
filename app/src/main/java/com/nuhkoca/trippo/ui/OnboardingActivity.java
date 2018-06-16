@@ -154,8 +154,6 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        mEditor = mSharedPreferences.edit();
-
         mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
 
         Intent mainIntent;

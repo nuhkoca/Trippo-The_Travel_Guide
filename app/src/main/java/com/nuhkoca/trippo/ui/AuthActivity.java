@@ -51,13 +51,18 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         setTitle(getString(R.string.auth_name));
 
         mReqCode = getIntent().getIntExtra(Constants.PARENT_ACTIVITY_REQ_KEY, 0);
+        ActionBar actionBar = getSupportActionBar();
 
         if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
-            ActionBar actionBar = getSupportActionBar();
 
             if (actionBar != null) {
                 actionBar.setDisplayShowHomeEnabled(true);
                 actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+        }else {
+            if (actionBar != null) {
+                actionBar.setDisplayShowHomeEnabled(false);
+                actionBar.setDisplayHomeAsUpEnabled(false);
             }
         }
 

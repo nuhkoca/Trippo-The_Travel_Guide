@@ -392,37 +392,6 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
         Bundle ttsParams = new Bundle();
         ttsParams.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, ArticleDetailActivity.this.getPackageName());
 
-        mTTS.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-            @Override
-            public void onStart(String utteranceId) {
-
-            }
-
-            @Override
-            public void onDone(String utteranceId) {
-                //Speaking completed
-
-                if (utteranceId.equals(Constants.TRIPPO_UTTRANCE_ID)) {
-                    AppsExecutor.mainThread().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_play_arrow_white_72dp);
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onError(String utteranceId) {
-
-            }
-
-            @Override
-            public void onError(String utteranceId, int errorCode) {
-                Timber.d("Error code: %s ", String.valueOf(errorCode));
-            }
-        });
-        
         int position = 0;
         int sizeOfChar = charSequence.length();
         String content = charSequence.substring(position, sizeOfChar);
@@ -432,18 +401,55 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
                 String temp;
 
                 try {
-
                     temp = content.substring(charSequence.lastIndexOf(reMatcher.group()), charSequence.indexOf(reMatcher.group()) + reMatcher.group().length());
                     mTTS.speak(temp, TextToSpeech.QUEUE_ADD, ttsParams, Constants.TRIPPO_UTTRANCE_ID);
+                    mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_stop_white_72dp);
 
                 } catch (Exception e) {
+                    Timber.d(e);
+
                     temp = content.substring(0, content.length());
                     mTTS.speak(temp, TextToSpeech.QUEUE_ADD, ttsParams, Constants.TRIPPO_UTTRANCE_ID);
+                    mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_stop_white_72dp);
                     break;
                 }
             }
         } else {
             mTTS.speak(content, TextToSpeech.QUEUE_FLUSH, ttsParams, Constants.TRIPPO_UTTRANCE_ID);
+            mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_stop_white_72dp);
+
+            mTTS.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {
+
+                }
+
+                @Override
+                public void onDone(String utteranceId) {
+                    //Speaking completed
+
+                    Timber.d("Utterance completed");
+
+                    if (utteranceId.equals(Constants.TRIPPO_UTTRANCE_ID)) {
+                        AppsExecutor.mainThread().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_play_arrow_white_72dp);
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(String utteranceId) {
+
+                }
+
+                @Override
+                public void onError(String utteranceId, int errorCode) {
+                    Timber.d("Error code: %s ", String.valueOf(errorCode));
+                }
+            });
         }
     }
 

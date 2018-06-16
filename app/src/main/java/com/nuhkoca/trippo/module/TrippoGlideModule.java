@@ -43,7 +43,7 @@ public class TrippoGlideModule extends AppGlideModule {
 
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
-        int memoryCacheSizeBytes = 1024 * 1024 * 200; // 200mb cache
+        int memoryCacheSizeBytes = 1024 * 1024 * 300; // 300mb cache
         builder.setMemoryCache(new LruResourceCache(memoryCacheSizeBytes));
         builder.setDiskCache(new InternalCacheDiskCacheFactory(context, memoryCacheSizeBytes));
         builder.setDefaultRequestOptions(requestOptions(context));
