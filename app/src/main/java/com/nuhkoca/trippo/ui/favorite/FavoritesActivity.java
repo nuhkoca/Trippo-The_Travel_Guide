@@ -204,7 +204,7 @@ public class FavoritesActivity extends AppCompatActivity implements ICatalogueIt
                     }
 
                 } else {
-                    if (mReqCode > 0) {
+                    if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
                         NavUtils.navigateUpFromSameTask(this);
                     } else {
                         super.onBackPressed();

@@ -4,6 +4,8 @@
 
 :boom: One travel guide for the whole world. It's free.
 
+[![Build Status](https://travis-ci.org/nuhkoca/Trippo-The_Travel_Guide.svg?branch=master)](https://travis-ci.org/nuhkoca/Trippo-The_Travel_Guide)
+
 Trippo is your smart travel guide - it’s free and works offline, too! Our awesome algorithms crunch through millions of websites and reviews to deliver unique recommendations across 50,000 destinations worldwide! Personalize your trip by picking your favorite hotels, sights, activities and restaurants and book them seamlessly in our app! You can skim through tours, locations, POIs, city walks, articles and so on. This guide will save you from a serious headache!
 
 This project is powered by **Triposo.com.** To get your own Account Id and Token, please visit [Triposo](https://www.triposo.com/)
@@ -31,7 +33,7 @@ You also need browser and API keys in order to use Google Maps with Nearby Place
 - [x] 225 countries are available in total.
 - [x] Users can add any country to their favorite lists.
 - [x] A comprehensive detail page for each of the countries helps you out to find everything.
-- [x] Users can book any activity by activating bookable option.
+- [x] Users can seamlessly book any event by activating bookable option.
 - [x] Users can show any landmark/country in the map.
 - [x] The app reads too long articles to users.
 - [x] Users receive remindful notifications. They can also switch off notifications if wish.

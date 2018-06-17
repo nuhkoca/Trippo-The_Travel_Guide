@@ -91,7 +91,7 @@ public class AboutActivity extends AppCompatActivity {
 
                 int reqCode = getIntent().getIntExtra(Constants.PARENT_ACTIVITY_REQ_KEY, 0);
 
-                if (reqCode > 0) {
+                if (reqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
                     NavUtils.navigateUpFromSameTask(this);
                 } else {
                     super.onBackPressed();

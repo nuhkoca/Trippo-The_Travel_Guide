@@ -59,15 +59,15 @@
             android:name=".ui.AboutActivity"
             android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".ui.content.first.FirstContentActivity"
+            android:name=".ui.content.feature.FirstContentActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.CountryDetailActivity" />
         <activity
-            android:name=".ui.content.second.OutsideContentActivity"
+            android:name=".ui.content.outside.OutsideContentActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.CountryDetailActivity" />
         <activity
-            android:name=".ui.content.third.ExperienceContentActivity"
+            android:name=".ui.content.experience.ExperienceContentActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.CountryDetailActivity" />
         <activity android:name=".ui.WebViewActivity" />
@@ -75,13 +75,13 @@
             android:name=".ui.favorite.FavoritesActivity"
             android:parentActivityName=".ui.searchable.SearchableActivity" />
         <activity
-            android:name=".ui.content.fifth.ArticleActivity"
+            android:name=".ui.content.article.ArticleActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.CountryDetailActivity" />
         <activity
-            android:name=".ui.content.fifth.ArticleDetailActivity"
+            android:name=".ui.content.article.ArticleDetailActivity"
             android:keepScreenOn="true"
-            android:parentActivityName=".ui.content.fifth.ArticleActivity"
+            android:parentActivityName=".ui.content.article.ArticleActivity"
             android:theme="@style/AppTheme.Details" />
         <activity android:name=".ui.AuthActivity"
             android:parentActivityName=".ui.MainActivity" />

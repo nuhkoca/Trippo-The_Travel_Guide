@@ -98,7 +98,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (itemThatWasClicked) {
             case R.id.tvSkipNow:
-                if (mReqCode > 0) {
+                if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
                     finish();
                 } else {
 

@@ -162,7 +162,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
             case android.R.id.home:
                 supportFinishAfterTransition();
 
-                if (mReqCode > 0) {
+                if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
                     NavUtils.navigateUpFromSameTask(this);
                 } else {
                     super.onBackPressed();
@@ -197,7 +197,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (mReqCode > 0) {
+                if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
                     mBottomState = mBottomSheetBehavior.getState();
                 } else {
                     if (newState == BottomSheetBehavior.STATE_DRAGGING) {
@@ -222,7 +222,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         mActivityNearbyBinding.lBottomSheet.clBottomSheet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mReqCode > 0) {
+                if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
                     toggleBottomSheet();
                 }
             }

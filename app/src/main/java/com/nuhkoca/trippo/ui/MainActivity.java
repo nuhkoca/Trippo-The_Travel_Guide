@@ -55,9 +55,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
+                if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
+                    mInterstitialAd = null;
+                    MainActivity.super.onBackPressed();
+                } else {
+                    MainActivity.super.onBackPressed();
+                }
+
                 super.onAdClosed();
-                mInterstitialAd = null;
-                MainActivity.super.onBackPressed();
             }
         });
     }
@@ -131,9 +136,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (mBackPressed + timeDelay > System.currentTimeMillis()) {
             supportFinishAfterTransition();
-            AppWidgetUtils.update(MainActivity.this);
 
-            if (mInterstitialAd.isLoaded()) {
+            if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
                 mInterstitialAd.show();
             } else {
                 super.onBackPressed();
@@ -144,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.LENGTH_SHORT).show();
         }
 
+        AppWidgetUtils.update(MainActivity.this);
         mBackPressed = System.currentTimeMillis();
     }
 

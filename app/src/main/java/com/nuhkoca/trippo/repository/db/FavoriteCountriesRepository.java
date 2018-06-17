@@ -23,7 +23,7 @@ public class FavoriteCountriesRepository {
         mFavoriteCountriesDao = trippoDatabase.favoriteCountriesDao();
     }
 
-    public List<FavoriteCountries> getAllForWidget(){
+    public List<FavoriteCountries> getAllForWidget() {
         return mFavoriteCountriesDao.getAllForWidget();
     }
 

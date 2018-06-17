@@ -32,16 +32,14 @@ import com.nuhkoca.trippo.ui.content.ArticleContentType;
 import com.nuhkoca.trippo.ui.content.ContentType;
 import com.nuhkoca.trippo.ui.content.ExperienceContentType;
 import com.nuhkoca.trippo.ui.content.OutsideContentType;
-import com.nuhkoca.trippo.ui.content.fifth.ArticleActivity;
-import com.nuhkoca.trippo.ui.content.first.FirstContentActivity;
-import com.nuhkoca.trippo.ui.content.second.OutsideContentActivity;
-import com.nuhkoca.trippo.ui.content.third.ExperienceContentActivity;
+import com.nuhkoca.trippo.ui.content.article.ArticleActivity;
+import com.nuhkoca.trippo.ui.content.feature.FirstContentActivity;
+import com.nuhkoca.trippo.ui.content.outside.OutsideContentActivity;
+import com.nuhkoca.trippo.ui.content.experience.ExperienceContentActivity;
 import com.nuhkoca.trippo.util.AlertDialogUtils;
 import com.nuhkoca.trippo.util.AppWidgetUtils;
 import com.nuhkoca.trippo.util.ScreenSizer;
 import com.nuhkoca.trippo.util.SnackbarUtils;
-
-import timber.log.Timber;
 
 public class CountryDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -265,7 +263,7 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
             case android.R.id.home:
                 supportFinishAfterTransition();
 
-                if (mReqCode > 0) {
+                if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
                     NavUtils.navigateUpFromSameTask(this);
                 } else {
                     super.onBackPressed();

@@ -6,7 +6,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.content.first.FirstContentActivity">
+        tools:context=".ui.content.feature.FirstContentActivity">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvCommonContent"
