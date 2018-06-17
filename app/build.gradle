@@ -21,13 +21,13 @@ android {
         releaseConfig {
             keyAlias 'Mobile Movement Team'
             keyPassword 'nuhkoca'
-            storeFile file("$rootDir/keystore/trippo_keystore.jks")
+            storeFile file("$rootDir/trippo_keystore.jks")
             storePassword 'nuhkoca'
         }
         debugConfig {
             keyAlias 'Mobile Movement Team'
             keyPassword 'nuhkoca'
-            storeFile file("$rootDir/keystore/trippo_keystore.jks")
+            storeFile file("$rootDir/trippo_keystore.jks")
             storePassword 'nuhkoca'
         }
     }
