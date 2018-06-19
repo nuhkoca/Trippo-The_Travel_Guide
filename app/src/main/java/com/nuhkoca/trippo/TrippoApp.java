@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nuhkoca.trippo.util.DeviceUtils;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -111,7 +112,7 @@ public class TrippoApp extends Application {
         FirebaseApp.initializeApp(this);
         String token = FirebaseInstanceId.getInstance().getToken();
 
-        if (!BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG && !DeviceUtils.isEmulator()) {
             if (!TextUtils.isEmpty(token)) {
                 SharedPreferenceUtil.getInstance().addTokenToSharedPreference(token);
 

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NavUtils;
@@ -155,18 +156,29 @@ public class FavoritesActivity extends AppCompatActivity implements ICatalogueIt
         }
 
         if (!TextUtils.isEmpty(sSearchString)) {
-            mSearchView.setQuery(sSearchString, false);
-
             mSearchView.setIconified(false);
             mSearchView.setFocusable(true);
             mSearchView.requestFocusFromTouch();
 
             menu.findItem(R.id.search).expandActionView();
+
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    mSearchView.setQuery(sSearchString, true);
+                }
+            });
         }
 
         mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                if (sIsRotatedAndSearchViewStated) {
+                    if (getAdapter() != null) {
+                        getAdapter().getFilter().filter(query);
+                    }
+                }
+
                 return false;
             }
 
@@ -384,15 +396,6 @@ public class FavoritesActivity extends AppCompatActivity implements ICatalogueIt
                 });
     }
 
-    @Override
-    protected void onDestroy() {
-        if (mFavoritesActivityViewModel != null) {
-            mFavoritesActivityViewModel.onCleared();
-        }
-
-        super.onDestroy();
-    }
-
     private void deleteAll(final FavoriteCountriesRepository favoriteCountriesRepository) {
         if (mFavoriteCountries.size() > 0) {
 
@@ -423,5 +426,14 @@ public class FavoritesActivity extends AppCompatActivity implements ICatalogueIt
                 mFavoriteCountries = favoriteCountries;
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mFavoritesActivityViewModel != null) {
+            mFavoritesActivityViewModel.onCleared();
+        }
+
+        super.onDestroy();
     }
 }

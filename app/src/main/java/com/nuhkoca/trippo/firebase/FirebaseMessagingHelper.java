@@ -22,10 +22,10 @@ public class FirebaseMessagingHelper extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        createCustomNotification(remoteMessage);
+        handleNotification(remoteMessage);
     }
 
-    private void createCustomNotification(RemoteMessage remoteMessage) {
+    private void handleNotification(RemoteMessage remoteMessage) {
         RemoteMessage.Notification notification = remoteMessage.getNotification();
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

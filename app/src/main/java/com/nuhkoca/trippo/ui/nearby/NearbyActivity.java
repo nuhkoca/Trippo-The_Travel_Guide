@@ -517,6 +517,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         if (!isGPSEnabled()) {
             showGPSAlert();
         } else {
+            mActivityNearbyBinding.lBottomSheet.pbNearby.setVisibility(View.VISIBLE);
             nearbyPlace(placeHolder, loadMapPreferencesFromSettings(mSharedPreferences));
         }
 
@@ -572,6 +573,8 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
 
                     reCenterMap();
                 }
+
+                mActivityNearbyBinding.lBottomSheet.pbNearby.setVisibility(View.INVISIBLE);
             }
         });
     }

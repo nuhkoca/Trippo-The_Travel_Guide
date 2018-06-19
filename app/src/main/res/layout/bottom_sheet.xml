@@ -18,12 +18,26 @@
     <TextView
         android:id="@+id/tvExploreHeader"
         style="@style/NearbyExploreHeaderTextTheme"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical|start"
         android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/pbNearby"
+        android:layout_width="35dp"
+        android:layout_height="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:indeterminateTint="@color/colorAccent"
+        android:gravity="center_vertical|end"
+        android:visibility="invisible"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:theme="@style/ProgressBarTheme"
+        style="?android:attr/progressBarStyle"/>
 
     <LinearLayout
         android:layout_width="match_parent"

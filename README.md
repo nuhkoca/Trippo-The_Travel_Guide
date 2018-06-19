@@ -1,6 +1,6 @@
 # Trippo - The Travel Guide
 
-![App Logo](https://github.com/nuhkoca/Trippo-The_Travel_Guide/blob/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png)
+<p align="center"><img src="https://github.com/nuhkoca/Trippo-The_Travel_Guide/blob/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" alt="Trippo" height="200px"></p>
 
 :boom: One travel guide for the whole world. It's free.
 

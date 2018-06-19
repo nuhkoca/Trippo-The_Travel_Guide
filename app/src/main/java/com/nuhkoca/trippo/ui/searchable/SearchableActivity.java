@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -149,7 +150,12 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
         }
 
         if (!TextUtils.isEmpty(sSearchString)) {
-            mSearchView.setQuery(sSearchString, false);
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    mSearchView.setQuery(sSearchString, true);
+                }
+            });
 
             mSearchView.setIconified(false);
             mSearchView.setFocusable(true);
@@ -161,6 +167,12 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
         mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                if (sIsRotatedAndSearchViewStated) {
+                    if (getAdapter() != null) {
+                        getAdapter().getFilter().filter(query);
+                    }
+                }
+
                 return false;
             }
 

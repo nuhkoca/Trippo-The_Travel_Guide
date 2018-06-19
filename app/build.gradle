@@ -21,13 +21,13 @@ android {
         releaseConfig {
             keyAlias 'Mobile Movement Team'
             keyPassword 'nuhkoca'
-            storeFile file("$rootDir/trippo_keystore.jks")
+            storeFile file("$rootDir/keystore/trippo_keystore.jks")
             storePassword 'nuhkoca'
         }
         debugConfig {
             keyAlias 'Mobile Movement Team'
             keyPassword 'nuhkoca'
-            storeFile file("$rootDir/trippo_keystore.jks")
+            storeFile file("$rootDir/keystore/trippo_keystore.jks")
             storePassword 'nuhkoca'
         }
     }
@@ -117,6 +117,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-location:$rootProject.ext.playServicesVersion"
     implementation "com.google.maps.android:android-maps-utils:$rootProject.ext.googleMapsUtilsVersion"
     implementation "com.google.android.gms:play-services-auth:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-ads:$rootProject.ext.googleAdsVersion"
 
     //Other
     implementation "com.github.apl-devs:appintro:$rootProject.ext.appIntroVersion"

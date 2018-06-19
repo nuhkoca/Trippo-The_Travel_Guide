@@ -10,4 +10,8 @@ public interface IAlertDialogItemClickListener {
     interface Snackbar {
         void onActionListen();
     }
+
+    interface Version {
+        void onVersionReceived(int versionCode);
+    }
 }

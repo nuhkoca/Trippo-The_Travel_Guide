@@ -1,8 +1,11 @@
 package com.nuhkoca.trippo.util;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -15,10 +18,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.TrippoApp;
+import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
 import com.nuhkoca.trippo.helper.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import timber.log.Timber;
 
@@ -196,6 +201,27 @@ public class SharedPreferenceUtil {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Timber.d(e);
+                    }
+                });
+    }
+
+    public static void checkAppVersion(final IAlertDialogItemClickListener.Version iAlertDialogItemClickListener) {
+        FirebaseFirestore db = TrippoApp.provideFirestore();
+
+        db.collection(Constants.FIRESTORE_APP_COLLECTION_NAME)
+                .document(Constants.VERSION_DOCUMENT_ID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+
+                        if (documentSnapshot.exists()) {
+                            iAlertDialogItemClickListener.onVersionReceived(
+                                    Integer.parseInt(
+                                            Objects.requireNonNull(documentSnapshot.get(Constants.VERSION_COLUMN_NAME)).toString())
+                            );
+                        }
                     }
                 });
     }

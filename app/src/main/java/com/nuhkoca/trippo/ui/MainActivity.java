@@ -1,9 +1,11 @@
 package com.nuhkoca.trippo.ui;
 
 import android.app.ActivityOptions;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,7 +18,9 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
+import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
 import com.nuhkoca.trippo.databinding.ActivityMainBinding;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.ui.nearby.NearbyActivity;
@@ -25,6 +29,7 @@ import com.nuhkoca.trippo.ui.settings.ActivityType;
 import com.nuhkoca.trippo.ui.settings.SettingsActivity;
 import com.nuhkoca.trippo.util.AppWidgetUtils;
 import com.nuhkoca.trippo.util.IntentUtils;
+import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -45,6 +50,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setWidthInDP();
         setupInterstitialAd();
         AppWidgetUtils.update(MainActivity.this);
+
+        checkAppVersion();
+    }
+
+    private void checkAppVersion() {
+        SharedPreferenceUtil.checkAppVersion(new IAlertDialogItemClickListener.Version() {
+            @Override
+            public void onVersionReceived(int versionCode) {
+                if (versionCode != BuildConfig.VERSION_CODE) {
+
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle(getString(R.string.app_update_title))
+                            .setMessage(getString(R.string.app_update_text))
+                            .setCancelable(false)
+                            .setPositiveButton(getString(R.string.update_button), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    finish();
+
+                                    new IntentUtils.Builder()
+                                            .setContext(getApplicationContext())
+                                            .setAction(IntentUtils.ActionType.GOOGLE_PLAY)
+                                            .create();
+                                }
+                            })
+                            .setNegativeButton(getString(R.string.exit_button), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    finish();
+                                }
+                            })
+                            .create().show();
+                }
+            }
+        });
     }
 
     private void setupInterstitialAd() {

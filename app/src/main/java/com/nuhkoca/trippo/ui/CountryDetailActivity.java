@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
@@ -161,6 +162,7 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
                     .listener(new RequestListener<Bitmap>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            supportStartPostponedEnterTransition();
                             doAfterAnimation();
 
                             return false;
@@ -168,6 +170,7 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
 
                         @Override
                         public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            scheduleStartPostponedTransition();
                             doAfterAnimation();
 
                             return false;
@@ -187,6 +190,18 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
         } else {
             doAfterAnimation();
         }
+    }
+
+    private void scheduleStartPostponedTransition() {
+        mActivityCountryDetailBinding.ivCountryPoster.getViewTreeObserver().addOnPreDrawListener(
+                new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        mActivityCountryDetailBinding.ivCountryPoster.getViewTreeObserver().removeOnPreDrawListener(this);
+                        startPostponedEnterTransition();
+                        return true;
+                    }
+                });
     }
 
     private void placeHeader() {

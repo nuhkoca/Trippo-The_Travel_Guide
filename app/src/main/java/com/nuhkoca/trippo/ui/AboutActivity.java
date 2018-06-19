@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
@@ -60,12 +61,18 @@ public class AboutActivity extends AppCompatActivity {
         mActivityAboutBinding.clAbout.addView(aboutPage, 0);
     }
 
-    private Element getVersionElement(){
+    private Element getVersionElement() {
         Element versionElement = new Element();
 
         String version = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME);
 
         versionElement.setTitle(version);
+        versionElement.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), getString(R.string.up_to_date_toast), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return versionElement;
     }
@@ -75,8 +82,8 @@ public class AboutActivity extends AppCompatActivity {
         final String copyrights = String.format(getString(R.string.copy_right), Calendar.getInstance().get(Calendar.YEAR));
         copyRightsElement.setTitle(copyrights);
         copyRightsElement.setIconDrawable(R.drawable.ic_copy_right_icon);
-        copyRightsElement.setIconTint(mehdi.sakout.aboutpage.R.color.about_item_icon_color);
-        copyRightsElement.setIconNightTint(android.R.color.white);
+        copyRightsElement.setIconTint(R.color.aboutItemIconColor);
+        copyRightsElement.setIconNightTint(R.color.colorWhite);
         copyRightsElement.setGravity(Gravity.CENTER);
         return copyRightsElement;
     }

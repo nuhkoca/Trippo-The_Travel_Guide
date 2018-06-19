@@ -26,6 +26,7 @@ public class Constants {
     public static final String TRIPPO_NOTIFICATION_CHANNEL_ID = "trippo-notification-channel-id";
     public static final int TRIPPO_NOTIFICATION_ID = 1267;
     public static final String FIRESTORE_COLLECTION_NAME = "devices_registered";
+    public static final String FIRESTORE_APP_COLLECTION_NAME = "app_version";
     public static final String FIRESTORE_KEY = "device-token";
     public static final String FIRESTORE_PUSH_KEY = "push-notification-key";
     public static final String FIRESTORE_DEVICE_MODEL_KEY = "device-model-key";
@@ -63,7 +64,9 @@ public class Constants {
     public static final int TTS_REQ_CODE = 4532;
     public static final int RC_SIGN_IN = 6749;
     public static final String TRIPPO_UTTRANCE_ID = "trippo-uttrance-id";
-    public static int MAP_INTERVAL = 1000;
+    public static final int MAP_INTERVAL = 1000;
+    public static final String VERSION_COLUMN_NAME = "version";
+    public static final String VERSION_DOCUMENT_ID = "zGpaMtxktC6SG3VXGIhO";
 
     private Constants() {
         throw new AssertionError();

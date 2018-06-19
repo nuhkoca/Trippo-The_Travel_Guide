@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
+import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.helper.Constants;
+import com.nuhkoca.trippo.util.DeviceUtils;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -56,7 +58,10 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.notifications_key))) {
             boolean isChecked = sharedPreferences.getBoolean(getString(R.string.notifications_key), true);
-            equalizeNotification(isChecked);
+
+            if (!BuildConfig.DEBUG && !DeviceUtils.isEmulator()) {
+                equalizeNotification(isChecked);
+            }
         }
     }
 

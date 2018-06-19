@@ -81,6 +81,10 @@
     <string name="sign_in_action_text">sIgn In</string>
     <string name="coming_soon_text">Community is coming soon. Stay tuned!</string>
     <string name="license_dialog">Author: %s\nLicense: %s</string>
+    <string name="app_update_title">App update is available</string>
+    <string name="app_update_text">You have to update Trippo to the latest version in order to use.</string>
+    <string name="update_button">Update</string>
+    <string name="exit_button">Exit</string>
 
 
     <!-- Content Descriptions -->
@@ -97,7 +101,7 @@
     <string name="onboarding_first_desc">If you love traveling, Trippo will be your best friend!</string>
 
     <string name="onboarding_second_title">POIs</string>
-    <string name="onboarding_second_desc">Have plenty of POIs for selected locations to join in an activity immediately!</string>
+    <string name="onboarding_second_desc">Have plenty of POIs for selected locations to join an activity immediately!</string>
 
     <string name="onboarding_third_title">Nearby Places</string>
     <string name="onboarding_third_desc">Discover new and unique places around you!</string>
@@ -168,6 +172,7 @@
     <string name="auth_subtext">By logging in, you will be able to add your favorites in the application.</string>
     <string name="skip_now_text">SkIp Now</string>
     <string name="log_out_subtext">Log out</string>
+    <string name="password_info_text">*We don\'t keep your passwords.</string>
 
 
     <!-- Places Holders-->
@@ -358,9 +363,10 @@
     <string name="send_with">Send with…</string>
     <string name="share_with">Share with…</string>
     <string name="open_with">Open with…</string>
-    <string name="share_exra_text">Hey traveler! Now download Trippo and plan your exciting trip! https://play.google.com/store/apps/details?id=%s</string>
+    <string name="share_exra_text">Hey traveler! Download Trippo now and plan your exciting trip! https://play.google.com/store/apps/details?id=%s</string>
 
     <!-- About Page Texts -->
+    <string name="up_to_date_toast">You are up-to-date!</string>
     <string name="copy_right" translatable="false">Trippo © %1$d - All rights reserved.</string>
     <string name="about_description">Trippo is your smart travel guide - it’s free and works offline! Our awesome algorithms crunch through millions of websites and reviews to deliver unique recommendations across 50,000 destinations worldwide! Personalize your trip by picking your favorite hotels, sights, activities and restaurants and book them seamlessly in our app! That’s not all, our city maps helps you find unique and exotic places around you so you can wander freely. <b>This app is powered by Triposo API.</b></string>
 
