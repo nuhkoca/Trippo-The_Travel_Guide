@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferenceUtil.checkAppVersion(new IAlertDialogItemClickListener.Version() {
             @Override
             public void onVersionReceived(int versionCode) {
-                if (versionCode != BuildConfig.VERSION_CODE) {
+                if (versionCode > BuildConfig.VERSION_CODE) {
 
                     new AlertDialog.Builder(MainActivity.this)
                             .setTitle(getString(R.string.app_update_title))

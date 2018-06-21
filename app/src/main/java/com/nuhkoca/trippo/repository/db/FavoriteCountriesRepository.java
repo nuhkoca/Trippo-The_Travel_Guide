@@ -4,15 +4,13 @@ import android.app.Application;
 import android.arch.paging.DataSource;
 import android.os.AsyncTask;
 
+import com.nuhkoca.trippo.callback.IDatabaseProgressListener;
 import com.nuhkoca.trippo.db.TrippoDatabase;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.model.local.dao.FavoriteCountriesDao;
 import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import timber.log.Timber;
 
 public class FavoriteCountriesRepository {
 
@@ -31,22 +29,12 @@ public class FavoriteCountriesRepository {
         return mFavoriteCountriesDao.getAll();
     }
 
-    public boolean checkIfItemExists(String cid) {
-        try {
-            return new getItemById(cid, mFavoriteCountriesDao).execute().get();
-        } catch (InterruptedException | ExecutionException e) {
-            Timber.d(e);
-            return false;
-        }
+    public void checkIfItemExists(String cid, IDatabaseProgressListener iDatabaseProgressListener) {
+        new getItemById(cid, mFavoriteCountriesDao, iDatabaseProgressListener).execute();
     }
 
-    public boolean insertOrThrow(FavoriteCountries favoriteCountries, String cid) {
-        try {
-            return new insertOrThrowAsync(cid, mFavoriteCountriesDao).execute(favoriteCountries).get();
-        } catch (InterruptedException | ExecutionException e) {
-            Timber.d(e);
-            return false;
-        }
+    public void insertOrThrow(FavoriteCountries favoriteCountries, String cid, IDatabaseProgressListener iDatabaseProgressListener) {
+        new insertOrThrowAsync(cid, mFavoriteCountriesDao, iDatabaseProgressListener).execute(favoriteCountries);
     }
 
     public void deleteItem(final String cid) {
@@ -71,10 +59,12 @@ public class FavoriteCountriesRepository {
 
         private String cid;
         private FavoriteCountriesDao favoriteCountriesDao;
+        private IDatabaseProgressListener iDatabaseProgressListener;
 
-        insertOrThrowAsync(String cid, FavoriteCountriesDao favoriteCountriesDao) {
+        insertOrThrowAsync(String cid, FavoriteCountriesDao favoriteCountriesDao, IDatabaseProgressListener iDatabaseProgressListener) {
             this.cid = cid;
             this.favoriteCountriesDao = favoriteCountriesDao;
+            this.iDatabaseProgressListener = iDatabaseProgressListener;
         }
 
         @Override
@@ -86,21 +76,33 @@ public class FavoriteCountriesRepository {
                 return true;
             }
         }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            iDatabaseProgressListener.onItemRetrieved(result);
+        }
     }
 
     private static class getItemById extends AsyncTask<Void, Void, Boolean> {
 
         private String cid;
         private FavoriteCountriesDao favoriteCountriesDao;
+        private IDatabaseProgressListener iDatabaseProgressListener;
 
-        getItemById(String cid, FavoriteCountriesDao favoriteCountriesDao) {
+        getItemById(String cid, FavoriteCountriesDao favoriteCountriesDao, IDatabaseProgressListener iDatabaseProgressListener) {
             this.cid = cid;
             this.favoriteCountriesDao = favoriteCountriesDao;
+            this.iDatabaseProgressListener = iDatabaseProgressListener;
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             return cid.equals(favoriteCountriesDao.getItemById(cid));
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            iDatabaseProgressListener.onItemRetrieved(result);
         }
     }
 }

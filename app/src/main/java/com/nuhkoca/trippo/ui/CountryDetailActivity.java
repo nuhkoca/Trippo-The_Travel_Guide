@@ -24,6 +24,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.firebase.auth.FirebaseAuth;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
+import com.nuhkoca.trippo.callback.IDatabaseProgressListener;
 import com.nuhkoca.trippo.databinding.ActivityCountryDetailBinding;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
@@ -99,11 +100,16 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
 
         mFavoriteCountriesRepository = new FavoriteCountriesRepository(getApplication());
 
-        if (mFavoriteCountriesRepository.checkIfItemExists(mCid)) {
-            mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_remove_item_white_48dp);
-        } else {
-            mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_favorite_white_48dp);
-        }
+        mFavoriteCountriesRepository.checkIfItemExists(mCid, new IDatabaseProgressListener() {
+            @Override
+            public void onItemRetrieved(boolean result) {
+                if (result) {
+                    mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_remove_item_white_48dp);
+                } else {
+                    mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_favorite_white_48dp);
+                }
+            }
+        });
 
         setupUI();
     }
@@ -462,7 +468,7 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
         double lat = mCountryLat;
         double lng = mCountryLng;
 
-        FavoriteCountries favoriteCountries = new FavoriteCountries(
+        final FavoriteCountries favoriteCountries = new FavoriteCountries(
                 cid,
                 name,
                 snippet,
@@ -473,21 +479,25 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
                 lng
         );
 
-        if (mFavoriteCountriesRepository.insertOrThrow(favoriteCountries, cid)) {
-            new SnackbarUtils.Builder()
-                    .setView(mActivityCountryDetailBinding.clCountryDetail)
-                    .setMessage(String.format(getString(R.string.database_adding_info_text), mCountryName))
-                    .setLength(SnackbarUtils.Length.LONG)
-                    .show(getString(R.string.dismiss_action_text), null)
-                    .build();
+        mFavoriteCountriesRepository.insertOrThrow(favoriteCountries, cid, new IDatabaseProgressListener() {
+            @Override
+            public void onItemRetrieved(boolean result) {
+                if (result) {
+                    new SnackbarUtils.Builder()
+                            .setView(mActivityCountryDetailBinding.clCountryDetail)
+                            .setMessage(String.format(getString(R.string.database_adding_info_text), mCountryName))
+                            .setLength(SnackbarUtils.Length.LONG)
+                            .show(getString(R.string.dismiss_action_text), null)
+                            .build();
 
-            mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_remove_item_white_48dp);
+                    mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_remove_item_white_48dp);
+                } else {
+                    deleteItem(mFavoriteCountriesRepository, favoriteCountries);
 
-        } else {
-            deleteItem(mFavoriteCountriesRepository, favoriteCountries);
-
-            mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_favorite_white_48dp);
-        }
+                    mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_favorite_white_48dp);
+                }
+            }
+        });
     }
 
     private void deleteItem(final FavoriteCountriesRepository favoriteCountriesRepository, final FavoriteCountries favoriteCountries) {

@@ -33,6 +33,7 @@ import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
 import com.nuhkoca.trippo.callback.ICatalogueItemClickListener;
+import com.nuhkoca.trippo.callback.IDatabaseProgressListener;
 import com.nuhkoca.trippo.callback.IMenuItemIdListener;
 import com.nuhkoca.trippo.callback.IPopupMenuClickListener;
 import com.nuhkoca.trippo.callback.IRetryClickListener;
@@ -468,7 +469,7 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
         popupMenu.show();
     }
 
-    private void addToDb(CountryResult countryResult, int position) {
+    private void addToDb(final CountryResult countryResult, int position) {
         String cid = countryResult.getId();
         String name = countryResult.getName();
         String snippet = countryResult.getSnippet();
@@ -489,22 +490,27 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
         );
 
         FavoriteCountriesRepository favoriteCountriesRepository = new FavoriteCountriesRepository(getApplication());
-        if (favoriteCountriesRepository.insertOrThrow(favoriteCountries, cid)) {
-            new SnackbarUtils.Builder()
-                    .setView(mActivitySearchableCommonBinding.clSearchable)
-                    .setMessage(String.format(getString(R.string.database_adding_info_text), countryResult.getName()))
-                    .setLength(SnackbarUtils.Length.LONG)
-                    .show(getString(R.string.dismiss_action_text), null)
-                    .build();
 
-        } else {
-            new SnackbarUtils.Builder()
-                    .setView(mActivitySearchableCommonBinding.clSearchable)
-                    .setMessage(String.format(getString(R.string.constraint_exception_text), countryResult.getName()))
-                    .setLength(SnackbarUtils.Length.LONG)
-                    .show(getString(R.string.dismiss_action_text), null)
-                    .build();
-        }
+        favoriteCountriesRepository.insertOrThrow(favoriteCountries, cid, new IDatabaseProgressListener() {
+            @Override
+            public void onItemRetrieved(boolean result) {
+                if (!result) {
+                    new SnackbarUtils.Builder()
+                            .setView(mActivitySearchableCommonBinding.clSearchable)
+                            .setMessage(String.format(getString(R.string.constraint_exception_text), countryResult.getName()))
+                            .setLength(SnackbarUtils.Length.LONG)
+                            .show(getString(R.string.dismiss_action_text), null)
+                            .build();
+                } else {
+                    new SnackbarUtils.Builder()
+                            .setView(mActivitySearchableCommonBinding.clSearchable)
+                            .setMessage(String.format(getString(R.string.database_adding_info_text), countryResult.getName()))
+                            .setLength(SnackbarUtils.Length.LONG)
+                            .show(getString(R.string.dismiss_action_text), null)
+                            .build();
+                }
+            }
+        });
     }
 
     @Override

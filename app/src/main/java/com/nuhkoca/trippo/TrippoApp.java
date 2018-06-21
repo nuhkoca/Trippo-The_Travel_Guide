@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nuhkoca.trippo.helper.TimberReleaseTree;
 import com.nuhkoca.trippo.util.DeviceUtils;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 import com.squareup.leakcanary.LeakCanary;
@@ -52,6 +53,8 @@ public class TrippoApp extends Application {
     private void provideTimber() {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+        } else {
+            Timber.plant(new TimberReleaseTree());
         }
     }
 

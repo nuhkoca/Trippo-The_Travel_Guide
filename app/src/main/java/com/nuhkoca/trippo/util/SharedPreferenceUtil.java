@@ -1,11 +1,8 @@
 package com.nuhkoca.trippo.util;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -14,7 +11,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.TrippoApp;
@@ -24,6 +23,8 @@ import com.nuhkoca.trippo.helper.Constants;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 import timber.log.Timber;
 
@@ -133,38 +134,6 @@ public class SharedPreferenceUtil {
                 });
     }
 
-    private void addDocumentIdToSharedPreference(String documentId) {
-        SharedPreferences.Editor editor = mSharedPref.edit();
-
-        editor.putString(Constants.FIRESTORE_DOC_ID_KEY, documentId);
-
-        Timber.d("Document Id %s", documentId);
-
-        editor.apply();
-    }
-
-    private String getDocumentId() {
-        return mSharedPref.getString(Constants.FIRESTORE_DOC_ID_KEY, "");
-    }
-
-    public void addTokenToSharedPreference(String token) {
-        SharedPreferences.Editor editor = mSharedPref.edit();
-
-        editor.putString(Constants.FIRESTORE_TOKEN_KEY, token);
-
-        Timber.d("Token %s", token);
-
-        editor.apply();
-    }
-
-    public String getTokenFromSharedPreference() {
-        return mSharedPref.getString(Constants.FIRESTORE_TOKEN_KEY, "");
-    }
-
-    public String getIsNotifyMeFromSharedPreference() {
-        return mSharedPref.getString(Constants.FIRESTORE_IS_NOTIFY_ME_KEY, "0");
-    }
-
     public void updateNotification(int isNotifyTheDevice) {
         FirebaseFirestore db = TrippoApp.provideFirestore();
 
@@ -210,20 +179,56 @@ public class SharedPreferenceUtil {
 
         db.collection(Constants.FIRESTORE_APP_COLLECTION_NAME)
                 .document(Constants.VERSION_DOCUMENT_ID)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot documentSnapshot = task.getResult();
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Timber.e(e);
+                        } else {
 
-                        if (documentSnapshot.exists()) {
-                            iAlertDialogItemClickListener.onVersionReceived(
-                                    Integer.parseInt(
-                                            Objects.requireNonNull(documentSnapshot.get(Constants.VERSION_COLUMN_NAME)).toString())
-                            );
+                            if (documentSnapshot != null && documentSnapshot.exists()) {
+                                iAlertDialogItemClickListener.onVersionReceived(
+                                        Integer.parseInt(
+                                                Objects.requireNonNull(documentSnapshot.get(Constants.VERSION_COLUMN_NAME)).toString())
+                                );
+                            } else {
+                                Timber.d("document not exists");
+                            }
                         }
                     }
                 });
+    }
+
+    public String getTokenFromSharedPreference() {
+        return mSharedPref.getString(Constants.FIRESTORE_TOKEN_KEY, "");
+    }
+
+    public String getIsNotifyMeFromSharedPreference() {
+        return mSharedPref.getString(Constants.FIRESTORE_IS_NOTIFY_ME_KEY, "0");
+    }
+
+    private String getDocumentId() {
+        return mSharedPref.getString(Constants.FIRESTORE_DOC_ID_KEY, "");
+    }
+
+    public void addTokenToSharedPreference(String token) {
+        SharedPreferences.Editor editor = mSharedPref.edit();
+
+        editor.putString(Constants.FIRESTORE_TOKEN_KEY, token);
+
+        Timber.d("Token %s", token);
+
+        editor.apply();
+    }
+
+    private void addDocumentIdToSharedPreference(String documentId) {
+        SharedPreferences.Editor editor = mSharedPref.edit();
+
+        editor.putString(Constants.FIRESTORE_DOC_ID_KEY, documentId);
+
+        Timber.d("Document Id %s", documentId);
+
+        editor.apply();
     }
 
     public static String loadToursScore(Context context, SharedPreferences sharedPreferences) {
@@ -245,7 +250,6 @@ public class SharedPreferenceUtil {
     public static String loadCityWalkingScore(Context context, SharedPreferences sharedPreferences) {
         return sharedPreferences.getString(context.getString(R.string.city_walking_key), context.getString(R.string.seven_and_greater_value));
     }
-
 
     public static String loadSightseeingScore(Context context, SharedPreferences sharedPreferences) {
         return sharedPreferences.getString(context.getString(R.string.sightseeing_key), context.getString(R.string.seven_and_greater_value));
