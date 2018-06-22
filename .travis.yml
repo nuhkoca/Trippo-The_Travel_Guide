@@ -1,0 +1,36 @@
+language: android
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-27.0.3
+    - android-27
+    - extra-android-m2repository
+
+jdk:
+  - oraclejdk8
+
+notifications:
+  email: false
+
+sudo: false
+
+before_install:
+ - chmod +x gradlew
+
+script:
+- ./gradlew assembleDebug
+
+after_script:
+- ./gradlew testReleaseUnitTest
+
+branches:
+  only:
+    - master
+    - development
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.gradle
