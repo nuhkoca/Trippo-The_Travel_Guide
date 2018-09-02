@@ -67,6 +67,8 @@ public class Constants {
     public static final int MAP_INTERVAL = 1000;
     public static final String VERSION_COLUMN_NAME = "version";
     public static final String VERSION_DOCUMENT_ID = "zGpaMtxktC6SG3VXGIhO";
+    public static final int DB_START_VERSION = 2;
+    public static final int DB_END_VERSION = 3;
 
     private Constants() {
         throw new AssertionError();

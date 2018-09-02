@@ -1,58 +1,52 @@
 package com.nuhkoca.trippo.repository.db;
 
-import android.app.Application;
 import android.arch.paging.DataSource;
 import android.os.AsyncTask;
 
 import com.nuhkoca.trippo.callback.IDatabaseProgressListener;
-import com.nuhkoca.trippo.db.TrippoDatabase;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.model.local.dao.FavoriteCountriesDao;
 import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class FavoriteCountriesRepository {
 
-    private FavoriteCountriesDao mFavoriteCountriesDao;
+    private FavoriteCountriesDao favoriteCountriesDao;
+    private AppsExecutor appsExecutor;
 
-    public FavoriteCountriesRepository(Application application) {
-        TrippoDatabase trippoDatabase = TrippoDatabase.getInstance(application);
-        mFavoriteCountriesDao = trippoDatabase.favoriteCountriesDao();
+    @Inject
+    public FavoriteCountriesRepository(FavoriteCountriesDao favoriteCountriesDao, AppsExecutor appsExecutor) {
+        this.favoriteCountriesDao = favoriteCountriesDao;
+        this.appsExecutor = appsExecutor;
     }
 
     public List<FavoriteCountries> getAllForWidget() {
-        return mFavoriteCountriesDao.getAllForWidget();
+        return favoriteCountriesDao.getAllForWidget();
     }
 
     public DataSource.Factory<Integer, FavoriteCountries> getAll() {
-        return mFavoriteCountriesDao.getAll();
+        return favoriteCountriesDao.getAll();
     }
 
     public void checkIfItemExists(String cid, IDatabaseProgressListener iDatabaseProgressListener) {
-        new getItemById(cid, mFavoriteCountriesDao, iDatabaseProgressListener).execute();
+        new getItemById(cid, favoriteCountriesDao, iDatabaseProgressListener).execute();
     }
 
     public void insertOrThrow(FavoriteCountries favoriteCountries, String cid, IDatabaseProgressListener iDatabaseProgressListener) {
-        new insertOrThrowAsync(cid, mFavoriteCountriesDao, iDatabaseProgressListener).execute(favoriteCountries);
+        new insertOrThrowAsync(cid, favoriteCountriesDao, iDatabaseProgressListener).execute(favoriteCountries);
     }
 
     public void deleteItem(final String cid) {
-        AppsExecutor.backgroundThread().execute(new Runnable() {
-            @Override
-            public void run() {
-                mFavoriteCountriesDao.deleteItem(cid);
-            }
-        });
+        appsExecutor.diskIO().execute(() -> favoriteCountriesDao.deleteItem(cid));
     }
 
     public void deleteAll() {
-        AppsExecutor.backgroundThread().execute(new Runnable() {
-            @Override
-            public void run() {
-                mFavoriteCountriesDao.deleteAll();
-            }
-        });
+        appsExecutor.diskIO().execute(() -> favoriteCountriesDao.deleteAll());
     }
 
     private static class insertOrThrowAsync extends AsyncTask<FavoriteCountries, Void, Boolean> {
@@ -70,10 +64,10 @@ public class FavoriteCountriesRepository {
         @Override
         protected Boolean doInBackground(FavoriteCountries... favoriteCountries) {
             if (cid.equals(favoriteCountriesDao.getItemById(cid))) {
-                return false;
+                return true;
             } else {
                 favoriteCountriesDao.insertItem(favoriteCountries[0]);
-                return true;
+                return false;
             }
         }
 

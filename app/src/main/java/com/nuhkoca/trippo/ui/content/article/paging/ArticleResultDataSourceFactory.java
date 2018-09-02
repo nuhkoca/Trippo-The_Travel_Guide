@@ -5,32 +5,23 @@ import android.arch.paging.DataSource;
 
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleResult;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class ArticleResultDataSourceFactory extends DataSource.Factory<Integer, ArticleResult> {
 
     private MutableLiveData<ItemKeyedArticleDataSource> mItemKeyedArticleDataSourceMutableLiveData;
-    private static ArticleResultDataSourceFactory INSTANCE;
+    private ItemKeyedArticleDataSource itemKeyedArticleDataSource;
 
-    private static String mCountryCode;
-    private static String mTagLabels;
-
-    private ArticleResultDataSourceFactory() {
+    @Inject
+    public ArticleResultDataSourceFactory(ItemKeyedArticleDataSource itemKeyedArticleDataSource) {
+        this.itemKeyedArticleDataSource = itemKeyedArticleDataSource;
         mItemKeyedArticleDataSourceMutableLiveData = new MutableLiveData<>();
-    }
-
-    public static ArticleResultDataSourceFactory getInstance(String tagLabels, String countryCode) {
-        if (INSTANCE == null) {
-            INSTANCE = new ArticleResultDataSourceFactory();
-        }
-
-        mTagLabels = tagLabels;
-        mCountryCode = countryCode;
-
-        return INSTANCE;
     }
 
     @Override
     public DataSource<Integer, ArticleResult> create() {
-        ItemKeyedArticleDataSource itemKeyedArticleDataSource = new ItemKeyedArticleDataSource(mTagLabels, mCountryCode);
         mItemKeyedArticleDataSourceMutableLiveData.postValue(itemKeyedArticleDataSource);
 
         return itemKeyedArticleDataSource;
@@ -38,5 +29,9 @@ public class ArticleResultDataSourceFactory extends DataSource.Factory<Integer, 
 
     public MutableLiveData<ItemKeyedArticleDataSource> getItemKeyedArticleDataSourceMutableLiveData() {
         return mItemKeyedArticleDataSourceMutableLiveData;
+    }
+
+    public ItemKeyedArticleDataSource getItemKeyedArticleDataSource() {
+        return itemKeyedArticleDataSource;
     }
 }

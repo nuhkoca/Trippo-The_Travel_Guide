@@ -1,14 +1,14 @@
 package com.nuhkoca.trippo.ui;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -23,27 +23,28 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.firebase.auth.FirebaseAuth;
 import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
-import com.nuhkoca.trippo.callback.IDatabaseProgressListener;
 import com.nuhkoca.trippo.databinding.ActivityCountryDetailBinding;
+import com.nuhkoca.trippo.di.GlideApp;
 import com.nuhkoca.trippo.helper.Constants;
-import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
-import com.nuhkoca.trippo.module.GlideApp;
 import com.nuhkoca.trippo.repository.db.FavoriteCountriesRepository;
 import com.nuhkoca.trippo.ui.content.ArticleContentType;
 import com.nuhkoca.trippo.ui.content.ContentType;
 import com.nuhkoca.trippo.ui.content.ExperienceContentType;
-import com.nuhkoca.trippo.ui.content.OutsideContentType;
 import com.nuhkoca.trippo.ui.content.article.ArticleActivity;
+import com.nuhkoca.trippo.ui.content.experience.ExperienceContentActivity;
 import com.nuhkoca.trippo.ui.content.feature.FirstContentActivity;
 import com.nuhkoca.trippo.ui.content.outside.OutsideContentActivity;
-import com.nuhkoca.trippo.ui.content.experience.ExperienceContentActivity;
 import com.nuhkoca.trippo.util.AlertDialogUtils;
 import com.nuhkoca.trippo.util.AppWidgetUtils;
 import com.nuhkoca.trippo.util.ScreenSizer;
+import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 import com.nuhkoca.trippo.util.SnackbarUtils;
 
-public class CountryDetailActivity extends AppCompatActivity implements View.OnClickListener {
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class CountryDetailActivity extends DaggerAppCompatActivity implements View.OnClickListener {
 
     private ActivityCountryDetailBinding mActivityCountryDetailBinding;
 
@@ -61,7 +62,19 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
     private boolean mIsFabShown = true;
     private int mMaxScrollSize;
 
-    private FavoriteCountriesRepository mFavoriteCountriesRepository;
+    @Inject
+    FavoriteCountriesRepository favoriteCountriesRepository;
+
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
+
+    @Inject
+    AdRequest adRequest;
+
+    private CountryDetailViewModel mCountryDetailViewModel;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
 
     private int mReqCode;
 
@@ -84,6 +97,8 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
             screenSizer.hideStatusBar();
         }
 
+        mCountryDetailViewModel = ViewModelProviders.of(this, viewModelFactory).get(CountryDetailViewModel.class);
+
         mCountryName = getIntent().getStringExtra(Constants.DETAIL_COUNTRY_NAME_KEY);
         mCountrySnippet = getIntent().getStringExtra(Constants.DETAIL_COUNTRY_SNIPPET_KEY);
         mCountryImage = getIntent().getStringExtra(Constants.DETAIL_COUNTRY_IMAGE_KEY);
@@ -98,12 +113,10 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
 
         mReqCode = getIntent().getIntExtra(Constants.PARENT_ACTIVITY_REQ_KEY, 0);
 
-        mFavoriteCountriesRepository = new FavoriteCountriesRepository(getApplication());
-
-        mFavoriteCountriesRepository.checkIfItemExists(mCid, new IDatabaseProgressListener() {
-            @Override
-            public void onItemRetrieved(boolean result) {
-                if (result) {
+        mCountryDetailViewModel.checkIfItemExists(mCid);
+        mCountryDetailViewModel.mIfItemExists.observe(this, isExisting -> {
+            if (isExisting != null) {
+                if (isExisting) {
                     mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_remove_item_white_48dp);
                 } else {
                     mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_favorite_white_48dp);
@@ -122,7 +135,6 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
     }
 
     private void initAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
         mActivityCountryDetailBinding.detailContentAd.adView.loadAd(adRequest);
 
         mActivityCountryDetailBinding.detailContentAd.adView.setAdListener(new AdListener() {
@@ -216,34 +228,31 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
     }
 
     private void animateFavoriteButton() {
-        mActivityCountryDetailBinding.aplCountryDetail.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (mMaxScrollSize == 0)
-                    mMaxScrollSize = appBarLayout.getTotalScrollRange();
+        mActivityCountryDetailBinding.aplCountryDetail.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            if (mMaxScrollSize == 0)
+                mMaxScrollSize = appBarLayout.getTotalScrollRange();
 
-                int percentage = (Math.abs(verticalOffset)) * 100 / mMaxScrollSize;
+            int percentage = (Math.abs(verticalOffset)) * 100 / mMaxScrollSize;
 
-                if (percentage >= Constants.PERCENTAGE_TO_ANIMATE_FAB && mIsFabShown) {
-                    mIsFabShown = false;
+            if (percentage >= Constants.PERCENTAGE_TO_ANIMATE_FAB && mIsFabShown) {
+                mIsFabShown = false;
 
-                    mActivityCountryDetailBinding.fabCountryDetail.animate()
-                            .scaleY(0).scaleX(0)
-                            .setDuration(200)
-                            .start();
+                mActivityCountryDetailBinding.fabCountryDetail.animate()
+                        .scaleY(0).scaleX(0)
+                        .setDuration(200)
+                        .start();
 
-                    mActivityCountryDetailBinding.fabCountryDetail.setClickable(false);
-                }
+                mActivityCountryDetailBinding.fabCountryDetail.setClickable(false);
+            }
 
-                if (percentage <= Constants.PERCENTAGE_TO_ANIMATE_FAB && !mIsFabShown) {
-                    mIsFabShown = true;
+            if (percentage <= Constants.PERCENTAGE_TO_ANIMATE_FAB && !mIsFabShown) {
+                mIsFabShown = true;
 
-                    mActivityCountryDetailBinding.fabCountryDetail.animate()
-                            .scaleY(1).scaleX(1)
-                            .start();
+                mActivityCountryDetailBinding.fabCountryDetail.animate()
+                        .scaleY(1).scaleX(1)
+                        .start();
 
-                    mActivityCountryDetailBinding.fabCountryDetail.setClickable(true);
-                }
+                mActivityCountryDetailBinding.fabCountryDetail.setClickable(true);
             }
         });
     }
@@ -315,19 +324,14 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
         switch (itemThatWasClicked) {
             case R.id.fabCountryDetail:
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    addOrDeleteFromDb(mItemPosition);
+                    addOrDeleteFromDb();
                     AppWidgetUtils.update(CountryDetailActivity.this);
                 } else {
                     new SnackbarUtils.Builder()
                             .setView(mActivityCountryDetailBinding.clCountryDetail)
                             .setLength(SnackbarUtils.Length.LONG)
                             .setMessage(getString(R.string.sign_in_alert))
-                            .show(getString(R.string.sign_in_action_text), new IAlertDialogItemClickListener.Snackbar() {
-                                @Override
-                                public void onActionListen() {
-                                    startActivity(new Intent(CountryDetailActivity.this, AuthActivity.class));
-                                }
-                            });
+                            .show(getString(R.string.sign_in_action_text), () -> startActivity(new Intent(CountryDetailActivity.this, AuthActivity.class)));
                 }
 
                 break;
@@ -337,6 +341,7 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
 
                 contentIntent
                         .putExtra(Constants.SECTION_TYPE_KEY, ContentType.CITY.getSectionId());
+
                 break;
 
             case R.id.btnRegions:
@@ -363,29 +368,29 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
             case R.id.btnSightseeing:
                 contentIntent = new Intent(CountryDetailActivity.this, OutsideContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, OutsideContentType.SIGHTSEEING.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.SECTION_TYPE_KEY, getString(R.string.sightseeing_placeholder));
+
                 break;
 
             case R.id.btnEatDrink:
                 contentIntent = new Intent(CountryDetailActivity.this, OutsideContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, OutsideContentType.EAT_AND_DRINK.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.SECTION_TYPE_KEY, getString(R.string.eat_and_drink_placeholder));
+
                 break;
 
             case R.id.btnNightlife:
                 contentIntent = new Intent(CountryDetailActivity.this, OutsideContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, OutsideContentType.NIGHTLIFE.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.SECTION_TYPE_KEY, getString(R.string.nightlife_placeholder));
+
                 break;
 
             case R.id.btnHotels:
                 contentIntent = new Intent(CountryDetailActivity.this, OutsideContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, OutsideContentType.HOTEL.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.SECTION_TYPE_KEY, getString(R.string.hotel_placeholder));
+
                 break;
 
             case R.id.btnTours:
@@ -459,30 +464,12 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    private void addOrDeleteFromDb(int position) {
-        String cid = mCid;
-        String name = mCountryName;
-        String snippet = mCountrySnippet;
-        String thumbnailPath = mCountryMediumImage;
-        String originalImage = mCountryImage;
-        double lat = mCountryLat;
-        double lng = mCountryLng;
+    private void addOrDeleteFromDb() {
+        mCountryDetailViewModel.addOrDeleteFromDb(mItemPosition, mCid, mCountryName, mCountrySnippet, mCountryMediumImage, mCountryImage, mCountryLat, mCountryLng);
 
-        final FavoriteCountries favoriteCountries = new FavoriteCountries(
-                cid,
-                name,
-                snippet,
-                position,
-                thumbnailPath,
-                originalImage,
-                lat,
-                lng
-        );
-
-        mFavoriteCountriesRepository.insertOrThrow(favoriteCountries, cid, new IDatabaseProgressListener() {
-            @Override
-            public void onItemRetrieved(boolean result) {
-                if (result) {
+        mCountryDetailViewModel.mIsItemAdded.observe(this, isAdded -> {
+            if (isAdded != null) {
+                if (isAdded) {
                     new SnackbarUtils.Builder()
                             .setView(mActivityCountryDetailBinding.clCountryDetail)
                             .setMessage(String.format(getString(R.string.database_adding_info_text), mCountryName))
@@ -492,7 +479,7 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
 
                     mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_remove_item_white_48dp);
                 } else {
-                    deleteItem(mFavoriteCountriesRepository, favoriteCountries);
+                    deleteItem();
 
                     mActivityCountryDetailBinding.fabCountryDetail.setImageResource(R.drawable.ic_favorite_white_48dp);
                 }
@@ -500,12 +487,12 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
         });
     }
 
-    private void deleteItem(final FavoriteCountriesRepository favoriteCountriesRepository, final FavoriteCountries favoriteCountries) {
-        favoriteCountriesRepository.deleteItem(favoriteCountries.getCid());
+    private void deleteItem() {
+        mCountryDetailViewModel.deleteItem(mCid);
 
         new SnackbarUtils.Builder()
                 .setView(mActivityCountryDetailBinding.clCountryDetail)
-                .setMessage(String.format(getString(R.string.item_deleted_info_text), favoriteCountries.getName()))
+                .setMessage(String.format(getString(R.string.item_deleted_info_text), mCountryName))
                 .setLength(SnackbarUtils.Length.LONG)
                 .show(getString(R.string.dismiss_action_text), null)
                 .build();
@@ -519,18 +506,15 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
         AlertDialogUtils.dialogWithList(this,
                 getString(R.string.background_button_text),
                 items,
-                new IAlertDialogItemClickListener() {
-                    @Override
-                    public void onIdReceived(int which) {
-                        Intent contentIntent = new Intent(CountryDetailActivity.this, ArticleActivity.class);
+                which -> {
+                    Intent contentIntent = new Intent(CountryDetailActivity.this, ArticleActivity.class);
 
-                        contentIntent.putExtra(Constants.ARTICLE_ENDPOINT_KEY, values[which]);
-                        contentIntent.putExtra(Constants.SECTION_TYPE_KEY, ArticleContentType.BACKGROUND.getSectionId());
-                        contentIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY, mCountryName);
-                        contentIntent.putExtra(Constants.COUNTRY_CODE_KEY, mItemPosition);
+                    contentIntent.putExtra(Constants.ARTICLE_ENDPOINT_KEY, values[which]);
+                    contentIntent.putExtra(Constants.SECTION_TYPE_KEY, ArticleContentType.BACKGROUND.getSectionId());
+                    contentIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY, mCountryName);
+                    contentIntent.putExtra(Constants.COUNTRY_CODE_KEY, mItemPosition);
 
-                        startActivity(contentIntent);
-                    }
+                    startActivity(contentIntent);
                 });
     }
 
@@ -541,21 +525,17 @@ public class CountryDetailActivity extends AppCompatActivity implements View.OnC
         AlertDialogUtils.dialogWithList(this,
                 getString(R.string.background_button_text),
                 items,
-                new IAlertDialogItemClickListener() {
-                    @Override
-                    public void onIdReceived(int which) {
-                        Intent contentIntent = new Intent(CountryDetailActivity.this, ArticleActivity.class);
+                which -> {
+                    Intent contentIntent = new Intent(CountryDetailActivity.this, ArticleActivity.class);
 
-                        contentIntent.putExtra(Constants.ARTICLE_ENDPOINT_KEY, values[which]);
-                        contentIntent.putExtra(Constants.SECTION_TYPE_KEY, ArticleContentType.PRACTICALITIES.getSectionId());
-                        contentIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY, mCountryName);
-                        contentIntent.putExtra(Constants.COUNTRY_CODE_KEY, mItemPosition);
+                    contentIntent.putExtra(Constants.ARTICLE_ENDPOINT_KEY, values[which]);
+                    contentIntent.putExtra(Constants.SECTION_TYPE_KEY, ArticleContentType.PRACTICALITIES.getSectionId());
+                    contentIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY, mCountryName);
+                    contentIntent.putExtra(Constants.COUNTRY_CODE_KEY, mItemPosition);
 
-                        startActivity(contentIntent);
-                    }
+                    startActivity(contentIntent);
                 });
     }
-
 
     @Override
     protected void onDestroy() {

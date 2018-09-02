@@ -31,11 +31,17 @@ ext {
     minSdkVersion = 21
     targetSdkVersion = 27
 
+
     supportVersion = '27.1.1'
     constraintVersion = '1.1.2'
-    archVersion = '1.1.0'
+    archVersion = '1.1.1'
     lifeCycleVersion = '1.1.1'
-    pagingVersion = '1.0.0'
+
+
+    daggerVersion = '2.16'
+
+
+    pagingVersion = '1.0.1'
     glideVersion = '4.7.1'
     rxJavaVersion = '2.3.0'
     rxJavaLibVersion = '1.3.0'
@@ -43,25 +49,35 @@ ext {
     okHttpVersion = '3.8.0'
     stethoVersion = '1.5.0'
     leakCanaryVersion = '1.5.4'
+    timberVersion = '4.7.0'
+
+
+    playServicesVersion = '15.0.1'
+    playServicesAuthVersion = '16.0.0'
+    googleAdsVersion = '12.0.1'
+    googleMapsUtilsVersion = '0.5'
+
+
+    firebaseVersion = '16.0.1'
+    firebaseMessagingVersion = '17.3.0'
+    firebaseCoreVersion = '16.0.1'
+    firestoreVersion = '17.1.0'
+    firebaseAdsVersion = '15.0.1'
+    firebaseAuthVersion = '16.0.3'
+    crashlyticsVersion = '2.9.4'
+
+
+    aboutPageVersion = '1.2.4'
+    aboutLibrariesVersion = '6.0.6'
+    tagGroupVersion = '1.1.4'
+    circleImageViewVersion = '2.2.0'
+    appIntroVersion = 'v4.2.3'
+    easyPermissionVersion = '1.2.0'
+
+
     espressoVersion = '3.0.2'
     testVersion = '1.0.1'
     JUnitVersion = '4.12'
-    timberVersion = '4.7.0'
-    appIntroVersion = 'v4.2.3'
-    easyPermissionVersion = '1.2.0'
-    playServicesVersion = '15.0.1'
-    firebaseVersion = '17.0.0'
-    firebaseCoreVersion = '16.0.1'
-    firestoreVersion = '17.0.1'
-    aboutPageVersion = '1.2.4'
-    aboutLibrariesVersion = '6.0.6'
-    crashlyticsVersion = '2.9.4'
-    googleMapsUtilsVersion = '0.5'
-    tagGroupVersion = '1.1.4'
-    adsVersion = '15.0.1'
-    googleAdsVersion = '12.0.1'
-    firebaseAuthVersion = '16.0.2'
-    circleImageViewVersion = '2.2.0'
 }
 
 task clean(type: Delete) {

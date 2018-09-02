@@ -103,14 +103,6 @@
             android:value="AppGlideModule" />
 
         <service
-            android:name=".firebase.FirebaseCloudMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
-
-        <service
             android:name=".firebase.FirebaseMessagingHelper"
             android:exported="false">
             <intent-filter>

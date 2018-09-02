@@ -14,10 +14,12 @@ import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.databinding.FragmentOnboardingBinding;
 import com.nuhkoca.trippo.helper.Constants;
 
+import dagger.android.support.DaggerFragment;
+
 /**
  * A simple {@link Fragment} subclass.
  */
-public class OnboardingFragment extends Fragment {
+public class OnboardingFragment extends DaggerFragment {
 
     private FragmentOnboardingBinding mFragmentOnboardingBinding;
 

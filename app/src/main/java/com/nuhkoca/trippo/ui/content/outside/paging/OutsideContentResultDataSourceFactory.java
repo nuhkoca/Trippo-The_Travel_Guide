@@ -5,36 +5,22 @@ import android.arch.paging.DataSource;
 
 import com.nuhkoca.trippo.model.remote.content.second.OutsideResult;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class OutsideContentResultDataSourceFactory extends DataSource.Factory<Integer, OutsideResult> {
 
     private MutableLiveData<ItemKeyedOutsideContentDataSource> mItemKeyedOutsideContentDataSourceMutableLiveData;
-    private static OutsideContentResultDataSourceFactory INSTANCE;
+    private ItemKeyedOutsideContentDataSource itemKeyedOutsideContentDataSource;
 
-    private static String mCountryCode;
-    private static String mTagLabels;
-    private static String mScore;
-    private static String mBookable;
-
-    private OutsideContentResultDataSourceFactory() {
+    @Inject
+    public OutsideContentResultDataSourceFactory(ItemKeyedOutsideContentDataSource itemKeyedOutsideContentDataSource) {
+        this.itemKeyedOutsideContentDataSource = itemKeyedOutsideContentDataSource;
         mItemKeyedOutsideContentDataSourceMutableLiveData = new MutableLiveData<>();
     }
-
-    public static OutsideContentResultDataSourceFactory getInstance(String tagLabels, String countryCode, String score, String bookable) {
-        if (INSTANCE == null) {
-            INSTANCE = new OutsideContentResultDataSourceFactory();
-        }
-
-        mTagLabels = tagLabels;
-        mCountryCode = countryCode;
-        mScore = score;
-        mBookable = bookable;
-
-        return INSTANCE;
-    }
-
     @Override
     public DataSource<Integer, OutsideResult> create() {
-        ItemKeyedOutsideContentDataSource itemKeyedOutsideContentDataSource = new ItemKeyedOutsideContentDataSource(mTagLabels, mCountryCode, mScore, mBookable);
         mItemKeyedOutsideContentDataSourceMutableLiveData.postValue(itemKeyedOutsideContentDataSource);
 
         return itemKeyedOutsideContentDataSource;
@@ -42,5 +28,9 @@ public class OutsideContentResultDataSourceFactory extends DataSource.Factory<In
 
     public MutableLiveData<ItemKeyedOutsideContentDataSource> getItemKeyedOutsideContentDataSourceMutableLiveData() {
         return mItemKeyedOutsideContentDataSourceMutableLiveData;
+    }
+
+    public ItemKeyedOutsideContentDataSource getItemKeyedOutsideContentDataSource() {
+        return itemKeyedOutsideContentDataSource;
     }
 }

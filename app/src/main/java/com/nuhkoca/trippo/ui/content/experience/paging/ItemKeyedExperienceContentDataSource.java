@@ -2,45 +2,49 @@ package com.nuhkoca.trippo.ui.content.experience.paging;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.ItemKeyedDataSource;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.nuhkoca.trippo.R;
+import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceResult;
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceWrapper;
 import com.nuhkoca.trippo.repository.api.EndpointRepository;
-import com.nuhkoca.trippo.api.NetworkState;
+import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+@Singleton
 public class ItemKeyedExperienceContentDataSource extends ItemKeyedDataSource<Integer, ExperienceResult> {
 
-    private EndpointRepository mEndpointRepository;
+    private EndpointRepository endpointRepository;
+    private SharedPreferenceUtil sharedPreferenceUtil;
+    private Context context;
+
     private int mPagedLoadSize = Constants.OFFSET_SIZE;
     private int mIsMoreOnce = 0;
 
     private MutableLiveData<NetworkState> mNetworkState;
     private MutableLiveData<NetworkState> mInitialLoading;
 
-    private String mTagLabels;
-    private String mCountryCode;
-    private String mScore;
-
-    ItemKeyedExperienceContentDataSource(String tagLabels, String countryCode, String score) {
-        mEndpointRepository = EndpointRepository.getInstance();
+    @Inject
+    public ItemKeyedExperienceContentDataSource(EndpointRepository endpointRepository, SharedPreferenceUtil sharedPreferenceUtil, Context context) {
+        this.endpointRepository = endpointRepository;
+        this.sharedPreferenceUtil = sharedPreferenceUtil;
+        this.context = context;
 
         mNetworkState = new MutableLiveData<>();
         mInitialLoading = new MutableLiveData<>();
-
-        this.mCountryCode = countryCode;
-        this.mTagLabels = tagLabels;
-        this.mScore = score;
     }
 
     public MutableLiveData<NetworkState> getNetworkState() {
@@ -51,6 +55,18 @@ public class ItemKeyedExperienceContentDataSource extends ItemKeyedDataSource<In
         return mInitialLoading;
     }
 
+    private String getTagLabels(){
+        return sharedPreferenceUtil.getStringData(Constants.SECTION_TYPE_KEY, "");
+    }
+
+    private String getCountryCode(){
+        return sharedPreferenceUtil.getStringData(Constants.COUNTRY_CODE_KEY,"");
+    }
+
+    private String getScore(){
+        return sharedPreferenceUtil.getStringData(context.getString(R.string.score_key),context.getString(R.string.seven_and_greater_value));
+    }
+
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull final LoadInitialCallback<ExperienceResult> callback) {
         final List<ExperienceResult> experienceResults = new ArrayList<>();
@@ -58,16 +74,11 @@ public class ItemKeyedExperienceContentDataSource extends ItemKeyedDataSource<In
         mNetworkState.postValue(NetworkState.LOADING);
         mInitialLoading.postValue(NetworkState.LOADING);
 
-        mEndpointRepository.getExperienceContentList(mTagLabels, 0, mCountryCode, mScore)
+        endpointRepository.getExperienceContentList(getTagLabels(), 0, getCountryCode(), getScore())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends ExperienceWrapper>>() {
-                    @Override
-                    public Observable<? extends ExperienceWrapper> call(Throwable throwable) {
-                        return Observable.error(throwable);
-                    }
-                })
+                .onErrorResumeNext(Observable::error)
                 .subscribe(new Subscriber<ExperienceWrapper>() {
                     @Override
                     public void onCompleted() {
@@ -103,16 +114,11 @@ public class ItemKeyedExperienceContentDataSource extends ItemKeyedDataSource<In
 
         mNetworkState.postValue(NetworkState.LOADING);
 
-        mEndpointRepository.getExperienceContentList(mTagLabels, params.key, mCountryCode, mScore)
+        endpointRepository.getExperienceContentList(getTagLabels(), params.key, getCountryCode(), getScore())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends ExperienceWrapper>>() {
-                    @Override
-                    public Observable<? extends ExperienceWrapper> call(Throwable throwable) {
-                        return Observable.error(throwable);
-                    }
-                })
+                .onErrorResumeNext(Observable::error)
                 .subscribe(new Subscriber<ExperienceWrapper>() {
                     @Override
                     public void onCompleted() {

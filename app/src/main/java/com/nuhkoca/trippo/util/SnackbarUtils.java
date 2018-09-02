@@ -52,7 +52,7 @@ public class SnackbarUtils {
             return this.mLength;
         }
 
-        public Builder show(CharSequence resId, final IAlertDialogItemClickListener.Snackbar iSnacbarListener) {
+        public Builder show(CharSequence resId, final IAlertDialogItemClickListener.Snackbar iSnackbarListener) {
             final Snackbar snackbar = Snackbar.make(
                     getView(),
                     getMessage(),
@@ -63,8 +63,8 @@ public class SnackbarUtils {
                 public void onClick(View v) {
                     snackbar.dismiss();
 
-                    if (iSnacbarListener != null) {
-                        iSnacbarListener.onActionListen();
+                    if (iSnackbarListener != null) {
+                        iSnackbarListener.onActionListen();
                     }
                 }
             });

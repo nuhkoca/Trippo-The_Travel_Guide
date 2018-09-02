@@ -1,7 +1,7 @@
 package com.nuhkoca.trippo.ui.content.experience;
 
 import android.app.ActivityOptions;
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +21,6 @@ import android.view.View;
 
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.api.NetworkState;
-import com.nuhkoca.trippo.callback.IMenuItemIdListener;
 import com.nuhkoca.trippo.callback.IPopupMenuClickListener;
 import com.nuhkoca.trippo.callback.IRetryClickListener;
 import com.nuhkoca.trippo.databinding.ActivityCommonContentWithoutDistanceBinding;
@@ -30,7 +28,6 @@ import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceResult;
 import com.nuhkoca.trippo.ui.WebViewActivity;
 import com.nuhkoca.trippo.ui.content.ExperienceContentType;
-import com.nuhkoca.trippo.ui.content.experience.paging.ExperienceContentResultDataSourceFactory;
 import com.nuhkoca.trippo.ui.settings.ActivityType;
 import com.nuhkoca.trippo.ui.settings.SettingsActivity;
 import com.nuhkoca.trippo.util.ConnectionUtil;
@@ -40,6 +37,8 @@ import com.nuhkoca.trippo.util.RecyclerViewItemDecoration;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 public class ExperienceContentActivity extends AppCompatActivity implements View.OnClickListener,
         IRetryClickListener,
@@ -65,6 +64,15 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
 
     private boolean mIsExternalBrowserEnabled;
 
+    @Inject
+    ConnectionUtil connectionUtil;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +93,7 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
 
         setTitle(setupTitle(contentType, countryName));
         setupRV();
-        setupContents(contentType, countryCode());
+        setupContents();
     }
 
     private String countryCode() {
@@ -116,100 +124,43 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
         mActivityCommonContentWithoutDistanceBinding.rvCommonContent.setLayoutManager(mLayoutManager);
 
         if (!getResources().getBoolean(R.bool.isTablet)) {
-            mActivityCommonContentWithoutDistanceBinding.rvCommonContent.addItemDecoration(new RecyclerViewItemDecoration(getApplicationContext(),
-                    1, 0));
+            mActivityCommonContentWithoutDistanceBinding.rvCommonContent.addItemDecoration(
+                    new RecyclerViewItemDecoration(1, 0));
         }
     }
 
-    private void setupContents(int contentType, String countryCode) {
-        if (contentType == ExperienceContentType.PRIVATE_TOURS.getSectionId()) {
-            mExperienceContentViewModel = ViewModelProviders.of(this,
-                    new ExperienceContentViewModelFactory(ExperienceContentResultDataSourceFactory.getInstance(
-                            getString(R.string.tours_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadToursScore(this, mSharedPreferences)))).get(ExperienceContentViewModel.class);
-
-            mTagLabels = getString(R.string.tours_placeholder);
-
-        } else if (contentType == ExperienceContentType.ACTIVITIES.getSectionId()) {
-            mExperienceContentViewModel = ViewModelProviders.of(this,
-                    new ExperienceContentViewModelFactory(ExperienceContentResultDataSourceFactory.getInstance(
-                            getString(R.string.activities_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadActivitiesScore(this, mSharedPreferences)))).get(ExperienceContentViewModel.class);
-
-            mTagLabels = getString(R.string.activities_placeholder);
-
-        } else if (contentType == ExperienceContentType.MULTI_DAY_TOURS.getSectionId()) {
-            mExperienceContentViewModel = ViewModelProviders.of(this,
-                    new ExperienceContentViewModelFactory(ExperienceContentResultDataSourceFactory.getInstance(
-                            getString(R.string.multi_day_tours_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadMultiDayToursScore(this, mSharedPreferences)))).get(ExperienceContentViewModel.class);
-
-            mTagLabels = getString(R.string.multi_day_tours_placeholder);
-
-        } else if (contentType == ExperienceContentType.DAY_TRIPS.getSectionId()) {
-            mExperienceContentViewModel = ViewModelProviders.of(this,
-                    new ExperienceContentViewModelFactory(ExperienceContentResultDataSourceFactory.getInstance(
-                            getString(R.string.day_trips_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadDayTripsScore(this, mSharedPreferences)))).get(ExperienceContentViewModel.class);
-
-            mTagLabels = getString(R.string.day_trips_placeholder);
-
-        } else if (contentType == ExperienceContentType.WALKING_TOURS.getSectionId()) {
-            mExperienceContentViewModel = ViewModelProviders.of(this,
-                    new ExperienceContentViewModelFactory(ExperienceContentResultDataSourceFactory.getInstance(
-                            getString(R.string.city_walking_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadCityWalkingScore(this, mSharedPreferences)))).get(ExperienceContentViewModel.class);
-            mTagLabels = getString(R.string.city_walking_placeholder);
-
-        } else {
-            return;
-        }
+    private void setupContents() {
+        mExperienceContentViewModel = ViewModelProviders.of(this, viewModelFactory).get(ExperienceContentViewModel.class);
 
         mExperienceContentAdapter = new ExperienceContentAdapter(this, this);
 
-        mExperienceContentViewModel.getExperienceContentResult().observe(this, new Observer<PagedList<ExperienceResult>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<ExperienceResult> experienceResults) {
-                mExperienceContentAdapter.submitList(experienceResults);
-                mExperienceResult = experienceResults;
-            }
+        mExperienceContentViewModel.getExperienceContentResult().observe(this, experienceResults -> {
+            mExperienceContentAdapter.submitList(experienceResults);
+            mExperienceResult = experienceResults;
         });
 
-        mExperienceContentViewModel.getNetworkState().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                mExperienceContentAdapter.setNetworkState(networkState);
-            }
-        });
+        mExperienceContentViewModel.getNetworkState().observe(this, networkState -> mExperienceContentAdapter.setNetworkState(networkState));
 
-        mExperienceContentViewModel.getInitialLoading().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                if (networkState != null) {
-                    if (networkState.getStatus() == NetworkState.Status.SUCCESS) {
-                        mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                    } else if (networkState.getStatus() == NetworkState.Status.FAILED) {
-                        mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.VISIBLE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setText(getString(R.string.response_error_text));
-                    } else if (networkState.getStatus() == NetworkState.Status.NO_ITEM) {
-                        mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setText(getString(R.string.no_result_error_text));
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                    } else {
-                        mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.VISIBLE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                    }
+        mExperienceContentViewModel.getInitialLoading().observe(this, networkState -> {
+            if (networkState != null) {
+                if (networkState.getStatus() == NetworkState.Status.SUCCESS) {
+                    mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
+                } else if (networkState.getStatus() == NetworkState.Status.FAILED) {
+                    mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.VISIBLE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setText(getString(R.string.response_error_text));
+                } else if (networkState.getStatus() == NetworkState.Status.NO_ITEM) {
+                    mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setText(getString(R.string.no_result_error_text));
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
+                } else {
+                    mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.VISIBLE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -220,13 +171,10 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
     }
 
     private void invokeExperienceContentResultsInCaseActiveConnection() {
-        mExperienceContentViewModel.refreshExperienceContentResult().observe(this, new Observer<PagedList<ExperienceResult>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<ExperienceResult> experienceResults) {
-                mExperienceContentAdapter.submitList(null);
-                mExperienceContentAdapter.submitList(experienceResults);
-                mExperienceResult = experienceResults;
-            }
+        mExperienceContentViewModel.refreshExperienceContentResult().observe(this, experienceResults -> {
+            mExperienceContentAdapter.submitList(null);
+            mExperienceContentAdapter.submitList(experienceResults);
+            mExperienceResult = experienceResults;
         });
     }
 
@@ -307,7 +255,7 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
 
     @Override
     public void onRefresh() {
-        boolean isConnection = ConnectionUtil.sniff();
+        boolean isConnection = connectionUtil.sniff();
 
         if (isConnection) {
             invokeExperienceContentResultsInCaseActiveConnection();
@@ -327,7 +275,7 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
                 popupMenu.getMenu().findItem(R.id.book).setTitle(String.format(getString(R.string.book_via),
                         Objects.requireNonNull(mExperienceResult.get(position)).getBookingInfo().getVendor()));
 
-                mIsExternalBrowserEnabled = SharedPreferenceUtil.isInternalBrowserEnabled(this, mSharedPreferences);
+                mIsExternalBrowserEnabled = sharedPreferenceUtil.getBooleanData(getString(R.string.webview_key), false);
             } else {
                 popupMenu.getMenu().findItem(R.id.book).setVisible(false);
             }
@@ -338,33 +286,30 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
         popupMenu.getMenu().findItem(R.id.show_in_map_menu).setVisible(false);
 
         PopupMenuUtils.Builder builder = new PopupMenuUtils.Builder()
-                .listener(new IMenuItemIdListener() {
-                    @Override
-                    public void onIdReceived(int itemId) {
-                        switch (itemId) {
-                            case R.id.book:
-                                if (!mIsExternalBrowserEnabled) {
-                                    Intent browserIntent = new Intent(ExperienceContentActivity.this, WebViewActivity.class);
-                                    browserIntent.putExtra(Constants.WEB_URL_KEY,
-                                            Objects.requireNonNull(mExperienceResult.get(position)).getBookingInfo().getVendorObjectUrl());
+                .listener(itemId -> {
+                    switch (itemId) {
+                        case R.id.book:
+                            if (!mIsExternalBrowserEnabled) {
+                                Intent browserIntent = new Intent(ExperienceContentActivity.this, WebViewActivity.class);
+                                browserIntent.putExtra(Constants.WEB_URL_KEY,
+                                        Objects.requireNonNull(mExperienceResult.get(position)).getBookingInfo().getVendorObjectUrl());
 
-                                    startActivity(browserIntent,
-                                            ActivityOptions.makeSceneTransitionAnimation(ExperienceContentActivity.this).toBundle());
-                                } else {
-                                    new IntentUtils.Builder()
-                                            .setContext(getApplicationContext())
-                                            .setUrl(Objects.requireNonNull(
-                                                    mExperienceResult.get(position)).getBookingInfo().getVendorObjectUrl())
-                                            .setAction(IntentUtils.ActionType.WEB)
-                                            .create();
-                                }
+                                startActivity(browserIntent,
+                                        ActivityOptions.makeSceneTransitionAnimation(ExperienceContentActivity.this).toBundle());
+                            } else {
+                                new IntentUtils.Builder()
+                                        .setContext(getApplicationContext())
+                                        .setUrl(Objects.requireNonNull(
+                                                mExperienceResult.get(position)).getBookingInfo().getVendorObjectUrl())
+                                        .setAction(IntentUtils.ActionType.WEB)
+                                        .create();
+                            }
 
 
-                                break;
+                            break;
 
-                            default:
-                                break;
-                        }
+                        default:
+                            break;
                     }
                 });
 
@@ -377,25 +322,11 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        String score;
-
-        if (key.equals(getString(R.string.tours_key))) {
-            score = SharedPreferenceUtil.loadToursScore(this, sharedPreferences);
-        } else if (key.equals(getString(R.string.activities_key))) {
-            score = SharedPreferenceUtil.loadActivitiesScore(this, sharedPreferences);
-        } else if (key.equals(getString(R.string.multi_day_tours_key))) {
-            score = SharedPreferenceUtil.loadMultiDayToursScore(this, sharedPreferences);
-        } else if (key.equals(getString(R.string.day_trips_key))) {
-            score = SharedPreferenceUtil.loadDayTripsScore(this, sharedPreferences);
-        } else if (key.equals(getString(R.string.city_walking_key))) {
-            score = SharedPreferenceUtil.loadCityWalkingScore(this, sharedPreferences);
+        if (key.equals(getString(R.string.webview_key))) {
+            sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key, false));
         } else {
-            return;
+            sharedPreferenceUtil.putStringData(getString(R.string.score_key), sharedPreferences.getString(getString(R.string.score_key), getString(R.string.seven_and_greater_value)));
         }
-
-        ExperienceContentResultDataSourceFactory.getInstance(mTagLabels,
-                countryCode(),
-                score);
 
         invokeExperienceContentResultsInCaseActiveConnection();
     }

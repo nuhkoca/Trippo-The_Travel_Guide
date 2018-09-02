@@ -51,9 +51,17 @@ android {
 
     allprojects {
         tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+            options.compilerArgs << "-Xlint:-unchecked" << "-Xlint:deprecation"
         }
     }
+
+    compileOptions {
+        incremental true
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
 }
 
 dependencies {
@@ -80,6 +88,13 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:$rootProject.ext.lifeCycleVersion"
     testImplementation "android.arch.core:core-testing:$rootProject.ext.lifeCycleVersion"
 
+    //Dagger
+    implementation "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
+    implementation "com.google.dagger:dagger-android:$rootProject.ext.daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$rootProject.ext.daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$rootProject.ext.daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
+
     //Square Libs
     implementation "com.jakewharton.timber:timber:$rootProject.ext.timberVersion"
     implementation "com.github.bumptech.glide:glide:$rootProject.ext.glideVersion"
@@ -105,18 +120,18 @@ dependencies {
     implementation "com.facebook.stetho:stetho-okhttp3:$rootProject.ext.stethoVersion"
 
     //Firebase
-    implementation "com.google.firebase:firebase-messaging:$rootProject.ext.firebaseVersion"
+    implementation "com.google.firebase:firebase-messaging:$rootProject.ext.firebaseMessagingVersion"
     implementation "com.google.firebase:firebase-core:$rootProject.ext.firebaseCoreVersion"
     implementation "com.google.firebase:firebase-firestore:$rootProject.ext.firestoreVersion"
     implementation "com.crashlytics.sdk.android:crashlytics:$rootProject.ext.crashlyticsVersion"
-    implementation "com.google.firebase:firebase-ads:$rootProject.ext.adsVersion"
+    implementation "com.google.firebase:firebase-ads:$rootProject.ext.firebaseAdsVersion"
     implementation "com.google.firebase:firebase-auth:$rootProject.ext.firebaseAuthVersion"
 
     //Google Play Services
     implementation "com.google.android.gms:play-services-maps:$rootProject.ext.playServicesVersion"
     implementation "com.google.android.gms:play-services-location:$rootProject.ext.playServicesVersion"
     implementation "com.google.maps.android:android-maps-utils:$rootProject.ext.googleMapsUtilsVersion"
-    implementation "com.google.android.gms:play-services-auth:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-auth:$rootProject.ext.playServicesAuthVersion"
     implementation "com.google.android.gms:play-services-ads:$rootProject.ext.googleAdsVersion"
 
     //Other

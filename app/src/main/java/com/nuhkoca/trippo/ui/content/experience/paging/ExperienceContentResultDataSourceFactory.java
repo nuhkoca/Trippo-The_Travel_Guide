@@ -5,34 +5,24 @@ import android.arch.paging.DataSource;
 
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceResult;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class ExperienceContentResultDataSourceFactory extends DataSource.Factory<Integer, ExperienceResult> {
 
     private MutableLiveData<ItemKeyedExperienceContentDataSource> mItemKeyedExperienceContentDataSourceMutableLiveData;
-    private static ExperienceContentResultDataSourceFactory INSTANCE;
+    private ItemKeyedExperienceContentDataSource itemKeyedExperienceContentDataSource;
 
-    private static String mCountryCode;
-    private static String mTagLabels;
-    private static String mScore;
+    @Inject
+    public ExperienceContentResultDataSourceFactory(ItemKeyedExperienceContentDataSource itemKeyedExperienceContentDataSource) {
+        this.itemKeyedExperienceContentDataSource = itemKeyedExperienceContentDataSource;
 
-    private ExperienceContentResultDataSourceFactory() {
         mItemKeyedExperienceContentDataSourceMutableLiveData = new MutableLiveData<>();
-    }
-
-    public static ExperienceContentResultDataSourceFactory getInstance(String tagLabels, String countryCode, String score) {
-        if (INSTANCE == null) {
-            INSTANCE = new ExperienceContentResultDataSourceFactory();
-        }
-
-        mTagLabels = tagLabels;
-        mCountryCode = countryCode;
-        mScore = score;
-
-        return INSTANCE;
     }
 
     @Override
     public DataSource<Integer, ExperienceResult> create() {
-        ItemKeyedExperienceContentDataSource itemKeyedExperienceContentDataSource = new ItemKeyedExperienceContentDataSource(mTagLabels, mCountryCode, mScore);
         mItemKeyedExperienceContentDataSourceMutableLiveData.postValue(itemKeyedExperienceContentDataSource);
 
         return itemKeyedExperienceContentDataSource;
@@ -40,5 +30,9 @@ public class ExperienceContentResultDataSourceFactory extends DataSource.Factory
 
     public MutableLiveData<ItemKeyedExperienceContentDataSource> getItemKeyedExperienceContentDataSourceMutableLiveData() {
         return mItemKeyedExperienceContentDataSourceMutableLiveData;
+    }
+
+    public ItemKeyedExperienceContentDataSource getItemKeyedExperienceContentDataSource() {
+        return itemKeyedExperienceContentDataSource;
     }
 }

@@ -4,7 +4,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,10 +16,11 @@ import com.nuhkoca.trippo.helper.Constants;
 
 import java.util.Calendar;
 
+import dagger.android.support.DaggerAppCompatActivity;
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
 
-public class AboutActivity extends AppCompatActivity {
+public class AboutActivity extends DaggerAppCompatActivity {
 
     private ActivityAboutBinding mActivityAboutBinding;
 
@@ -67,12 +67,7 @@ public class AboutActivity extends AppCompatActivity {
         String version = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME);
 
         versionElement.setTitle(version);
-        versionElement.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), getString(R.string.up_to_date_toast), Toast.LENGTH_SHORT).show();
-            }
-        });
+        versionElement.setOnClickListener(v -> Toast.makeText(getApplicationContext(), getString(R.string.up_to_date_toast), Toast.LENGTH_SHORT).show());
 
         return versionElement;
     }

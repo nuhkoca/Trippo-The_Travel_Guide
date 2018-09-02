@@ -72,6 +72,7 @@ _Soon_
 ### Credits
 
 * [Support Library](https://developer.android.com/topic/libraries/support-library/)
+* [Dagger2](https://google.github.io/dagger)
 * [MVVM Pattern](https://github.com/googlesamples/android-architecture)
 * [Architecture Components](https://developer.android.com/topic/libraries/architecture/)
 * [BindingAdapter](https://developer.android.com/reference/android/databinding/BindingAdapter.html)

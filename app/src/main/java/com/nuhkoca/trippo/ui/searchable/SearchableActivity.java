@@ -2,7 +2,7 @@ package com.nuhkoca.trippo.ui.searchable;
 
 import android.app.ActivityOptions;
 import android.app.SearchManager;
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
 import android.content.Context;
@@ -18,7 +18,6 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
@@ -31,10 +30,7 @@ import android.widget.ImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.api.NetworkState;
-import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
 import com.nuhkoca.trippo.callback.ICatalogueItemClickListener;
-import com.nuhkoca.trippo.callback.IDatabaseProgressListener;
-import com.nuhkoca.trippo.callback.IMenuItemIdListener;
 import com.nuhkoca.trippo.callback.IPopupMenuClickListener;
 import com.nuhkoca.trippo.callback.IRetryClickListener;
 import com.nuhkoca.trippo.databinding.ActivitySearchableCommonBinding;
@@ -48,7 +44,6 @@ import com.nuhkoca.trippo.ui.AuthActivity;
 import com.nuhkoca.trippo.ui.CountryDetailActivity;
 import com.nuhkoca.trippo.ui.favorite.FavoritesActivity;
 import com.nuhkoca.trippo.ui.nearby.NearbyActivity;
-import com.nuhkoca.trippo.ui.searchable.paging.CountryResultDataSourceFactory;
 import com.nuhkoca.trippo.util.AppWidgetUtils;
 import com.nuhkoca.trippo.util.ConnectionUtil;
 import com.nuhkoca.trippo.util.PopupMenuUtils;
@@ -57,7 +52,11 @@ import com.nuhkoca.trippo.util.SnackbarUtils;
 
 import java.util.Objects;
 
-public class SearchableActivity extends AppCompatActivity implements View.OnClickListener, IRetryClickListener, ICatalogueItemClickListener, IPopupMenuClickListener {
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class SearchableActivity extends DaggerAppCompatActivity implements View.OnClickListener, IRetryClickListener, ICatalogueItemClickListener, IPopupMenuClickListener {
 
     private SearchView mSearchView;
     private ActivitySearchableCommonBinding mActivitySearchableCommonBinding;
@@ -72,6 +71,15 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
     private LinearLayoutManager mLayoutManager;
 
     private PagedList<CountryResult> mCountryResult;
+
+    @Inject
+    FavoriteCountriesRepository favoriteCountriesRepository;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+
+    @Inject
+    ConnectionUtil connectionUtil;
 
     @VisibleForTesting
     @Nullable
@@ -97,7 +105,7 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
         mActivitySearchableCommonBinding = DataBindingUtil.setContentView(this, R.layout.activity_searchable_common);
         setTitle(getString(R.string.catalogue_name));
 
-        mSearchableActivityViewModel = ViewModelProviders.of(this, new SearchableActivityViewModelFactory(CountryResultDataSourceFactory.getInstance()))
+        mSearchableActivityViewModel = ViewModelProviders.of(this, viewModelFactory)
                 .get(SearchableActivityViewModel.class);
 
         if (savedInstanceState != null) {
@@ -151,12 +159,7 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
         }
 
         if (!TextUtils.isEmpty(sSearchString)) {
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    mSearchView.setQuery(sSearchString, true);
-                }
-            });
+            new Handler().post(() -> mSearchView.setQuery(sSearchString, true));
 
             mSearchView.setIconified(false);
             mSearchView.setFocusable(true);
@@ -195,77 +198,65 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
         mActivitySearchableCommonBinding.rvCatalogue.setLayoutManager(mLayoutManager);
 
         if (!getResources().getBoolean(R.bool.isTablet)) {
-            mActivitySearchableCommonBinding.rvCatalogue.addItemDecoration(new RecyclerViewItemDecoration(getApplicationContext(),
-                    1, 0));
+            mActivitySearchableCommonBinding.rvCatalogue.addItemDecoration(new RecyclerViewItemDecoration(1, 0));
         }
 
         mSearchableAdapter = new SearchableAdapter(this, this, this);
 
-        mSearchableActivityViewModel.getCountryResult().observe(this, new Observer<PagedList<CountryResult>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<CountryResult> countryResults) {
-                mSearchableAdapter.submitList(countryResults);
-                mSearchableAdapter.swapCatalogue(countryResults);
+        mSearchableActivityViewModel.getCountryResult().observe(this, countryResults -> {
+            mSearchableAdapter.submitList(countryResults);
+            mSearchableAdapter.swapCatalogue(countryResults);
 
-                mCountryResult = countryResults;
+            mCountryResult = countryResults;
 
-                if (mIdlingResource != null) {
-                    mIdlingResource.setIdleState(true);
-                }
+            if (mIdlingResource != null) {
+                mIdlingResource.setIdleState(true);
             }
         });
 
 
-        mSearchableActivityViewModel.getNetworkState().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                mSearchableAdapter.setNetworkState(networkState);
-            }
-        });
+        mSearchableActivityViewModel.getNetworkState().observe(this, networkState -> mSearchableAdapter.setNetworkState(networkState));
 
 
-        mSearchableActivityViewModel.getInitialLoading().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                if (networkState != null) {
-                    if (networkState.getStatus() == NetworkState.Status.SUCCESS) {
-                        mActivitySearchableCommonBinding.pbCatalogue.setVisibility(View.GONE);
-                        mActivitySearchableCommonBinding.tvCatalogueErr.setVisibility(View.GONE);
-                        mActivitySearchableCommonBinding.tvCatalogueErrButton.setVisibility(View.GONE);
+        mSearchableActivityViewModel.getInitialLoading().observe(this, networkState -> {
+            if (networkState != null) {
+                if (networkState.getStatus() == NetworkState.Status.SUCCESS) {
+                    mActivitySearchableCommonBinding.pbCatalogue.setVisibility(View.GONE);
+                    mActivitySearchableCommonBinding.tvCatalogueErr.setVisibility(View.GONE);
+                    mActivitySearchableCommonBinding.tvCatalogueErrButton.setVisibility(View.GONE);
 
-                        if (mIdlingResource != null) {
-                            mIdlingResource.setIdleState(true);
-                        }
+                    if (mIdlingResource != null) {
+                        mIdlingResource.setIdleState(true);
+                    }
 
-                    } else if (networkState.getStatus() == NetworkState.Status.FAILED) {
-                        mActivitySearchableCommonBinding.pbCatalogue.setVisibility(View.GONE);
-                        mActivitySearchableCommonBinding.tvCatalogueErr.setVisibility(View.VISIBLE);
-                        mActivitySearchableCommonBinding.tvCatalogueErrButton.setVisibility(View.VISIBLE);
-                        mActivitySearchableCommonBinding.tvCatalogueErr.setText(getString(R.string.response_error_text));
+                } else if (networkState.getStatus() == NetworkState.Status.FAILED) {
+                    mActivitySearchableCommonBinding.pbCatalogue.setVisibility(View.GONE);
+                    mActivitySearchableCommonBinding.tvCatalogueErr.setVisibility(View.VISIBLE);
+                    mActivitySearchableCommonBinding.tvCatalogueErrButton.setVisibility(View.VISIBLE);
+                    mActivitySearchableCommonBinding.tvCatalogueErr.setText(getString(R.string.response_error_text));
 
-                        if (mIdlingResource != null) {
-                            mIdlingResource.setIdleState(false);
-                        }
+                    if (mIdlingResource != null) {
+                        mIdlingResource.setIdleState(false);
+                    }
 
-                        invalidateOptionsMenu();
+                    invalidateOptionsMenu();
 
-                    } else if (networkState.getStatus() == NetworkState.Status.NO_ITEM) {
-                        mActivitySearchableCommonBinding.pbCatalogue.setVisibility(View.GONE);
-                        mActivitySearchableCommonBinding.tvCatalogueErr.setVisibility(View.VISIBLE);
-                        mActivitySearchableCommonBinding.tvCatalogueErr.setText(getString(R.string.no_result_error_text));
-                        mActivitySearchableCommonBinding.tvCatalogueErrButton.setVisibility(View.GONE);
+                } else if (networkState.getStatus() == NetworkState.Status.NO_ITEM) {
+                    mActivitySearchableCommonBinding.pbCatalogue.setVisibility(View.GONE);
+                    mActivitySearchableCommonBinding.tvCatalogueErr.setVisibility(View.VISIBLE);
+                    mActivitySearchableCommonBinding.tvCatalogueErr.setText(getString(R.string.no_result_error_text));
+                    mActivitySearchableCommonBinding.tvCatalogueErrButton.setVisibility(View.GONE);
 
-                        if (mIdlingResource != null) {
-                            mIdlingResource.setIdleState(false);
-                        }
-                    } else {
-                        mActivitySearchableCommonBinding.pbCatalogue.setVisibility(View.VISIBLE);
-                        mActivitySearchableCommonBinding.tvCatalogueErr.setVisibility(View.GONE);
-                        mActivitySearchableCommonBinding.tvCatalogueErrButton.setVisibility(View.GONE);
+                    if (mIdlingResource != null) {
+                        mIdlingResource.setIdleState(false);
+                    }
+                } else {
+                    mActivitySearchableCommonBinding.pbCatalogue.setVisibility(View.VISIBLE);
+                    mActivitySearchableCommonBinding.tvCatalogueErr.setVisibility(View.GONE);
+                    mActivitySearchableCommonBinding.tvCatalogueErrButton.setVisibility(View.GONE);
 
-                        if (mIdlingResource != null) {
-                            mIdlingResource.setIdleState(false);
-                        }
+                    if (mIdlingResource != null) {
+                        mIdlingResource.setIdleState(false);
                     }
                 }
             }
@@ -277,16 +268,13 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void invokeInCaseActiveConnection() {
-        mSearchableActivityViewModel.refreshCountryResults().observe(this, new Observer<PagedList<CountryResult>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<CountryResult> countryResults) {
-                mSearchableAdapter.submitList(null);
-                mSearchableAdapter.submitList(countryResults);
-                mCountryResult = countryResults;
+        mSearchableActivityViewModel.refreshCountryResults().observe(this, countryResults -> {
+            mSearchableAdapter.submitList(null);
+            mSearchableAdapter.submitList(countryResults);
+            mCountryResult = countryResults;
 
-                if (mIdlingResource != null) {
-                    mIdlingResource.setIdleState(true);
-                }
+            if (mIdlingResource != null) {
+                mIdlingResource.setIdleState(true);
             }
         });
     }
@@ -382,7 +370,7 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onRefresh() {
-        boolean isConnection = ConnectionUtil.sniff();
+        boolean isConnection = connectionUtil.sniff();
 
         if (isConnection) {
             invokeInCaseActiveConnection();
@@ -418,47 +406,39 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
         menuInflater.inflate(R.menu.catalogue_overflow_menu, popupMenu.getMenu());
 
         PopupMenuUtils.Builder builder = new PopupMenuUtils.Builder()
-                .listener(new IMenuItemIdListener() {
-                    @Override
-                    public void onIdReceived(int itemId) {
-                        switch (itemId) {
-                            case R.id.show_in_map_menu:
-                                Intent mapIntent = new Intent(SearchableActivity.this, NearbyActivity.class);
-                                mapIntent.putExtra(Constants.CATALOGUE_LAT_REQ,
-                                        Objects.requireNonNull(mCountryResult.get(position)).getCoordinates().getLat());
-                                mapIntent.putExtra(Constants.CATALOGUE_LNG_REQ,
-                                        Objects.requireNonNull(mCountryResult.get(position)).getCoordinates().getLng());
-                                mapIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY,
-                                        Objects.requireNonNull(mCountryResult.get(position)).getName());
+                .listener(itemId -> {
+                    switch (itemId) {
+                        case R.id.show_in_map_menu:
+                            Intent mapIntent = new Intent(SearchableActivity.this, NearbyActivity.class);
+                            mapIntent.putExtra(Constants.CATALOGUE_LAT_REQ,
+                                    Objects.requireNonNull(mCountryResult.get(position)).getCoordinates().getLat());
+                            mapIntent.putExtra(Constants.CATALOGUE_LNG_REQ,
+                                    Objects.requireNonNull(mCountryResult.get(position)).getCoordinates().getLng());
+                            mapIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY,
+                                    Objects.requireNonNull(mCountryResult.get(position)).getName());
 
-                                startActivity(mapIntent,
-                                        ActivityOptions.makeSceneTransitionAnimation(SearchableActivity.this).toBundle());
+                            startActivity(mapIntent,
+                                    ActivityOptions.makeSceneTransitionAnimation(SearchableActivity.this).toBundle());
 
-                                break;
+                            break;
 
-                            case R.id.add_to_favorites_menu:
+                        case R.id.add_to_favorites_menu:
 
-                                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                    addToDb(Objects.requireNonNull(mCountryResult.get(position)), position);
-                                    AppWidgetUtils.update(SearchableActivity.this);
-                                } else {
-                                    new SnackbarUtils.Builder()
-                                            .setView(mActivitySearchableCommonBinding.clSearchable)
-                                            .setLength(SnackbarUtils.Length.LONG)
-                                            .setMessage(getString(R.string.sign_in_alert))
-                                            .show(getString(R.string.sign_in_action_text), new IAlertDialogItemClickListener.Snackbar() {
-                                                @Override
-                                                public void onActionListen() {
-                                                    startActivity(new Intent(SearchableActivity.this, AuthActivity.class));
-                                                }
-                                            });
-                                }
+                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                addToDb(Objects.requireNonNull(mCountryResult.get(position)), position);
+                                AppWidgetUtils.update(SearchableActivity.this);
+                            } else {
+                                new SnackbarUtils.Builder()
+                                        .setView(mActivitySearchableCommonBinding.clSearchable)
+                                        .setLength(SnackbarUtils.Length.LONG)
+                                        .setMessage(getString(R.string.sign_in_alert))
+                                        .show(getString(R.string.sign_in_action_text), () -> startActivity(new Intent(SearchableActivity.this, AuthActivity.class)));
+                            }
 
-                                break;
+                            break;
 
-                            default:
-                                break;
-                        }
+                        default:
+                            break;
                     }
                 });
 
@@ -489,26 +469,21 @@ public class SearchableActivity extends AppCompatActivity implements View.OnClic
                 lng
         );
 
-        FavoriteCountriesRepository favoriteCountriesRepository = new FavoriteCountriesRepository(getApplication());
-
-        favoriteCountriesRepository.insertOrThrow(favoriteCountries, cid, new IDatabaseProgressListener() {
-            @Override
-            public void onItemRetrieved(boolean result) {
-                if (!result) {
-                    new SnackbarUtils.Builder()
-                            .setView(mActivitySearchableCommonBinding.clSearchable)
-                            .setMessage(String.format(getString(R.string.constraint_exception_text), countryResult.getName()))
-                            .setLength(SnackbarUtils.Length.LONG)
-                            .show(getString(R.string.dismiss_action_text), null)
-                            .build();
-                } else {
-                    new SnackbarUtils.Builder()
-                            .setView(mActivitySearchableCommonBinding.clSearchable)
-                            .setMessage(String.format(getString(R.string.database_adding_info_text), countryResult.getName()))
-                            .setLength(SnackbarUtils.Length.LONG)
-                            .show(getString(R.string.dismiss_action_text), null)
-                            .build();
-                }
+        favoriteCountriesRepository.insertOrThrow(favoriteCountries, cid, result -> {
+            if (result) {
+                new SnackbarUtils.Builder()
+                        .setView(mActivitySearchableCommonBinding.clSearchable)
+                        .setMessage(String.format(getString(R.string.constraint_exception_text), countryResult.getName()))
+                        .setLength(SnackbarUtils.Length.LONG)
+                        .show(getString(R.string.dismiss_action_text), null)
+                        .build();
+            } else {
+                new SnackbarUtils.Builder()
+                        .setView(mActivitySearchableCommonBinding.clSearchable)
+                        .setMessage(String.format(getString(R.string.database_adding_info_text), countryResult.getName()))
+                        .setLength(SnackbarUtils.Length.LONG)
+                        .show(getString(R.string.dismiss_action_text), null)
+                        .build();
             }
         });
     }

@@ -1,16 +1,26 @@
 package com.nuhkoca.trippo.util;
 
+import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.nuhkoca.trippo.TrippoApp;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class ConnectionUtil {
 
-    public static boolean sniff() {
+    private Application application;
+
+    @Inject
+    public ConnectionUtil(Application application) {
+        this.application = application;
+    }
+
+    public boolean sniff() {
         ConnectivityManager connectivityManager =
-                (ConnectivityManager) TrippoApp.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo = null;
         if (connectivityManager != null) {

@@ -244,6 +244,11 @@
     <!-- Outside Values/Labels -->
     <string name="outside_header">Outside Content Preferences</string>
     <string name="outside_summary">Changes will be reflected right away after any selection.</string>
+    <string name="activity_key">activity_key</string>
+    <string name="country_key">country_key</string>
+    <string name="tag_key">tag_key</string>
+    <string name="score_key">score_key</string>
+
     <string name="sightseeing_key" translatable="false">sightseeing</string>
     <string name="eat_drink_key" translatable="false">eat_and_drink</string>
     <string name="nightlife_key" translatable="false">nightlife</string>

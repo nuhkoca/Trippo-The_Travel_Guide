@@ -1,15 +1,12 @@
 package com.nuhkoca.trippo.ui.content.article;
 
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.paging.PagedList;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,14 +22,17 @@ import com.nuhkoca.trippo.databinding.ActivityCommonContentWithoutDistanceBindin
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleResult;
 import com.nuhkoca.trippo.ui.content.ArticleContentType;
-import com.nuhkoca.trippo.ui.content.article.paging.ArticleResultDataSourceFactory;
 import com.nuhkoca.trippo.ui.settings.ActivityType;
 import com.nuhkoca.trippo.ui.settings.SettingsActivity;
 import com.nuhkoca.trippo.util.ConnectionUtil;
 import com.nuhkoca.trippo.util.IntentUtils;
 import com.nuhkoca.trippo.util.RecyclerViewItemDecoration;
 
-public class ArticleActivity extends AppCompatActivity implements
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class ArticleActivity extends DaggerAppCompatActivity implements
         ICatalogueItemClickListener.Article,
         IRetryClickListener,
         View.OnClickListener {
@@ -46,6 +46,12 @@ public class ArticleActivity extends AppCompatActivity implements
     private int sTop = -1;
 
     private ArticleAdapter mArticleAdapter;
+
+    @Inject
+    ConnectionUtil connectionUtil;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +70,7 @@ public class ArticleActivity extends AppCompatActivity implements
 
         setTitle(setupTitle(contentType, countryName));
         setupRV();
-        setupContents(contentType, countryCode());
+        setupContents();
     }
 
     private String countryCode() {
@@ -95,67 +101,39 @@ public class ArticleActivity extends AppCompatActivity implements
         mActivityCommonContentWithoutDistanceBinding.rvCommonContent.setLayoutManager(mLayoutManager);
 
         if (!getResources().getBoolean(R.bool.isTablet)) {
-            mActivityCommonContentWithoutDistanceBinding.rvCommonContent.addItemDecoration(new RecyclerViewItemDecoration(getApplicationContext(),
-                    1, 0));
+            mActivityCommonContentWithoutDistanceBinding.rvCommonContent.addItemDecoration(new RecyclerViewItemDecoration(1, 0));
         }
     }
 
-    private void setupContents(int contentType, String countryCode) {
-        if (contentType == ArticleContentType.BACKGROUND.getSectionId()) {
-            mArticleViewModel = ViewModelProviders.of(this,
-                    new ArticleViewModelFactory(ArticleResultDataSourceFactory.getInstance(
-                            endpoint(),
-                            countryCode))).get(ArticleViewModel.class);
-
-        } else if (contentType == ArticleContentType.PRACTICALITIES.getSectionId()) {
-            mArticleViewModel = ViewModelProviders.of(this,
-                    new ArticleViewModelFactory(ArticleResultDataSourceFactory.getInstance(
-                            endpoint(),
-                            countryCode))).get(ArticleViewModel.class);
-
-        } else {
-            return;
-        }
+    private void setupContents() {
+            mArticleViewModel = ViewModelProviders.of(this, viewModelFactory).get(ArticleViewModel.class);
 
         mArticleAdapter = new ArticleAdapter(this, this);
 
-        mArticleViewModel.getArticleResult().observe(this, new Observer<PagedList<ArticleResult>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<ArticleResult> articleResults) {
-                mArticleAdapter.submitList(articleResults);
-            }
-        });
+        mArticleViewModel.getArticleResult().observe(this, articleResults -> mArticleAdapter.submitList(articleResults));
 
-        mArticleViewModel.getNetworkState().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                mArticleAdapter.setNetworkState(networkState);
-            }
-        });
+        mArticleViewModel.getNetworkState().observe(this, networkState -> mArticleAdapter.setNetworkState(networkState));
 
-        mArticleViewModel.getInitialLoading().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                if (networkState != null) {
-                    if (networkState.getStatus() == NetworkState.Status.SUCCESS) {
-                        mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                    } else if (networkState.getStatus() == NetworkState.Status.FAILED) {
-                        mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.VISIBLE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setText(getString(R.string.response_error_text));
-                    } else if (networkState.getStatus() == NetworkState.Status.NO_ITEM) {
-                        mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setText(getString(R.string.no_result_error_text));
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                    } else {
-                        mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.VISIBLE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.GONE);
-                        mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                    }
+        mArticleViewModel.getInitialLoading().observe(this, networkState -> {
+            if (networkState != null) {
+                if (networkState.getStatus() == NetworkState.Status.SUCCESS) {
+                    mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
+                } else if (networkState.getStatus() == NetworkState.Status.FAILED) {
+                    mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.VISIBLE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setText(getString(R.string.response_error_text));
+                } else if (networkState.getStatus() == NetworkState.Status.NO_ITEM) {
+                    mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setText(getString(R.string.no_result_error_text));
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
+                } else {
+                    mActivityCommonContentWithoutDistanceBinding.pbCommonContent.setVisibility(View.VISIBLE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErr.setVisibility(View.GONE);
+                    mActivityCommonContentWithoutDistanceBinding.tvCommonContentErrButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -166,12 +144,9 @@ public class ArticleActivity extends AppCompatActivity implements
     }
 
     private void invokeArticleResultsInCaseActiveConnection() {
-        mArticleViewModel.refreshArticleResult().observe(this, new Observer<PagedList<ArticleResult>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<ArticleResult> articleResults) {
-                mArticleAdapter.submitList(null);
-                mArticleAdapter.submitList(articleResults);
-            }
+        mArticleViewModel.refreshArticleResult().observe(this, articleResults -> {
+            mArticleAdapter.submitList(null);
+            mArticleAdapter.submitList(articleResults);
         });
     }
 
@@ -258,7 +233,7 @@ public class ArticleActivity extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
-        boolean isConnection = ConnectionUtil.sniff();
+        boolean isConnection = connectionUtil.sniff();
 
         if (isConnection) {
             invokeArticleResultsInCaseActiveConnection();

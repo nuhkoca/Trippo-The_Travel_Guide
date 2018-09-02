@@ -4,32 +4,32 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.ItemKeyedDataSource;
 import android.support.annotation.NonNull;
 
+import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.helper.Constants;
-import com.nuhkoca.trippo.repository.api.EndpointRepository;
 import com.nuhkoca.trippo.model.remote.country.CountryResult;
 import com.nuhkoca.trippo.model.remote.country.CountryWrapper;
-import com.nuhkoca.trippo.api.NetworkState;
+import com.nuhkoca.trippo.repository.api.EndpointRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
+import javax.inject.Inject;
+
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 public class ItemKeyedCountryDataSource extends ItemKeyedDataSource<Integer, CountryResult> {
 
-    private EndpointRepository mEndpointRepository;
+    private EndpointRepository endpointRepository;
+
     private int mPagedLoadSize = Constants.OFFSET_SIZE;
     private int mIsMoreOnce = 0;
 
     private MutableLiveData<NetworkState> mNetworkState;
     private MutableLiveData<NetworkState> mInitialLoading;
 
-    ItemKeyedCountryDataSource() {
-        mEndpointRepository = EndpointRepository.getInstance();
+    @Inject
+    public ItemKeyedCountryDataSource(EndpointRepository endpointRepository) {
+        this.endpointRepository = endpointRepository;
 
         mNetworkState = new MutableLiveData<>();
         mInitialLoading = new MutableLiveData<>();
@@ -50,16 +50,7 @@ public class ItemKeyedCountryDataSource extends ItemKeyedDataSource<Integer, Cou
         mNetworkState.postValue(NetworkState.LOADING);
         mInitialLoading.postValue(NetworkState.LOADING);
 
-        mEndpointRepository.getCountryList(0)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends CountryWrapper>>() {
-                    @Override
-                    public Observable<? extends CountryWrapper> call(Throwable throwable) {
-                        return Observable.error(throwable);
-                    }
-                })
+        endpointRepository.getCountryList(0)
                 .subscribe(new Subscriber<CountryWrapper>() {
                     @Override
                     public void onCompleted() {
@@ -80,9 +71,6 @@ public class ItemKeyedCountryDataSource extends ItemKeyedDataSource<Integer, Cou
 
                             mNetworkState.postValue(NetworkState.LOADED);
                             mInitialLoading.postValue(NetworkState.LOADED);
-                        } else {
-                            mNetworkState.postValue(new NetworkState(NetworkState.Status.NO_ITEM));
-                            mInitialLoading.postValue(new NetworkState(NetworkState.Status.NO_ITEM));
                         }
                     }
                 });
@@ -94,16 +82,7 @@ public class ItemKeyedCountryDataSource extends ItemKeyedDataSource<Integer, Cou
 
         mNetworkState.postValue(NetworkState.LOADING);
 
-        mEndpointRepository.getCountryList(params.key)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends CountryWrapper>>() {
-                    @Override
-                    public Observable<? extends CountryWrapper> call(Throwable throwable) {
-                        return Observable.error(throwable);
-                    }
-                })
+        endpointRepository.getCountryList(params.key)
                 .subscribe(new Subscriber<CountryWrapper>() {
                     @Override
                     public void onCompleted() {

@@ -7,18 +7,22 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.db.TrippoDatabase;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
 import com.nuhkoca.trippo.repository.db.FavoriteCountriesRepository;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by nuhkoca on 3/17/18.
  */
 
 public class GridWidgetService extends RemoteViewsService {
+
+    @Inject
+    AppsExecutor appsExecutor;
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
@@ -28,39 +32,28 @@ public class GridWidgetService extends RemoteViewsService {
     public class GridRemoteViewsFactory implements RemoteViewsFactory {
 
         private Context mContext;
-        private FavoriteCountriesRepository mFavoriteCountriesRepository;
+
+        @Inject
+        FavoriteCountriesRepository mFavoriteCountriesRepository;
+
         private List<FavoriteCountries> mFavoriteCountriesList;
 
         GridRemoteViewsFactory(Context context) {
             this.mContext = context;
-
-            mFavoriteCountriesRepository = new FavoriteCountriesRepository(getApplication());
         }
 
         @Override
         public void onCreate() {
-            AppsExecutor.backgroundThread().execute(new Runnable() {
-                @Override
-                public void run() {
-                    mFavoriteCountriesList = mFavoriteCountriesRepository.getAllForWidget();
-                }
-            });
+            appsExecutor.diskIO().execute(() -> mFavoriteCountriesList = mFavoriteCountriesRepository.getAllForWidget());
         }
 
         @Override
         public void onDataSetChanged() {
-            AppsExecutor.backgroundThread().execute(new Runnable() {
-                @Override
-                public void run() {
-                    mFavoriteCountriesList = mFavoriteCountriesRepository.getAllForWidget();
-                }
-            });
+            appsExecutor.diskIO().execute(() -> mFavoriteCountriesList = mFavoriteCountriesRepository.getAllForWidget());
         }
 
         @Override
-        public void onDestroy() {
-            TrippoDatabase.destroyInstance();
-        }
+        public void onDestroy() {}
 
         @Override
         public int getCount() {

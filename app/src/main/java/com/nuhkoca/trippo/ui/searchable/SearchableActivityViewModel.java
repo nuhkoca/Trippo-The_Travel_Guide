@@ -1,43 +1,38 @@
 package com.nuhkoca.trippo.ui.searchable;
 
-import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
 
+import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.country.CountryResult;
-import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.ui.searchable.paging.CountryResultDataSourceFactory;
 import com.nuhkoca.trippo.ui.searchable.paging.ItemKeyedCountryDataSource;
+
+import javax.inject.Inject;
 
 public class SearchableActivityViewModel extends ViewModel {
 
     private LiveData<NetworkState> networkState;
     private LiveData<NetworkState> initialLoading;
     private LiveData<PagedList<CountryResult>> countryResult;
+
     private CountryResultDataSourceFactory countryResultDataSourceFactory;
+    private AppsExecutor appsExecutor;
 
-    SearchableActivityViewModel(CountryResultDataSourceFactory countryResultDataSourceFactory) {
+    @Inject
+    SearchableActivityViewModel(CountryResultDataSourceFactory countryResultDataSourceFactory, AppsExecutor appsExecutor) {
         this.countryResultDataSourceFactory = countryResultDataSourceFactory;
+        this.appsExecutor = appsExecutor;
 
-        networkState = Transformations.switchMap(countryResultDataSourceFactory.getItemKeyedCountryDataSourceMutableLiveData(), new Function<ItemKeyedCountryDataSource, LiveData<NetworkState>>() {
-            @Override
-            public LiveData<NetworkState> apply(ItemKeyedCountryDataSource input) {
-                return input.getNetworkState();
-            }
-        });
+        networkState = Transformations.switchMap(countryResultDataSourceFactory.getItemKeyedCountryDataSourceMutableLiveData(), ItemKeyedCountryDataSource::getNetworkState);
 
         initialLoading = Transformations.switchMap(countryResultDataSourceFactory.getItemKeyedCountryDataSourceMutableLiveData(),
-                new Function<ItemKeyedCountryDataSource, LiveData<NetworkState>>() {
-                    @Override
-                    public LiveData<NetworkState> apply(ItemKeyedCountryDataSource input) {
-                        return input.getInitialLoading();
-                    }
-                });
+                ItemKeyedCountryDataSource::getInitialLoading);
 
         PagedList.Config config = new PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
@@ -47,7 +42,7 @@ public class SearchableActivityViewModel extends ViewModel {
                 .build();
 
         countryResult = new LivePagedListBuilder<>(countryResultDataSourceFactory, config)
-                .setFetchExecutor(AppsExecutor.networkIO())
+                .setFetchExecutor(appsExecutor.networkIO())
                 .build();
     }
 
@@ -72,7 +67,7 @@ public class SearchableActivityViewModel extends ViewModel {
                 .build();
 
         countryResult = new LivePagedListBuilder<>(countryResultDataSourceFactory, config)
-                .setFetchExecutor(AppsExecutor.networkIO())
+                .setFetchExecutor(appsExecutor.networkIO())
                 .build();
 
         return countryResult;

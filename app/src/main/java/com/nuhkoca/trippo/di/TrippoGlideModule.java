@@ -1,4 +1,4 @@
-package com.nuhkoca.trippo.module;
+package com.nuhkoca.trippo.di;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,13 +17,12 @@ import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
+import com.nuhkoca.trippo.R;
 
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
-
-import com.nuhkoca.trippo.R;
 
 import static com.bumptech.glide.load.DecodeFormat.PREFER_ARGB_8888;
 

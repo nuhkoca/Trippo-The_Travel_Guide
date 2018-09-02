@@ -1,7 +1,7 @@
 package com.nuhkoca.trippo.ui.nearby;
 
 import android.Manifest;
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +22,6 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,12 +44,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
 import com.nuhkoca.trippo.databinding.ActivityNearbyBinding;
 import com.nuhkoca.trippo.helper.Constants;
-import com.nuhkoca.trippo.model.remote.places.PlacesWrapper;
 import com.nuhkoca.trippo.model.remote.places.Results;
-import com.nuhkoca.trippo.repository.api.PlacesEndpointRepository;
 import com.nuhkoca.trippo.ui.settings.ActivityType;
 import com.nuhkoca.trippo.ui.settings.SettingsActivity;
 import com.nuhkoca.trippo.util.AlertDialogUtils;
@@ -60,12 +56,15 @@ import com.nuhkoca.trippo.util.SnackbarUtils;
 import java.util.List;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
-public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallback,
+public class NearbyActivity extends DaggerAppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         EasyPermissions.PermissionCallbacks,
@@ -93,13 +92,16 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
 
     private int mReqCode;
 
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivityNearbyBinding = DataBindingUtil.setContentView(this, R.layout.activity_nearby);
         setTitle(getString(R.string.nearby_name));
 
-        mNearbyActivityViewModel = ViewModelProviders.of(this, new NearbyActivityViewModelFactory(getApplication(), PlacesEndpointRepository.getInstance())).get(NearbyActivityViewModel.class);
+        mNearbyActivityViewModel = ViewModelProviders.of(this, viewModelFactory).get(NearbyActivityViewModel.class);
 
         ActionBar actionBar = getSupportActionBar();
 
@@ -116,12 +118,9 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
             mType = savedInstanceState.getString(Constants.PLACE_TYPE_STATE);
             mMapZoom = savedInstanceState.getFloat(Constants.ZOOM_STATE);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (!TextUtils.isEmpty(mType)) {
-                        nearbyPlace(mType, loadMapPreferencesFromSettings(mSharedPreferences));
-                    }
+            new Handler().postDelayed(() -> {
+                if (!TextUtils.isEmpty(mType)) {
+                    nearbyPlace(mType, loadMapPreferencesFromSettings(mSharedPreferences));
                 }
             }, 1000);
         }
@@ -219,12 +218,9 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         });
 
-        mActivityNearbyBinding.lBottomSheet.clBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
-                    toggleBottomSheet();
-                }
+        mActivityNearbyBinding.lBottomSheet.clBottomSheet.setOnClickListener(v -> {
+            if (mReqCode == Constants.PARENT_ACTIVITY_REQ_CODE) {
+                toggleBottomSheet();
             }
         });
 
@@ -306,27 +302,19 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.setPadding(0, 0, 0, 150);
 
-        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-            @Override
-            public boolean onMyLocationButtonClick() {
-                reCenterMap();
+        mMap.setOnMyLocationButtonClickListener(() -> {
+            reCenterMap();
 
-                if (!isGPSEnabled()) {
-                    showGPSAlert();
-
-                    return true;
-                }
+            if (!isGPSEnabled()) {
+                showGPSAlert();
 
                 return true;
             }
+
+            return true;
         });
 
-        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            @Override
-            public void onCameraMove() {
-                mMapZoom = mMap.getCameraPosition().zoom;
-            }
-        });
+        mMap.setOnCameraMoveListener(() -> mMapZoom = mMap.getCameraPosition().zoom);
     }
 
     private void getRequestFromCatalogue() {
@@ -530,52 +518,49 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         mType = type;
 
         mNearbyActivityViewModel.findNearbyPlaces(location, radius, mType);
-        mNearbyActivityViewModel.getNearbyPlaces().observe(this, new Observer<PlacesWrapper>() {
-            @Override
-            public void onChanged(@Nullable PlacesWrapper placesWrapper) {
-                if (placesWrapper != null && placesWrapper.getResults().size() != 0) {
-                    mMap.clear();
+        mNearbyActivityViewModel.getNearbyPlaces().observe(this, placesWrapper -> {
+            if (placesWrapper != null && placesWrapper.getResults().size() != 0) {
+                mMap.clear();
 
-                    for (int i = 0; i < placesWrapper.getResults().size(); i++) {
-                        MarkerOptions markerOptions = new MarkerOptions();
+                for (int i = 0; i < placesWrapper.getResults().size(); i++) {
+                    MarkerOptions markerOptions = new MarkerOptions();
 
-                        Results results = placesWrapper.getResults().get(i);
+                    Results results = placesWrapper.getResults().get(i);
 
-                        double lat = Double.parseDouble(results.getGeometry().getLocation().getLat());
-                        double lng = Double.parseDouble(results.getGeometry().getLocation().getLng());
-                        String placeName = results.getName();
+                    double lat = Double.parseDouble(results.getGeometry().getLocation().getLat());
+                    double lng = Double.parseDouble(results.getGeometry().getLocation().getLng());
+                    String placeName = results.getName();
 
-                        LatLng latLng = new LatLng(lat, lng);
-                        markerOptions.title(placeName);
-                        markerOptions.position(latLng);
+                    LatLng latLng = new LatLng(lat, lng);
+                    markerOptions.title(placeName);
+                    markerOptions.position(latLng);
 
-                        if (type.equals(getString(R.string.restaurant_holder))) {
-                            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker));
-                        } else if (type.equals(getString(R.string.cafe_holder))) {
-                            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_cafe_marker));
-                        } else if (type.equals(getString(R.string.gas_station_holder))) {
-                            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_gas_station_marker));
-                        } else if (type.equals(getString(R.string.atm_holder))) {
-                            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_atm_marker));
-                        } else if (type.equals(getString(R.string.pharmacy_holder))) {
-                            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pharmacy_marker));
-                        } else if (type.equals(getString(R.string.grocery_holder))) {
-                            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_grocery_marker));
-                        } else {
-                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                        }
-
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(mMapZoom));
-
-                        mMap.addMarker(markerOptions);
+                    if (type.equals(getString(R.string.restaurant_holder))) {
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker));
+                    } else if (type.equals(getString(R.string.cafe_holder))) {
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_cafe_marker));
+                    } else if (type.equals(getString(R.string.gas_station_holder))) {
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_gas_station_marker));
+                    } else if (type.equals(getString(R.string.atm_holder))) {
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_atm_marker));
+                    } else if (type.equals(getString(R.string.pharmacy_holder))) {
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_pharmacy_marker));
+                    } else if (type.equals(getString(R.string.grocery_holder))) {
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_grocery_marker));
+                    } else {
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                     }
 
-                    reCenterMap();
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(mMapZoom));
+
+                    mMap.addMarker(markerOptions);
                 }
 
-                mActivityNearbyBinding.lBottomSheet.pbNearby.setVisibility(View.INVISIBLE);
+                reCenterMap();
             }
+
+            mActivityNearbyBinding.lBottomSheet.pbNearby.setVisibility(View.INVISIBLE);
         });
     }
 
@@ -606,12 +591,7 @@ public class NearbyActivity extends AppCompatActivity implements OnMapReadyCallb
         AlertDialogUtils.dialogWithAlert(this,
                 null,
                 getString(R.string.gps_warning_text),
-                new IAlertDialogItemClickListener.Alert() {
-                    @Override
-                    public void onPositiveButtonClicked() {
-                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                });
+                () -> startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)));
     }
 
     @Override

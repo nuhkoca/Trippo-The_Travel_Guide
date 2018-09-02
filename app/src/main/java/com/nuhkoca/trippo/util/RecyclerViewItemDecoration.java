@@ -11,7 +11,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.View;
 
+import javax.inject.Inject;
+
 public class RecyclerViewItemDecoration extends RecyclerView.ItemDecoration {
+
 
     private static final int[] ATTRS = new int[]{
             android.R.attr.listDivider
@@ -22,11 +25,12 @@ public class RecyclerViewItemDecoration extends RecyclerView.ItemDecoration {
 
     private Drawable mDivider;
     private int mOrientation;
-    private Context context;
     private int margin;
 
-    public RecyclerViewItemDecoration(Context context, int orientation, int margin) {
-        this.context = context;
+    @Inject
+    Context context;
+
+    public RecyclerViewItemDecoration(int orientation, int margin) {
         this.margin = margin;
         final TypedArray a = context.obtainStyledAttributes(ATTRS);
         mDivider = a.getDrawable(0);

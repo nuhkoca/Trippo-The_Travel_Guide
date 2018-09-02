@@ -49,16 +49,13 @@ public class ArticleSettingsFragment extends PreferenceFragmentCompat implements
         super.onCreate(savedInstanceState);
 
         Preference ttsIntentPref = findPreference(getString(R.string.tts_intent_key));
-        ttsIntentPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Intent installIntent = new Intent();
-                installIntent.setAction(
-                        TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                startActivityForResult(installIntent, Constants.TTS_REQ_CODE);
+        ttsIntentPref.setOnPreferenceClickListener(preference -> {
+            Intent installIntent = new Intent();
+            installIntent.setAction(
+                    TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+            startActivityForResult(installIntent, Constants.TTS_REQ_CODE);
 
-                return false;
-            }
+            return false;
         });
     }
 

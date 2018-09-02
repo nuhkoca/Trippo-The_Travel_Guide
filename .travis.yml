@@ -39,3 +39,8 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
+
+script:
+    - ./gradlew build
+before_install:
+    - chmod +x gradlew

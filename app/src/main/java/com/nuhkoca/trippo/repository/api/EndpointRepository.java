@@ -1,54 +1,68 @@
 package com.nuhkoca.trippo.repository.api;
 
 import com.nuhkoca.trippo.BuildConfig;
-import com.nuhkoca.trippo.TrippoApp;
-import com.nuhkoca.trippo.model.remote.content.first.ContentWrapper;
+import com.nuhkoca.trippo.api.ITrippoAPI;
+import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleWrapper;
+import com.nuhkoca.trippo.model.remote.content.first.ContentWrapper;
 import com.nuhkoca.trippo.model.remote.content.second.OutsideWrapper;
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceWrapper;
 import com.nuhkoca.trippo.model.remote.country.CountryWrapper;
-import com.nuhkoca.trippo.api.ITrippoAPI;
 
-import retrofit2.Retrofit;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
+@Singleton
 public class EndpointRepository {
+    
     private ITrippoAPI iTrippoAPI;
-    private static EndpointRepository instance;
 
-    private EndpointRepository() {
-        iTrippoAPI = getRetrofit().create(ITrippoAPI.class);
-    }
-
-    public static EndpointRepository getInstance() {
-        if (instance == null) {
-            instance = new EndpointRepository();
-        }
-
-        return instance;
-    }
-
-    private static Retrofit getRetrofit() {
-        return TrippoApp.provideRetrofit(BuildConfig.BASE_URL);
+    @Inject
+    public EndpointRepository(ITrippoAPI iTrippoAPI) {
+        this.iTrippoAPI = iTrippoAPI;
     }
 
     public Observable<CountryWrapper> getCountryList(int offset) {
-        return iTrippoAPI.getCountryList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, offset);
+        return iTrippoAPI.getCountryList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, offset)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .retry(Constants.DEFAULT_RETRY_COUNT)
+                .onErrorResumeNext(Observable::error);
     }
 
     public Observable<ContentWrapper> getContentList(String tagLabels, int offset, String partOf) {
-        return iTrippoAPI.getContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, partOf);
+        return iTrippoAPI.getContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, partOf)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .retry(Constants.DEFAULT_RETRY_COUNT)
+                .onErrorResumeNext(Observable::error);
     }
 
     public Observable<OutsideWrapper> getOutsideContentList(String tagLabels, int offset, String countryCode, String score, String bookable) {
-        return iTrippoAPI.getOutsideContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode, score, bookable);
+        return iTrippoAPI.getOutsideContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode, score, bookable)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .retry(Constants.DEFAULT_RETRY_COUNT)
+                .onErrorResumeNext(Observable::error);
     }
 
     public Observable<ExperienceWrapper> getExperienceContentList(String tagLabels, int offset, String countryCode, String score) {
-        return iTrippoAPI.getExperienceContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode, score);
+        return iTrippoAPI.getExperienceContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode, score)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .retry(Constants.DEFAULT_RETRY_COUNT)
+                .onErrorResumeNext(Observable::error);
     }
 
     public Observable<ArticleWrapper> getArticleList(String tagLabels, int offset, String countryCode) {
-        return iTrippoAPI.getArticleList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode);
+        return iTrippoAPI.getArticleList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .retry(Constants.DEFAULT_RETRY_COUNT)
+                .onErrorResumeNext(Observable::error);
     }
 }

@@ -1,7 +1,6 @@
 package com.nuhkoca.trippo.util;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 
@@ -16,13 +15,10 @@ public class AlertDialogUtils {
         builder.setTitle(title);
 
         if (items != null) {
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    iAlertDialogItemClickListener.onIdReceived(which);
+            builder.setItems(items, (dialog, which) -> {
+                iAlertDialogItemClickListener.onIdReceived(which);
 
-                    dialog.dismiss();
-                }
+                dialog.dismiss();
             });
         }
 
@@ -37,21 +33,11 @@ public class AlertDialogUtils {
         }
 
         builder.setMessage(message);
-        builder.setPositiveButton(positiveButtonText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                iAlertDialogItemClickListener.onPositiveButtonClicked();
-            }
-        });
+        builder.setPositiveButton(positiveButtonText, (dialog, which) -> iAlertDialogItemClickListener.onPositiveButtonClicked());
 
 
         if (isNegativeButton) {
-            builder.setNegativeButton(owner.getString(R.string.negative_button), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+            builder.setNegativeButton(owner.getString(R.string.negative_button), (dialog, which) -> dialog.dismiss());
         }
 
         if (!isCancelable) {

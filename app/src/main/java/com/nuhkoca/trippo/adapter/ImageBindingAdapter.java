@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.module.GlideApp;
+import com.nuhkoca.trippo.di.GlideApp;
 
 public class ImageBindingAdapter {
 

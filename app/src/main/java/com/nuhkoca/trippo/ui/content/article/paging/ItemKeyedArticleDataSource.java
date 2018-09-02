@@ -2,6 +2,7 @@ package com.nuhkoca.trippo.ui.content.article.paging;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.ItemKeyedDataSource;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.nuhkoca.trippo.api.NetworkState;
@@ -9,36 +10,46 @@ import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleResult;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleWrapper;
 import com.nuhkoca.trippo.repository.api.EndpointRepository;
+import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import rx.Subscriber;
+
+@Singleton
 public class ItemKeyedArticleDataSource extends ItemKeyedDataSource<Integer, ArticleResult> {
 
-    private EndpointRepository mEndpointRepository;
+    private EndpointRepository endpointRepository;
+    private Context context;
+    private SharedPreferenceUtil sharedPreferenceUtil;
+
+
     private int mPagedLoadSize = Constants.OFFSET_SIZE;
     private int mIsMoreOnce = 0;
 
     private MutableLiveData<NetworkState> mNetworkState;
     private MutableLiveData<NetworkState> mInitialLoading;
 
-    private String mTagLabels;
-    private String mCountryCode;
-
-    ItemKeyedArticleDataSource(String tagLabels, String countryCode) {
-        mEndpointRepository = EndpointRepository.getInstance();
+    @Inject
+    public ItemKeyedArticleDataSource(EndpointRepository endpointRepository, Context context, SharedPreferenceUtil sharedPreferenceUtil) {
+        this.endpointRepository = endpointRepository;
+        this.context = context;
+        this.sharedPreferenceUtil = sharedPreferenceUtil;
 
         mNetworkState = new MutableLiveData<>();
         mInitialLoading = new MutableLiveData<>();
+    }
 
-        this.mCountryCode = countryCode;
-        this.mTagLabels = tagLabels;
+    private String getTagLabels(){
+        return sharedPreferenceUtil.getStringData(Constants.SECTION_TYPE_KEY, "");
+    }
+
+    private String getCountryCode(){
+        return sharedPreferenceUtil.getStringData(Constants.COUNTRY_CODE_KEY,"");
     }
 
     public MutableLiveData<NetworkState> getNetworkState() {
@@ -56,16 +67,7 @@ public class ItemKeyedArticleDataSource extends ItemKeyedDataSource<Integer, Art
         mNetworkState.postValue(NetworkState.LOADING);
         mInitialLoading.postValue(NetworkState.LOADING);
 
-        mEndpointRepository.getArticleList(mTagLabels, 0, mCountryCode)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends ArticleWrapper>>() {
-                    @Override
-                    public Observable<? extends ArticleWrapper> call(Throwable throwable) {
-                        return Observable.error(throwable);
-                    }
-                })
+        endpointRepository.getArticleList(getTagLabels(), 0, getCountryCode())
                 .subscribe(new Subscriber<ArticleWrapper>() {
                     @Override
                     public void onCompleted() {
@@ -101,16 +103,7 @@ public class ItemKeyedArticleDataSource extends ItemKeyedDataSource<Integer, Art
 
         mNetworkState.postValue(NetworkState.LOADING);
 
-        mEndpointRepository.getArticleList(mTagLabels, params.key, mCountryCode)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends ArticleWrapper>>() {
-                    @Override
-                    public Observable<? extends ArticleWrapper> call(Throwable throwable) {
-                        return Observable.error(throwable);
-                    }
-                })
+        endpointRepository.getArticleList(getCountryCode(), params.key, getTagLabels())
                 .subscribe(new Subscriber<ArticleWrapper>() {
                     @Override
                     public void onCompleted() {
