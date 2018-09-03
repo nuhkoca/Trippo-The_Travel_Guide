@@ -46,7 +46,10 @@ public class Constants {
     public static final String PARENT_ACTIVITY_REQ_KEY = "parent-activity-req-key";
     public static final String CITY_OR_COUNTRY_NAME_KEY = "city-or-country-name-key";
     public static final String COUNTRY_CODE_KEY = "country-code-key";
-    public static final String SECTION_TYPE_KEY = "section-type-key";
+    public static final String OUTSIDE_SECTION_TYPE_KEY = "outside-section-type-key";
+    public static final String FEATURE_SECTION_TYPE_KEY = "feature-section-type-key";
+    public static final String EXPERIENCE_SECTION_TYPE_KEY = "experience-section-type-key";
+    public static final String ARTICLE_SECTION_TYPE_KEY = "article-section-type-key";
     public static final String COUNTRY_ID_KEY = "country-id-key";
     public static final int DEFAULT_TAG_NUMBER = 4;
     public static final int DEFAULT_TAG_LENGTH = 15;

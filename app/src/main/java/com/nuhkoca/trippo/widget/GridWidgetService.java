@@ -9,7 +9,7 @@ import android.widget.RemoteViewsService;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
-import com.nuhkoca.trippo.repository.db.FavoriteCountriesRepository;
+import com.nuhkoca.trippo.db.repository.FavoriteCountriesRepository;
 
 import java.util.List;
 

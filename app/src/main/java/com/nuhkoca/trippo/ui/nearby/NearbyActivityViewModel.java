@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel;
 import android.widget.Toast;
 
 import com.nuhkoca.trippo.model.remote.places.PlacesWrapper;
-import com.nuhkoca.trippo.repository.api.PlacesEndpointRepository;
+import com.nuhkoca.trippo.api.repository.PlacesEndpointRepository;
 
 import javax.inject.Inject;
 

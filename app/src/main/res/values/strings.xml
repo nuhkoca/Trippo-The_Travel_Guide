@@ -41,6 +41,7 @@
     <string name="multi_day_tours_placeholder" translatable="false">multiday</string>
     <string name="day_trips_placeholder" translatable="false">daytrips</string>
     <string name="city_walking_placeholder" translatable="false">walkingtours</string>
+    <string name="background_placeholder" translatable="false">background</string>
 
     <!-- Menu/Toast/Alert Strings -->
     <string name="about_menu_text">About</string>

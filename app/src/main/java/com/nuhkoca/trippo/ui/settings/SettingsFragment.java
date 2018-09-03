@@ -25,7 +25,7 @@ import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.di.GlideApp;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.helper.Constants;
-import com.nuhkoca.trippo.repository.db.FavoriteCountriesRepository;
+import com.nuhkoca.trippo.db.repository.FavoriteCountriesRepository;
 import com.nuhkoca.trippo.ui.AboutActivity;
 import com.nuhkoca.trippo.ui.AuthActivity;
 import com.nuhkoca.trippo.util.AlertDialogUtils;

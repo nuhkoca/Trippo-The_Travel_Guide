@@ -26,10 +26,7 @@ import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.databinding.ActivityCountryDetailBinding;
 import com.nuhkoca.trippo.di.GlideApp;
 import com.nuhkoca.trippo.helper.Constants;
-import com.nuhkoca.trippo.repository.db.FavoriteCountriesRepository;
-import com.nuhkoca.trippo.ui.content.ArticleContentType;
-import com.nuhkoca.trippo.ui.content.ContentType;
-import com.nuhkoca.trippo.ui.content.ExperienceContentType;
+import com.nuhkoca.trippo.db.repository.FavoriteCountriesRepository;
 import com.nuhkoca.trippo.ui.content.article.ArticleActivity;
 import com.nuhkoca.trippo.ui.content.experience.ExperienceContentActivity;
 import com.nuhkoca.trippo.ui.content.feature.FirstContentActivity;
@@ -78,6 +75,8 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
 
     private int mReqCode;
 
+    private String[] mCountryCodes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +104,8 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
         mCountryMediumImage = getIntent().getStringExtra(Constants.DETAIL_COUNTRY_MEDIUM_IMAGE_KEY);
 
         mItemPosition = getIntent().getIntExtra(Constants.COUNTRY_CODE_KEY, 0);
+
+        mCountryCodes = getResources().getStringArray(R.array.iso_codes);
 
         mCountryLat = getIntent().getDoubleExtra(Constants.DETAIL_COUNTRY_LAT_KEY, 0);
         mCountryLng = getIntent().getDoubleExtra(Constants.DETAIL_COUNTRY_LNG_KEY, 0);
@@ -339,93 +340,92 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
             case R.id.btnCities:
                 contentIntent = new Intent(CountryDetailActivity.this, FirstContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ContentType.CITY.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.city_placeholder));
 
                 break;
 
             case R.id.btnRegions:
                 contentIntent = new Intent(CountryDetailActivity.this, FirstContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ContentType.REGION.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.region_placeholder));
+
                 break;
 
             case R.id.btnNationalParks:
                 contentIntent = new Intent(CountryDetailActivity.this, FirstContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ContentType.NATIONAL_PARK.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.national_park_placeholder));
+
                 break;
 
             case R.id.btnIslands:
                 contentIntent = new Intent(CountryDetailActivity.this, FirstContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ContentType.ISLAND.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.island_placeholder));
+
                 break;
 
             case R.id.btnSightseeing:
                 contentIntent = new Intent(CountryDetailActivity.this, OutsideContentActivity.class);
 
-                sharedPreferenceUtil.putStringData(Constants.SECTION_TYPE_KEY, getString(R.string.sightseeing_placeholder));
+                sharedPreferenceUtil.putStringData(Constants.OUTSIDE_SECTION_TYPE_KEY, getString(R.string.sightseeing_placeholder));
 
                 break;
 
             case R.id.btnEatDrink:
                 contentIntent = new Intent(CountryDetailActivity.this, OutsideContentActivity.class);
 
-                sharedPreferenceUtil.putStringData(Constants.SECTION_TYPE_KEY, getString(R.string.eat_and_drink_placeholder));
+                sharedPreferenceUtil.putStringData(Constants.OUTSIDE_SECTION_TYPE_KEY, getString(R.string.eat_and_drink_placeholder));
 
                 break;
 
             case R.id.btnNightlife:
                 contentIntent = new Intent(CountryDetailActivity.this, OutsideContentActivity.class);
 
-                sharedPreferenceUtil.putStringData(Constants.SECTION_TYPE_KEY, getString(R.string.nightlife_placeholder));
+                sharedPreferenceUtil.putStringData(Constants.OUTSIDE_SECTION_TYPE_KEY, getString(R.string.nightlife_placeholder));
 
                 break;
 
             case R.id.btnHotels:
                 contentIntent = new Intent(CountryDetailActivity.this, OutsideContentActivity.class);
 
-                sharedPreferenceUtil.putStringData(Constants.SECTION_TYPE_KEY, getString(R.string.hotel_placeholder));
+                sharedPreferenceUtil.putStringData(Constants.OUTSIDE_SECTION_TYPE_KEY, getString(R.string.hotel_placeholder));
 
                 break;
 
             case R.id.btnTours:
                 contentIntent = new Intent(CountryDetailActivity.this, ExperienceContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ExperienceContentType.PRIVATE_TOURS.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.tours_placeholder));
+
                 break;
 
             case R.id.btnActivities:
                 contentIntent = new Intent(CountryDetailActivity.this, ExperienceContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ExperienceContentType.ACTIVITIES.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.activities_placeholder));
+
                 break;
 
             case R.id.btnMultiDayTours:
                 contentIntent = new Intent(CountryDetailActivity.this, ExperienceContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ExperienceContentType.MULTI_DAY_TOURS.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.multi_day_tours_placeholder));
+
                 break;
 
             case R.id.btnDayTrips:
                 contentIntent = new Intent(CountryDetailActivity.this, ExperienceContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ExperienceContentType.DAY_TRIPS.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.day_trips_placeholder));
+
                 break;
 
             case R.id.btnCityWalking:
                 contentIntent = new Intent(CountryDetailActivity.this, ExperienceContentActivity.class);
 
-                contentIntent
-                        .putExtra(Constants.SECTION_TYPE_KEY, ExperienceContentType.WALKING_TOURS.getSectionId());
+                sharedPreferenceUtil.putStringData(Constants.FEATURE_SECTION_TYPE_KEY, getString(R.string.city_walking_placeholder));
+
                 break;
 
             case R.id.btnBackground:
@@ -453,9 +453,10 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
         }
 
         if (contentIntent != null) {
+            sharedPreferenceUtil.putStringData(Constants.COUNTRY_CODE_KEY, mCountryCodes[mItemPosition]);
+
             contentIntent
                     .putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY, mCountryName)
-                    .putExtra(Constants.COUNTRY_CODE_KEY, mItemPosition)
                     .putExtra(Constants.COUNTRY_ID_KEY, mCid)
                     .putExtra(Constants.CATALOGUE_LAT_REQ, mCountryLat)
                     .putExtra(Constants.CATALOGUE_LNG_REQ, mCountryLng);
@@ -507,10 +508,11 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
                 getString(R.string.background_button_text),
                 items,
                 which -> {
+                    sharedPreferenceUtil.putStringData(Constants.COUNTRY_CODE_KEY, mCountryCodes[mItemPosition]);
+
                     Intent contentIntent = new Intent(CountryDetailActivity.this, ArticleActivity.class);
 
                     contentIntent.putExtra(Constants.ARTICLE_ENDPOINT_KEY, values[which]);
-                    contentIntent.putExtra(Constants.SECTION_TYPE_KEY, ArticleContentType.BACKGROUND.getSectionId());
                     contentIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY, mCountryName);
                     contentIntent.putExtra(Constants.COUNTRY_CODE_KEY, mItemPosition);
 
@@ -526,12 +528,12 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
                 getString(R.string.background_button_text),
                 items,
                 which -> {
+                    sharedPreferenceUtil.putStringData(Constants.COUNTRY_CODE_KEY, mCountryCodes[mItemPosition]);
+
                     Intent contentIntent = new Intent(CountryDetailActivity.this, ArticleActivity.class);
 
                     contentIntent.putExtra(Constants.ARTICLE_ENDPOINT_KEY, values[which]);
-                    contentIntent.putExtra(Constants.SECTION_TYPE_KEY, ArticleContentType.PRACTICALITIES.getSectionId());
                     contentIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY, mCountryName);
-                    contentIntent.putExtra(Constants.COUNTRY_CODE_KEY, mItemPosition);
 
                     startActivity(contentIntent);
                 });

@@ -2,14 +2,13 @@ package com.nuhkoca.trippo.ui.content.feature.paging;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.ItemKeyedDataSource;
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.nuhkoca.trippo.api.NetworkState;
+import com.nuhkoca.trippo.api.repository.EndpointRepository;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.first.ContentResult;
 import com.nuhkoca.trippo.model.remote.content.first.ContentWrapper;
-import com.nuhkoca.trippo.repository.api.EndpointRepository;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.ArrayList;
@@ -18,16 +17,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 @Singleton
 public class ItemKeyedContentDataSource extends ItemKeyedDataSource<Integer, ContentResult> {
 
     private EndpointRepository endpointRepository;
-    private Context context;
     private SharedPreferenceUtil sharedPreferenceUtil;
 
     private int mPagedLoadSize = Constants.OFFSET_SIZE;
@@ -37,9 +32,8 @@ public class ItemKeyedContentDataSource extends ItemKeyedDataSource<Integer, Con
     private MutableLiveData<NetworkState> mInitialLoading;
 
     @Inject
-    public ItemKeyedContentDataSource(EndpointRepository endpointRepository, Context context, SharedPreferenceUtil sharedPreferenceUtil) {
+    public ItemKeyedContentDataSource(EndpointRepository endpointRepository, SharedPreferenceUtil sharedPreferenceUtil) {
         this.endpointRepository = endpointRepository;
-        this.context = context;
         this.sharedPreferenceUtil = sharedPreferenceUtil;
 
         mNetworkState = new MutableLiveData<>();
@@ -55,7 +49,7 @@ public class ItemKeyedContentDataSource extends ItemKeyedDataSource<Integer, Con
     }
 
     private String getTagLabels(){
-        return sharedPreferenceUtil.getStringData(Constants.SECTION_TYPE_KEY, "");
+        return sharedPreferenceUtil.getStringData(Constants.FEATURE_SECTION_TYPE_KEY, "");
     }
 
     private String getPartOf(){
@@ -70,10 +64,6 @@ public class ItemKeyedContentDataSource extends ItemKeyedDataSource<Integer, Con
         mInitialLoading.postValue(NetworkState.LOADING);
 
         endpointRepository.getContentList(getTagLabels(), 0, getPartOf())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error)
                 .subscribe(new Subscriber<ContentWrapper>() {
                     @Override
                     public void onCompleted() {
@@ -110,10 +100,6 @@ public class ItemKeyedContentDataSource extends ItemKeyedDataSource<Integer, Con
         mNetworkState.postValue(NetworkState.LOADING);
 
         endpointRepository.getContentList(getTagLabels(), params.key, getPartOf())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error)
                 .subscribe(new Subscriber<ContentWrapper>() {
                     @Override
                     public void onCompleted() {

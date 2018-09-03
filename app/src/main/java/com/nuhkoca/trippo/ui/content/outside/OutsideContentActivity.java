@@ -88,7 +88,7 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        String contentType = sharedPreferenceUtil.getStringData(Constants.SECTION_TYPE_KEY, "");
+        String contentType = sharedPreferenceUtil.getStringData(Constants.OUTSIDE_SECTION_TYPE_KEY, "");
         String countryName = getIntent().getStringExtra(Constants.CITY_OR_COUNTRY_NAME_KEY);
 
         mParentCountryLat = getIntent().getDoubleExtra(Constants.CATALOGUE_LAT_REQ, 0);
@@ -352,7 +352,7 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.webview_key))) {
-            sharedPreferenceUtil.putStringData(getString(R.string.score_key), sharedPreferences.getString(getString(R.string.score_key), getString(R.string.seven_and_greater_value)));
+            sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key,false));
         } else if (key.equals(getString(R.string.bookable_key))) {
             sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key, false));
         } else {

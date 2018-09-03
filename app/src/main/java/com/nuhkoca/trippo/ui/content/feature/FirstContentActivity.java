@@ -24,12 +24,12 @@ import com.nuhkoca.trippo.callback.IRetryClickListener;
 import com.nuhkoca.trippo.databinding.ActivityCommonContentBinding;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.first.ContentResult;
-import com.nuhkoca.trippo.ui.content.ContentType;
 import com.nuhkoca.trippo.ui.nearby.NearbyActivity;
 import com.nuhkoca.trippo.util.ConnectionUtil;
 import com.nuhkoca.trippo.util.IntentUtils;
 import com.nuhkoca.trippo.util.PopupMenuUtils;
 import com.nuhkoca.trippo.util.RecyclerViewItemDecoration;
+import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.Objects;
 
@@ -59,6 +59,9 @@ public class FirstContentActivity extends AppCompatActivity implements IPopupMen
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,9 +74,8 @@ public class FirstContentActivity extends AppCompatActivity implements IPopupMen
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        int contentType = getIntent().getIntExtra(Constants.SECTION_TYPE_KEY, 0);
+        String contentType = sharedPreferenceUtil.getStringData(Constants.FEATURE_SECTION_TYPE_KEY, "");
         String countryName = getIntent().getStringExtra(Constants.CITY_OR_COUNTRY_NAME_KEY);
-        String countryId = getIntent().getStringExtra(Constants.COUNTRY_ID_KEY);
 
         mParentCountryLat = getIntent().getDoubleExtra(Constants.CATALOGUE_LAT_REQ, 0);
         mParentCountryLng = getIntent().getDoubleExtra(Constants.CATALOGUE_LNG_REQ, 0);
@@ -85,14 +87,14 @@ public class FirstContentActivity extends AppCompatActivity implements IPopupMen
         mActivityCommonContentBinding.tvCommonDistanceInfo.setText(String.format(getString(R.string.distance_from_text), countryName));
     }
 
-    private String setupTitle(int contentType, String countryName) {
-        if (contentType == ContentType.CITY.getSectionId()) {
+    private String setupTitle(String contentType, String countryName) {
+        if (contentType.equals(getString(R.string.city_placeholder))) {
             return String.format(getString(R.string.cities_of), countryName);
-        } else if (contentType == ContentType.REGION.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.region_placeholder))) {
             return String.format(getString(R.string.regions_of), countryName);
-        } else if (contentType == ContentType.NATIONAL_PARK.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.national_park_placeholder))) {
             return String.format(getString(R.string.national_parks_of), countryName);
-        } else if (contentType == ContentType.ISLAND.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.island_placeholder))) {
             return String.format(getString(R.string.islands_of), countryName);
         } else {
             return "";

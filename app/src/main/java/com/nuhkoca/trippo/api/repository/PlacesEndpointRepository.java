@@ -1,4 +1,4 @@
-package com.nuhkoca.trippo.repository.api;
+package com.nuhkoca.trippo.api.repository;
 
 import android.content.Context;
 

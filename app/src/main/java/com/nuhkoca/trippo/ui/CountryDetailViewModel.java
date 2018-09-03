@@ -4,7 +4,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
-import com.nuhkoca.trippo.repository.db.FavoriteCountriesRepository;
+import com.nuhkoca.trippo.db.repository.FavoriteCountriesRepository;
 
 import javax.inject.Inject;
 

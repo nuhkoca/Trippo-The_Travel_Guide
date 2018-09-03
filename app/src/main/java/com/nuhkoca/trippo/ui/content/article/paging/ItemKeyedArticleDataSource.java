@@ -2,14 +2,13 @@ package com.nuhkoca.trippo.ui.content.article.paging;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.ItemKeyedDataSource;
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.nuhkoca.trippo.api.NetworkState;
+import com.nuhkoca.trippo.api.repository.EndpointRepository;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleResult;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleWrapper;
-import com.nuhkoca.trippo.repository.api.EndpointRepository;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import rx.Subscriber;
 public class ItemKeyedArticleDataSource extends ItemKeyedDataSource<Integer, ArticleResult> {
 
     private EndpointRepository endpointRepository;
-    private Context context;
     private SharedPreferenceUtil sharedPreferenceUtil;
 
 
@@ -35,9 +33,8 @@ public class ItemKeyedArticleDataSource extends ItemKeyedDataSource<Integer, Art
     private MutableLiveData<NetworkState> mInitialLoading;
 
     @Inject
-    public ItemKeyedArticleDataSource(EndpointRepository endpointRepository, Context context, SharedPreferenceUtil sharedPreferenceUtil) {
+    public ItemKeyedArticleDataSource(EndpointRepository endpointRepository, SharedPreferenceUtil sharedPreferenceUtil) {
         this.endpointRepository = endpointRepository;
-        this.context = context;
         this.sharedPreferenceUtil = sharedPreferenceUtil;
 
         mNetworkState = new MutableLiveData<>();
@@ -45,7 +42,7 @@ public class ItemKeyedArticleDataSource extends ItemKeyedDataSource<Integer, Art
     }
 
     private String getTagLabels(){
-        return sharedPreferenceUtil.getStringData(Constants.SECTION_TYPE_KEY, "");
+        return sharedPreferenceUtil.getStringData(Constants.ARTICLE_SECTION_TYPE_KEY, "");
     }
 
     private String getCountryCode(){

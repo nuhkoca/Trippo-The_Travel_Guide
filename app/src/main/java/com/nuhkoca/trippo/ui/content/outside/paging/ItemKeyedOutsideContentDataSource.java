@@ -7,10 +7,10 @@ import android.support.annotation.NonNull;
 
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.api.NetworkState;
+import com.nuhkoca.trippo.api.repository.EndpointRepository;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.second.OutsideResult;
 import com.nuhkoca.trippo.model.remote.content.second.OutsideWrapper;
-import com.nuhkoca.trippo.repository.api.EndpointRepository;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.ArrayList;
@@ -19,10 +19,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 @Singleton
 public class ItemKeyedOutsideContentDataSource extends ItemKeyedDataSource<Integer, OutsideResult> {
@@ -56,7 +53,7 @@ public class ItemKeyedOutsideContentDataSource extends ItemKeyedDataSource<Integ
     }
 
     private String getTagLabels(){
-        return sharedPreferenceUtil.getStringData(Constants.SECTION_TYPE_KEY, "");
+        return sharedPreferenceUtil.getStringData(Constants.OUTSIDE_SECTION_TYPE_KEY, "");
     }
 
     private String getCountryCode(){
@@ -85,10 +82,6 @@ public class ItemKeyedOutsideContentDataSource extends ItemKeyedDataSource<Integ
         mInitialLoading.postValue(NetworkState.LOADING);
 
         endpointRepository.getOutsideContentList(getTagLabels(), 0, getCountryCode(), getScore(), getBookable())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error)
                 .subscribe(new Subscriber<OutsideWrapper>() {
                     @Override
                     public void onCompleted() {
@@ -125,10 +118,6 @@ public class ItemKeyedOutsideContentDataSource extends ItemKeyedDataSource<Integ
         mNetworkState.postValue(NetworkState.LOADING);
 
         endpointRepository.getOutsideContentList(getTagLabels(), params.key, getCountryCode(), getScore(), getBookable())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error)
                 .subscribe(new Subscriber<OutsideWrapper>() {
                     @Override
                     public void onCompleted() {

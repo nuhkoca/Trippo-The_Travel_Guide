@@ -27,7 +27,6 @@ import com.nuhkoca.trippo.databinding.ActivityCommonContentWithoutDistanceBindin
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceResult;
 import com.nuhkoca.trippo.ui.WebViewActivity;
-import com.nuhkoca.trippo.ui.content.ExperienceContentType;
 import com.nuhkoca.trippo.ui.settings.ActivityType;
 import com.nuhkoca.trippo.ui.settings.SettingsActivity;
 import com.nuhkoca.trippo.util.ConnectionUtil;
@@ -60,8 +59,6 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
 
     private PagedList<ExperienceResult> mExperienceResult;
 
-    private String mTagLabels;
-
     private boolean mIsExternalBrowserEnabled;
 
     @Inject
@@ -88,7 +85,7 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        int contentType = getIntent().getIntExtra(Constants.SECTION_TYPE_KEY, 0);
+        String contentType = sharedPreferenceUtil.getStringData(Constants.EXPERIENCE_SECTION_TYPE_KEY, "");
         String countryName = getIntent().getStringExtra(Constants.CITY_OR_COUNTRY_NAME_KEY);
 
         setTitle(setupTitle(contentType, countryName));
@@ -96,23 +93,16 @@ public class ExperienceContentActivity extends AppCompatActivity implements View
         setupContents();
     }
 
-    private String countryCode() {
-        String[] countryCodes = getResources().getStringArray(R.array.iso_codes);
-        int itemPosition = getIntent().getIntExtra(Constants.COUNTRY_CODE_KEY, 0);
-
-        return countryCodes[itemPosition];
-    }
-
-    private String setupTitle(int contentType, String countryName) {
-        if (contentType == ExperienceContentType.PRIVATE_TOURS.getSectionId()) {
+    private String setupTitle(String contentType, String countryName) {
+        if (contentType.equals(getString(R.string.tours_placeholder))) {
             return String.format(getString(R.string.tours_in), countryName);
-        } else if (contentType == ExperienceContentType.ACTIVITIES.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.activities_placeholder))) {
             return String.format(getString(R.string.activities_in), countryName);
-        } else if (contentType == ExperienceContentType.MULTI_DAY_TOURS.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.multi_day_tours_placeholder))) {
             return String.format(getString(R.string.multi_day_tours_in), countryName);
-        } else if (contentType == ExperienceContentType.DAY_TRIPS.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.day_trips_placeholder))) {
             return String.format(getString(R.string.day_trips_in), countryName);
-        } else if (contentType == ExperienceContentType.WALKING_TOURS.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.city_walking_placeholder))) {
             return String.format(getString(R.string.city_walking_in), countryName);
         } else {
             return "";

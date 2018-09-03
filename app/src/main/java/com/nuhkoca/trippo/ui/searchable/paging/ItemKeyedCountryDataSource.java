@@ -8,7 +8,7 @@ import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.country.CountryResult;
 import com.nuhkoca.trippo.model.remote.country.CountryWrapper;
-import com.nuhkoca.trippo.repository.api.EndpointRepository;
+import com.nuhkoca.trippo.api.repository.EndpointRepository;
 
 import java.util.ArrayList;
 import java.util.List;

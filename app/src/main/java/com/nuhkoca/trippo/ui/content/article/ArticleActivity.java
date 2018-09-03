@@ -21,12 +21,12 @@ import com.nuhkoca.trippo.callback.IRetryClickListener;
 import com.nuhkoca.trippo.databinding.ActivityCommonContentWithoutDistanceBinding;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleResult;
-import com.nuhkoca.trippo.ui.content.ArticleContentType;
 import com.nuhkoca.trippo.ui.settings.ActivityType;
 import com.nuhkoca.trippo.ui.settings.SettingsActivity;
 import com.nuhkoca.trippo.util.ConnectionUtil;
 import com.nuhkoca.trippo.util.IntentUtils;
 import com.nuhkoca.trippo.util.RecyclerViewItemDecoration;
+import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import javax.inject.Inject;
 
@@ -53,6 +53,9 @@ public class ArticleActivity extends DaggerAppCompatActivity implements
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +68,7 @@ public class ArticleActivity extends DaggerAppCompatActivity implements
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        int contentType = getIntent().getIntExtra(Constants.SECTION_TYPE_KEY, 0);
+        String contentType = sharedPreferenceUtil.getStringData(Constants.ARTICLE_SECTION_TYPE_KEY, "");
         String countryName = getIntent().getStringExtra(Constants.CITY_OR_COUNTRY_NAME_KEY);
 
         setTitle(setupTitle(contentType, countryName));
@@ -73,23 +76,12 @@ public class ArticleActivity extends DaggerAppCompatActivity implements
         setupContents();
     }
 
-    private String countryCode() {
-        String[] countryCodes = getResources().getStringArray(R.array.iso_codes);
-        int itemPosition = getIntent().getIntExtra(Constants.COUNTRY_CODE_KEY, 0);
-
-        return countryCodes[itemPosition];
-    }
-
-    private String endpoint() {
-        return getIntent().getStringExtra(Constants.ARTICLE_ENDPOINT_KEY);
-    }
-
-    private String setupTitle(int contentType, String countryName) {
+    private String setupTitle(String contentType, String countryName) {
         String title = getIntent().getStringExtra(Constants.ARTICLE_ENDPOINT_KEY);
 
         title = title.substring(0, 1).toUpperCase() + title.substring(1).toLowerCase();
 
-        if (contentType == ArticleContentType.BACKGROUND.getSectionId()) {
+        if (contentType.equals(getString(R.string.background_placeholder))) {
             return String.format(getString(R.string.of_country), title, countryName);
         } else {
             return String.format(getString(R.string.in_country), title, countryName);
@@ -106,7 +98,7 @@ public class ArticleActivity extends DaggerAppCompatActivity implements
     }
 
     private void setupContents() {
-            mArticleViewModel = ViewModelProviders.of(this, viewModelFactory).get(ArticleViewModel.class);
+        mArticleViewModel = ViewModelProviders.of(this, viewModelFactory).get(ArticleViewModel.class);
 
         mArticleAdapter = new ArticleAdapter(this, this);
 

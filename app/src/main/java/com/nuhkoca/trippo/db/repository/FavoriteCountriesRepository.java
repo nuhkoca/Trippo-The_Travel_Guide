@@ -1,4 +1,4 @@
-package com.nuhkoca.trippo.repository.db;
+package com.nuhkoca.trippo.db.repository;
 
 import android.arch.paging.DataSource;
 import android.os.AsyncTask;

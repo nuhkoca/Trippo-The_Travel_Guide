@@ -3,7 +3,7 @@ package com.nuhkoca.trippo;
 import android.content.Context;
 import android.content.res.Resources;
 
-import com.nuhkoca.trippo.test.EmailValidator;
+import com.nuhkoca.trippo.util.test.EmailValidator;
 
 import org.junit.Before;
 import org.junit.Test;

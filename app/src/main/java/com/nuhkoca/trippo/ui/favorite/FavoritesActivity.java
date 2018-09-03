@@ -31,7 +31,7 @@ import com.nuhkoca.trippo.databinding.ActivitySearchableCommonBinding;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.helper.SearchView;
 import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
-import com.nuhkoca.trippo.repository.db.FavoriteCountriesRepository;
+import com.nuhkoca.trippo.db.repository.FavoriteCountriesRepository;
 import com.nuhkoca.trippo.ui.AuthActivity;
 import com.nuhkoca.trippo.ui.CountryDetailActivity;
 import com.nuhkoca.trippo.ui.nearby.NearbyActivity;
