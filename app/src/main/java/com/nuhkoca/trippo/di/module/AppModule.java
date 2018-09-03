@@ -34,7 +34,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
         ContextModule.class,
         ViewModelModule.class,
         GoogleModule.class,
-        WidgetModule.class})
+        ServiceModule.class})
 public class AppModule {
 
     @Provides

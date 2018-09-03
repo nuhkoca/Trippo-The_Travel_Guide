@@ -8,8 +8,10 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.nuhkoca.trippo.R;
 
 import javax.inject.Singleton;
@@ -63,5 +65,17 @@ public class GoogleModule {
     @Singleton
     FirebaseAuth provideFirebaseAuth(){
         return FirebaseAuth.getInstance();
+    }
+
+    @Provides
+    @Singleton
+    FirebaseApp provideFirebaseApp(Context context){
+        return FirebaseApp.initializeApp(context);
+    }
+
+    @Provides
+    @Singleton
+    FirebaseInstanceId provideFirebaseInstanceId(){
+        return FirebaseInstanceId.getInstance();
     }
 }

@@ -6,7 +6,6 @@ import android.text.TextUtils;
 
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.ads.MobileAds;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
@@ -24,15 +23,18 @@ public class AppUtils {
     private Context context;
     private Stetho.Initializer initializer;
     private SharedPreferenceUtil sharedPreferenceUtil;
+    private FirebaseInstanceId firebaseInstanceId;
 
     @Inject
-    public AppUtils(Application application, Context context, Stetho.Initializer initializer, SharedPreferenceUtil sharedPreferenceUtil) {
+    public AppUtils(Application application, Context context, Stetho.Initializer initializer, SharedPreferenceUtil sharedPreferenceUtil, FirebaseInstanceId firebaseInstanceId) {
         this.application = application;
         this.context = context;
         this.initializer = initializer;
         this.sharedPreferenceUtil = sharedPreferenceUtil;
+        this.firebaseInstanceId = firebaseInstanceId;
     }
 
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "ConstantConditions"})
     public void setupNecessaryPlugins() {
         if (LeakCanary.isInAnalyzerProcess(context)) {
             return;
@@ -52,9 +54,7 @@ public class AppUtils {
     }
 
     private void setupFirebase() {
-        FirebaseApp.initializeApp(context);
-
-        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(instanceIdResult -> {
+        firebaseInstanceId.getInstanceId().addOnSuccessListener(instanceIdResult -> {
             final String token = instanceIdResult.getToken();
 
             if (!BuildConfig.DEBUG && !DeviceUtils.isEmulator()) {
