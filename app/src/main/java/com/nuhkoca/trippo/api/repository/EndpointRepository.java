@@ -12,9 +12,11 @@ import com.nuhkoca.trippo.model.remote.country.CountryWrapper;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class EndpointRepository {
@@ -26,43 +28,43 @@ public class EndpointRepository {
         this.iTrippoAPI = iTrippoAPI;
     }
 
-    public Observable<CountryWrapper> getCountryList(int offset) {
+    public Observable<CountryWrapper> getCountryList(long offset) {
         return iTrippoAPI.getCountryList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, offset)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error);
+                .onErrorResumeNext((Function<Throwable, ObservableSource<? extends CountryWrapper>>) Observable::error);
     }
 
-    public Observable<ContentWrapper> getContentList(String tagLabels, int offset, String partOf) {
+    public Observable<ContentWrapper> getContentList(String tagLabels, long offset, String partOf) {
         return iTrippoAPI.getContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, partOf)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error);
+                .onErrorResumeNext((Function<Throwable, ObservableSource<? extends ContentWrapper>>) Observable::error);
     }
 
-    public Observable<OutsideWrapper> getOutsideContentList(String tagLabels, int offset, String countryCode, String score, String bookable) {
+    public Observable<OutsideWrapper> getOutsideContentList(String tagLabels, long offset, String countryCode, String score, String bookable) {
         return iTrippoAPI.getOutsideContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode, score, bookable)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error);
+                .onErrorResumeNext((Function<Throwable, ObservableSource<? extends OutsideWrapper>>) Observable::error);
     }
 
-    public Observable<ExperienceWrapper> getExperienceContentList(String tagLabels, int offset, String countryCode, String score) {
+    public Observable<ExperienceWrapper> getExperienceContentList(String tagLabels, long offset, String countryCode, String score) {
         return iTrippoAPI.getExperienceContentList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode, score)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error);
+                .onErrorResumeNext((Function<Throwable, ObservableSource<? extends ExperienceWrapper>>) Observable::error);
     }
 
-    public Observable<ArticleWrapper> getArticleList(String tagLabels, int offset, String countryCode) {
+    public Observable<ArticleWrapper> getArticleList(String tagLabels, long offset, String countryCode) {
         return iTrippoAPI.getArticleList(BuildConfig.ACCOUNT_ID, BuildConfig.API_TOKEN, tagLabels, offset, countryCode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error);
+                .onErrorResumeNext((Function<Throwable, ObservableSource<? extends ArticleWrapper>>) Observable::error);
     }
 }

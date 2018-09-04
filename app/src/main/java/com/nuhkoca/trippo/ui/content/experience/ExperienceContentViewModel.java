@@ -75,6 +75,8 @@ public class ExperienceContentViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
+        experienceContentResultDataSourceFactory.getItemKeyedExperienceContentDataSource().clear();
+
         super.onCleared();
     }
 }

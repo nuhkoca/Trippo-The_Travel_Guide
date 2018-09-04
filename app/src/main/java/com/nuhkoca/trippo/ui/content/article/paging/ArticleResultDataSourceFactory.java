@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class ArticleResultDataSourceFactory extends DataSource.Factory<Integer, ArticleResult> {
+public class ArticleResultDataSourceFactory extends DataSource.Factory<Long, ArticleResult> {
 
     private MutableLiveData<ItemKeyedArticleDataSource> mItemKeyedArticleDataSourceMutableLiveData;
     private ItemKeyedArticleDataSource itemKeyedArticleDataSource;
@@ -21,7 +21,7 @@ public class ArticleResultDataSourceFactory extends DataSource.Factory<Integer, 
     }
 
     @Override
-    public DataSource<Integer, ArticleResult> create() {
+    public DataSource<Long, ArticleResult> create() {
         mItemKeyedArticleDataSourceMutableLiveData.postValue(itemKeyedArticleDataSource);
 
         return itemKeyedArticleDataSource;

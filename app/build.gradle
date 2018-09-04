@@ -60,8 +60,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-
-    com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
 }
 
 dependencies {
@@ -104,7 +102,7 @@ dependencies {
     }
 
     //Retrofit
-    implementation "com.squareup.retrofit2:adapter-rxjava:$rootProject.ext.rxJavaVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.rxJava2AdapterVersion"
     implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.rxJavaVersion"
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.ext.rxJavaVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okHttpVersion"
@@ -112,8 +110,8 @@ dependencies {
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leakCanaryVersion"
 
     //RxJava
-    implementation "io.reactivex:rxjava:$rootProject.ext.rxJavaLibVersion"
-    implementation "io.reactivex:rxandroid:$rootProject.ext.rxAndroidVersion"
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxJavaLibVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxAndroidVersion"
 
     //Stetho
     implementation "com.facebook.stetho:stetho:$rootProject.ext.stethoVersion"

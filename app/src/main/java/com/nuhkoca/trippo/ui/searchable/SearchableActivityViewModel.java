@@ -75,6 +75,8 @@ public class SearchableActivityViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
+        countryResultDataSourceFactory.getItemKeyedCountryDataSource().clear();
+
         super.onCleared();
     }
 }

@@ -75,6 +75,8 @@ public class ContentViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
+        contentResultDataSourceFactory.getItemKeyedContentDataSource().clear();
+
         super.onCleared();
     }
 }

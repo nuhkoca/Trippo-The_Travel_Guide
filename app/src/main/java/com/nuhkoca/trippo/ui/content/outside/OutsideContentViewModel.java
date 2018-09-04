@@ -75,6 +75,8 @@ public class OutsideContentViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
+        outsideContentResultDataSourceFactory.getItemKeyedOutsideContentDataSource().clear();
+
         super.onCleared();
     }
 }

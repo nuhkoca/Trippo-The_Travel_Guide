@@ -2,29 +2,29 @@ package com.nuhkoca.trippo.api;
 
 import android.support.annotation.NonNull;
 
-import com.nuhkoca.trippo.model.remote.content.first.ContentWrapper;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleWrapper;
+import com.nuhkoca.trippo.model.remote.content.first.ContentWrapper;
 import com.nuhkoca.trippo.model.remote.content.second.OutsideWrapper;
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceWrapper;
 import com.nuhkoca.trippo.model.remote.country.CountryWrapper;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import rx.Observable;
 
 public interface ITrippoAPI {
 
     @GET("location.json?tag_labels=country&count=20&fields=id,name,score,country_id,parent_id,snippet,images,coordinates&order_by=name")
     Observable<CountryWrapper> getCountryList(@Query("account") @NonNull String accountId,
                                               @Query("token") @NonNull String token,
-                                              @Query("offset") int offset);
+                                              @Query("offset") long offset);
 
 
     @GET("location.json?count=20&fields=id,name,score,country_id,parent_id,snippet,images,coordinates&order_by=name")
     Observable<ContentWrapper> getContentList(@Query("account") @NonNull String accountId,
                                               @Query("token") @NonNull String token,
                                               @Query("tag_labels") @NonNull String tagLabels,
-                                              @Query("offset") int offset,
+                                              @Query("offset") long offset,
                                               @Query("part_of") @NonNull String partOf);
 
 
@@ -32,7 +32,7 @@ public interface ITrippoAPI {
     Observable<OutsideWrapper> getOutsideContentList(@Query("account") @NonNull String accountId,
                                                      @Query("token") @NonNull String token,
                                                      @Query("tag_labels") @NonNull String tagLabels,
-                                                     @Query("offset") int offset,
+                                                     @Query("offset") long offset,
                                                      @Query("countrycode") @NonNull String countryCode,
                                                      @Query("score") @NonNull String score,
                                                      @Query("bookable") String bookable);
@@ -41,7 +41,7 @@ public interface ITrippoAPI {
     Observable<ExperienceWrapper> getExperienceContentList(@Query("account") @NonNull String accountId,
                                                            @Query("token") @NonNull String token,
                                                            @Query("tag_labels") @NonNull String tagLabels,
-                                                           @Query("offset") int offset,
+                                                           @Query("offset") long offset,
                                                            @Query("countrycode") @NonNull String countryCode,
                                                            @Query("score") @NonNull String score);
 
@@ -49,6 +49,6 @@ public interface ITrippoAPI {
     Observable<ArticleWrapper> getArticleList(@Query("account") @NonNull String accountId,
                                               @Query("token") @NonNull String token,
                                               @Query("tag_labels") @NonNull String tagLabels,
-                                              @Query("offset") int offset,
+                                              @Query("offset") long offset,
                                               @Query("countrycode") @NonNull String countryCode);
 }

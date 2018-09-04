@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class ExperienceContentResultDataSourceFactory extends DataSource.Factory<Integer, ExperienceResult> {
+public class ExperienceContentResultDataSourceFactory extends DataSource.Factory<Long, ExperienceResult> {
 
     private MutableLiveData<ItemKeyedExperienceContentDataSource> mItemKeyedExperienceContentDataSourceMutableLiveData;
     private ItemKeyedExperienceContentDataSource itemKeyedExperienceContentDataSource;
@@ -22,7 +22,7 @@ public class ExperienceContentResultDataSourceFactory extends DataSource.Factory
     }
 
     @Override
-    public DataSource<Integer, ExperienceResult> create() {
+    public DataSource<Long, ExperienceResult> create() {
         mItemKeyedExperienceContentDataSourceMutableLiveData.postValue(itemKeyedExperienceContentDataSource);
 
         return itemKeyedExperienceContentDataSource;

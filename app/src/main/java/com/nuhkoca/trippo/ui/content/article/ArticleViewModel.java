@@ -75,6 +75,8 @@ public class ArticleViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
+        articleResultDataSourceFactory.getItemKeyedArticleDataSource().clear();
+
         super.onCleared();
     }
 }

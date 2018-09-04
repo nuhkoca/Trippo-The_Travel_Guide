@@ -10,9 +10,11 @@ import com.nuhkoca.trippo.model.remote.places.PlacesWrapper;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class PlacesEndpointRepository {
@@ -31,6 +33,6 @@ public class PlacesEndpointRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .retry(Constants.DEFAULT_RETRY_COUNT)
-                .onErrorResumeNext(Observable::error);
+                .onErrorResumeNext((Function<Throwable, ObservableSource<? extends PlacesWrapper>>) Observable::error);
     }
 }
