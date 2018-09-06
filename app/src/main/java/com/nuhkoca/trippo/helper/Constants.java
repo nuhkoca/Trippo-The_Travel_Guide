@@ -2,7 +2,7 @@ package com.nuhkoca.trippo.helper;
 
 import android.Manifest;
 
-public class Constants {
+public final class Constants {
     public static final String TRIPPO_SHARED_PREF = "trippo-sharedpref";
     public static final String VERSION_CODE_KEY = "saved-version-code-key";
     public static final String IS_FIRST_AND_AUTH_REQUIRED = "is-first-and-auth-required-key";

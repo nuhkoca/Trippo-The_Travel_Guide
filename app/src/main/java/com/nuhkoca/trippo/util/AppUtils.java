@@ -14,9 +14,11 @@ import com.nuhkoca.trippo.helper.TimberReleaseTree;
 import com.squareup.leakcanary.LeakCanary;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import timber.log.Timber;
 
+@Singleton
 public class AppUtils {
 
     private Application application;

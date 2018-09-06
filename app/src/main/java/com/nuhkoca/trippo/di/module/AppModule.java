@@ -31,7 +31,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module(includes = {ActivityBuilder.class,
         FragmentBuilder.class,
         RoomModule.class,
-        ContextModule.class,
         ViewModelModule.class,
         GoogleModule.class,
         ServiceModule.class})

@@ -2,7 +2,7 @@ package com.nuhkoca.trippo.util;
 
 import android.os.Build;
 
-public class DeviceUtils {
+public final class DeviceUtils {
 
     public static String model() {
         return Build.MODEL;

@@ -73,9 +73,10 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
-    private int mReqCode;
+    @Inject
+    FirebaseAuth firebaseAuth;
 
-    private String[] mCountryCodes;
+    private int mReqCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +106,7 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
 
         mItemPosition = getIntent().getIntExtra(Constants.COUNTRY_CODE_KEY, 0);
 
-        mCountryCodes = getResources().getStringArray(R.array.iso_codes);
+        String[] countryCodes = getResources().getStringArray(R.array.iso_codes);
 
         mCountryLat = getIntent().getDoubleExtra(Constants.DETAIL_COUNTRY_LAT_KEY, 0);
         mCountryLng = getIntent().getDoubleExtra(Constants.DETAIL_COUNTRY_LNG_KEY, 0);
@@ -124,6 +125,8 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
                 }
             }
         });
+
+        sharedPreferenceUtil.putStringData(Constants.COUNTRY_CODE_KEY, countryCodes[mItemPosition]);
 
         setupUI();
     }
@@ -324,7 +327,7 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
 
         switch (itemThatWasClicked) {
             case R.id.fabCountryDetail:
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                if (firebaseAuth.getCurrentUser() != null) {
                     addOrDeleteFromDb();
                     AppWidgetUtils.update(CountryDetailActivity.this);
                 } else {
@@ -453,8 +456,6 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
         }
 
         if (contentIntent != null) {
-            sharedPreferenceUtil.putStringData(Constants.COUNTRY_CODE_KEY, mCountryCodes[mItemPosition]);
-
             contentIntent
                     .putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY, mCountryName)
                     .putExtra(Constants.COUNTRY_ID_KEY, mCid)
@@ -508,8 +509,6 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
                 getString(R.string.background_button_text),
                 items,
                 which -> {
-                    sharedPreferenceUtil.putStringData(Constants.COUNTRY_CODE_KEY, mCountryCodes[mItemPosition]);
-
                     Intent contentIntent = new Intent(CountryDetailActivity.this, ArticleActivity.class);
 
                     contentIntent.putExtra(Constants.ARTICLE_ENDPOINT_KEY, values[which]);
@@ -528,8 +527,6 @@ public class CountryDetailActivity extends DaggerAppCompatActivity implements Vi
                 getString(R.string.background_button_text),
                 items,
                 which -> {
-                    sharedPreferenceUtil.putStringData(Constants.COUNTRY_CODE_KEY, mCountryCodes[mItemPosition]);
-
                     Intent contentIntent = new Intent(CountryDetailActivity.this, ArticleActivity.class);
 
                     contentIntent.putExtra(Constants.ARTICLE_ENDPOINT_KEY, values[which]);

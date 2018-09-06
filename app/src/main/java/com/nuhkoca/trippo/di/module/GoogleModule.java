@@ -41,8 +41,14 @@ public class GoogleModule {
 
     @Provides
     @Singleton
-    Fabric provideFabric(Context context){
-        return Fabric.with(context, new Crashlytics());
+    Crashlytics provideCrashlytics(){
+        return new Crashlytics();
+    }
+
+    @Provides
+    @Singleton
+    Fabric provideFabric(Context context, Crashlytics crashlytics){
+        return Fabric.with(context, crashlytics);
     }
 
     @Provides

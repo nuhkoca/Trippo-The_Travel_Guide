@@ -96,16 +96,9 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
 
         setTitle(setupTitle(contentType, countryName));
         setupRV();
-        setCountryCode();
         setupContents();
 
         mActivityCommonContentBinding.tvCommonDistanceInfo.setText(String.format(getString(R.string.distance_from_text), countryName));
-    }
-
-    private void setCountryCode() {
-        String[] countryCodes = getResources().getStringArray(R.array.iso_codes);
-        int itemPosition = getIntent().getIntExtra(Constants.COUNTRY_CODE_KEY, 0);
-        sharedPreferenceUtil.putStringData(getString(R.string.country_key), countryCodes[itemPosition]);
     }
 
     private String setupTitle(String contentType, String countryName) {
@@ -352,7 +345,7 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.webview_key))) {
-            sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key,false));
+            sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key, false));
         } else if (key.equals(getString(R.string.bookable_key))) {
             sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key, false));
         } else {

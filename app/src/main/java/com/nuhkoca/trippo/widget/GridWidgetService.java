@@ -7,9 +7,9 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.nuhkoca.trippo.R;
+import com.nuhkoca.trippo.db.repository.FavoriteCountriesRepository;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.model.local.entity.FavoriteCountries;
-import com.nuhkoca.trippo.db.repository.FavoriteCountriesRepository;
 
 import java.util.List;
 
@@ -21,9 +21,6 @@ import javax.inject.Inject;
 
 public class GridWidgetService extends RemoteViewsService {
 
-    @Inject
-    AppsExecutor appsExecutor;
-
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new GridRemoteViewsFactory(this.getApplicationContext());
@@ -34,7 +31,10 @@ public class GridWidgetService extends RemoteViewsService {
         private Context mContext;
 
         @Inject
-        FavoriteCountriesRepository mFavoriteCountriesRepository;
+        AppsExecutor appsExecutor;
+
+        @Inject
+        FavoriteCountriesRepository favoriteCountriesRepository;
 
         private List<FavoriteCountries> mFavoriteCountriesList;
 
@@ -44,16 +44,17 @@ public class GridWidgetService extends RemoteViewsService {
 
         @Override
         public void onCreate() {
-            appsExecutor.diskIO().execute(() -> mFavoriteCountriesList = mFavoriteCountriesRepository.getAllForWidget());
+            appsExecutor.diskIO().execute(() -> mFavoriteCountriesList = favoriteCountriesRepository.getAllForWidget());
         }
 
         @Override
         public void onDataSetChanged() {
-            appsExecutor.diskIO().execute(() -> mFavoriteCountriesList = mFavoriteCountriesRepository.getAllForWidget());
+            appsExecutor.diskIO().execute(() -> mFavoriteCountriesList = favoriteCountriesRepository.getAllForWidget());
         }
 
         @Override
-        public void onDestroy() {}
+        public void onDestroy() {
+        }
 
         @Override
         public int getCount() {

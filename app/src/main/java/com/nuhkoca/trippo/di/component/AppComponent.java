@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.nuhkoca.trippo.TrippoApp;
 import com.nuhkoca.trippo.di.module.AppModule;
+import com.nuhkoca.trippo.di.module.ContextModule;
 
 import javax.inject.Singleton;
 
@@ -14,7 +15,7 @@ import dagger.android.support.AndroidSupportInjectionModule;
 
 @Singleton
 @Component(modules = {AndroidSupportInjectionModule.class,
-        AppModule.class})
+        AppModule.class, ContextModule.class})
 public interface AppComponent extends AndroidInjector<TrippoApp> {
 
     @Override

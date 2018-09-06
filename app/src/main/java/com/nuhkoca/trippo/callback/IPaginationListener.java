@@ -4,14 +4,14 @@ import android.arch.paging.PageKeyedDataSource;
 
 import java.util.List;
 
-public interface IPaginationListener<T, K> {
+public interface IPaginationListener<Wrapper, Model> {
     void onInitialError(Throwable throwable);
 
-    void onInitialSuccess(T wrapper, PageKeyedDataSource.LoadInitialCallback<Long, K> callback, List<K> model);
+    void onInitialSuccess(Wrapper wrapper, PageKeyedDataSource.LoadInitialCallback<Long, Model> callback, List<Model> model);
 
     void onPaginationError(Throwable throwable);
 
-    void onPaginationSuccess(T wrapper, PageKeyedDataSource.LoadCallback<Long, K> callback, PageKeyedDataSource.LoadParams<Long> params, List<K> model);
+    void onPaginationSuccess(Wrapper wrapper, PageKeyedDataSource.LoadCallback<Long, Model> callback, PageKeyedDataSource.LoadParams<Long> params, List<Model> model);
 
     void clear();
 }

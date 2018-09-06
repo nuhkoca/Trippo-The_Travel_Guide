@@ -21,7 +21,7 @@ public class RoomModule {
     @Provides
     @Singleton
     Migration provideMigration() {
-        return new Migration(2, 3) {
+        return new Migration(Constants.DB_START_VERSION, Constants.DB_END_VERSION) {
             @Override
             public void migrate(@NonNull SupportSQLiteDatabase database) {
                 // do nothing

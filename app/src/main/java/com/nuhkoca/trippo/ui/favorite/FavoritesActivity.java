@@ -65,6 +65,9 @@ public class FavoritesActivity extends DaggerAppCompatActivity implements ICatal
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
+    @Inject
+    FirebaseAuth firebaseAuth;
+
     private PagedList<FavoriteCountries> mFavoriteCountries;
 
     private SearchView mSearchView;
@@ -215,7 +218,7 @@ public class FavoritesActivity extends DaggerAppCompatActivity implements ICatal
                 return true;
 
             case R.id.delete_all_favorites_menu:
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                if (firebaseAuth.getCurrentUser() != null) {
                     deleteAll(favoriteCountriesRepository);
                     AppWidgetUtils.update(FavoritesActivity.this);
                 } else {
@@ -289,7 +292,7 @@ public class FavoritesActivity extends DaggerAppCompatActivity implements ICatal
                 .listener(itemId -> {
                     switch (itemId) {
                         case R.id.remove_from_favorites_menu:
-                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                            if (firebaseAuth.getCurrentUser() != null) {
                                 deleteItem(favoriteCountriesRepository,
                                         favoriteCountries);
 

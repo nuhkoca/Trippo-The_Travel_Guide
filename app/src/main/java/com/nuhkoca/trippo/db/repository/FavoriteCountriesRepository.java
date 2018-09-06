@@ -13,6 +13,11 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Observable;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 @Singleton
 public class FavoriteCountriesRepository {
 
@@ -34,19 +39,109 @@ public class FavoriteCountriesRepository {
     }
 
     public void checkIfItemExists(String cid, IDatabaseProgressListener iDatabaseProgressListener) {
-        new getItemById(cid, favoriteCountriesDao, iDatabaseProgressListener).execute();
+        //new getItemById(cid, favoriteCountriesDao, iDatabaseProgressListener).execute();
+
+        Observable.fromCallable(()-> cid.equals(favoriteCountriesDao.getItemById(cid))).firstOrError()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new SingleObserver<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+                        iDatabaseProgressListener.onItemRetrieved(aBoolean);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
     }
 
     public void insertOrThrow(FavoriteCountries favoriteCountries, String cid, IDatabaseProgressListener iDatabaseProgressListener) {
-        new insertOrThrowAsync(cid, favoriteCountriesDao, iDatabaseProgressListener).execute(favoriteCountries);
+        //new insertOrThrowAsync(cid, favoriteCountriesDao, iDatabaseProgressListener).execute(favoriteCountries);
+
+        Observable.fromCallable(()-> cid.equals(favoriteCountriesDao.getItemById(cid))).firstOrError()
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new SingleObserver<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+                        if (!aBoolean) {
+                            favoriteCountriesDao.insertItem(favoriteCountries);
+                        }
+
+                        iDatabaseProgressListener.onItemRetrieved(aBoolean);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
     }
 
     public void deleteItem(final String cid) {
-        appsExecutor.diskIO().execute(() -> favoriteCountriesDao.deleteItem(cid));
+        //appsExecutor.diskIO().execute(() -> favoriteCountriesDao.deleteItem(cid));
+
+        Observable.fromCallable(() -> {
+            favoriteCountriesDao.deleteItem(cid);
+            return true;
+        }).firstOrError()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe((new SingleObserver<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }));
     }
 
     public void deleteAll() {
-        appsExecutor.diskIO().execute(() -> favoriteCountriesDao.deleteAll());
+        //appsExecutor.diskIO().execute(() -> favoriteCountriesDao.deleteAll());
+
+        Observable.fromCallable(() -> {
+            favoriteCountriesDao.deleteAll();
+            return true;
+        }).firstOrError()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new SingleObserver<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
     }
 
     private static class insertOrThrowAsync extends AsyncTask<FavoriteCountries, Void, Boolean> {
