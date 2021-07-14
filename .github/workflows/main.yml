@@ -26,8 +26,11 @@ jobs:
           distribution: 'adopt'
           java-version: '8'
 
+      - name: Make checksum executable
+        run: chmod +x ./checksum.sh
+
       - name: Generate cache key
-        run: chmod+x ./checksum.sh checksum.txt
+        run: ./checksum.sh checksum.txt
 
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
