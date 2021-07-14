@@ -42,11 +42,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Build App
-        uses: ./gradlew assembleDebug
-
       - name: Unit Tests
         run: ./gradlew testDebugUnitTest
+
+      - name: Build App
+        uses: ./gradlew assembleDebug
 
       - name: Upload Sample Artifacts
         uses: actions/upload-artifact@v2
