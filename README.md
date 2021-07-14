@@ -4,7 +4,7 @@
 
 :boom: One travel guide for the whole world. It's free.
 
-[Build Status](https://github.com/nuhkoca/Trippo-The_Travel_Guide/workflows/Trippo/badge.svg)
+![Build Status](https://github.com/nuhkoca/Trippo-The_Travel_Guide/workflows/Trippo/badge.svg)
 
 Trippo is your smart travel guide - it’s free and works offline, too! Our awesome algorithms crunch through millions of websites and reviews to deliver unique recommendations across 50,000 destinations worldwide! Personalize your trip by picking your favorite hotels, sights, activities and restaurants and book them seamlessly in our app! You can skim through tours, locations, POIs, city walks, articles and so on. This guide will save you from a serious headache!
 
