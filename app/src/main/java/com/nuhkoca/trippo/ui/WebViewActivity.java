@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +24,9 @@ import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.databinding.ActivityWebViewBinding;
 import com.nuhkoca.trippo.helper.Constants;
 
-public class WebViewActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class WebViewActivity extends DaggerAppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     private ActivityWebViewBinding mActivityWebViewBinding;
 
@@ -115,33 +116,30 @@ public class WebViewActivity extends AppCompatActivity implements SwipeRefreshLa
         mActivityWebViewBinding.wvMain.clearCache(true);
         mActivityWebViewBinding.wvMain.clearHistory();
 
-        mActivityWebViewBinding.wvMain.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+        mActivityWebViewBinding.wvMain.setOnTouchListener((v, event) -> {
 
 
-                if (event.getPointerCount() > 1) {
-                    return true;
-                }
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN: {
-                        // save the x
-                        m_downX = event.getX();
-                    }
-                    break;
-
-                    case MotionEvent.ACTION_MOVE:
-                    case MotionEvent.ACTION_CANCEL:
-                    case MotionEvent.ACTION_UP: {
-                        // set x so that it doesn't move
-                        event.setLocation(m_downX, event.getY());
-                    }
-                    break;
-                }
-
-                return false;
+            if (event.getPointerCount() > 1) {
+                return true;
             }
+
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN: {
+                    // save the x
+                    m_downX = event.getX();
+                }
+                break;
+
+                case MotionEvent.ACTION_MOVE:
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_UP: {
+                    // set x so that it doesn't move
+                    event.setLocation(m_downX, event.getY());
+                }
+                break;
+            }
+
+            return false;
         });
     }
 

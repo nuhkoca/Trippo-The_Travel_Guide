@@ -2,9 +2,9 @@ package com.nuhkoca.trippo.api;
 
 import com.nuhkoca.trippo.model.remote.places.PlacesWrapper;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import rx.Observable;
 
 public interface IGooglePlacesAPI {
 

@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class ScreenSizer {
+public final class ScreenSizer {
 
     private Activity owner;
 

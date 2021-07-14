@@ -1,11 +1,10 @@
 package com.nuhkoca.trippo.ui.settings;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
@@ -15,9 +14,16 @@ import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.util.DeviceUtils;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
-public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class SettingsActivity extends DaggerAppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private int mReqCode;
+
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +80,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
             isNotifyTheDevice = 0;
         }
 
-        SharedPreferenceUtil.getInstance().updateNotification(isNotifyTheDevice);
+        sharedPreferenceUtil.updateNotification(isNotifyTheDevice);
     }
 
     @Override

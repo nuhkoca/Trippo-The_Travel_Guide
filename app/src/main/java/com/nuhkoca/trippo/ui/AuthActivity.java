@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -15,34 +14,38 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.databinding.ActivityAuthBinding;
+import com.nuhkoca.trippo.di.GlideApp;
 import com.nuhkoca.trippo.helper.Constants;
-import com.nuhkoca.trippo.module.GlideApp;
 
 import java.util.Objects;
 
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
 
-public class AuthActivity extends AppCompatActivity implements View.OnClickListener {
+public class AuthActivity extends DaggerAppCompatActivity implements View.OnClickListener {
 
     private ActivityAuthBinding mActivityAuthBinding;
 
     private GoogleSignInClient mGoogleSignInClient;
-    private FirebaseAuth mAuth;
 
     private int mReqCode;
+
+    @Inject
+    GoogleSignInOptions googleSignInOptions;
+
+    @Inject
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,22 +75,14 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
 
         mActivityAuthBinding.btnSignIn.setSize(SignInButton.SIZE_WIDE);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(new Scope(Scopes.EMAIL))
-                .requestIdToken(getString(R.string.oauth_token))
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        mAuth = FirebaseAuth.getInstance();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
         updateUI(currentUser);
     }
@@ -146,7 +141,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     private void doSignOut() {
         mActivityAuthBinding.pbAuth.setVisibility(View.VISIBLE);
 
-        FirebaseAuth.getInstance().signOut();
+        firebaseAuth.signOut();
 
         mActivityAuthBinding.llSignedOut.setVisibility(View.VISIBLE);
         mActivityAuthBinding.tvSkipNow.setVisibility(View.VISIBLE);
@@ -193,7 +188,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
 
             loadAvatar(currentUser);
 
-            Timber.d("account name: %s", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail());
+            Timber.d("account name: %s", Objects.requireNonNull(firebaseAuth.getCurrentUser()).getEmail());
 
             if (mReqCode != Constants.PARENT_ACTIVITY_REQ_CODE) {
                 startActivity(new Intent(AuthActivity.this, MainActivity.class)
@@ -213,21 +208,18 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         Timber.d("firebaseAuthWithGoogle: %s", acct.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Timber.d("signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Timber.w(task.getException());
-                            Snackbar.make(mActivityAuthBinding.clAuth, "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Timber.d("signInWithCredential:success");
+                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                        updateUI(user);
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Timber.w(task.getException());
+                        Snackbar.make(mActivityAuthBinding.clAuth, "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                        updateUI(null);
                     }
                 });
     }
@@ -262,13 +254,13 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
 
-        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+        firebaseAuth.addAuthStateListener(authStateListener);
     }
 
     @Override
     protected void onStop() {
         if (authStateListener != null) {
-            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+            firebaseAuth.removeAuthStateListener(authStateListener);
         }
         super.onStop();
     }
@@ -276,7 +268,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         if (authStateListener != null) {
-            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+            firebaseAuth.removeAuthStateListener(authStateListener);
         }
         super.onDestroy();
     }

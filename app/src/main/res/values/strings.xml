@@ -48,6 +48,7 @@
     <string name="multi_day_tours_placeholder" translatable="false">multiday</string>
     <string name="day_trips_placeholder" translatable="false">daytrips</string>
     <string name="city_walking_placeholder" translatable="false">walkingtours</string>
+    <string name="background_placeholder" translatable="false">background</string>
 
     <!-- Menu/Toast/Alert Strings -->
     <string name="about_menu_text">About</string>
@@ -251,6 +252,11 @@
     <!-- Outside Values/Labels -->
     <string name="outside_header">Outside Content Preferences</string>
     <string name="outside_summary">Changes will be reflected right away after any selection.</string>
+    <string name="activity_key">activity_key</string>
+    <string name="country_key">country_key</string>
+    <string name="tag_key">tag_key</string>
+    <string name="score_key">score_key</string>
+
     <string name="sightseeing_key" translatable="false">sightseeing</string>
     <string name="eat_drink_key" translatable="false">eat_and_drink</string>
     <string name="nightlife_key" translatable="false">nightlife</string>

@@ -1,43 +1,38 @@
 package com.nuhkoca.trippo.ui.content.experience;
 
-import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
 
+import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.third.ExperienceResult;
-import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.ui.content.experience.paging.ExperienceContentResultDataSourceFactory;
 import com.nuhkoca.trippo.ui.content.experience.paging.ItemKeyedExperienceContentDataSource;
+
+import javax.inject.Inject;
 
 public class ExperienceContentViewModel extends ViewModel {
 
     private LiveData<NetworkState> networkState;
     private LiveData<NetworkState> initialLoading;
-    private LiveData<PagedList<ExperienceResult>> exprienceResult;
+    private LiveData<PagedList<ExperienceResult>> experienceResult;
+
     private ExperienceContentResultDataSourceFactory experienceContentResultDataSourceFactory;
+    private AppsExecutor appsExecutor;
 
-    ExperienceContentViewModel(ExperienceContentResultDataSourceFactory experienceContentResultDataSourceFactory) {
+    @Inject
+    ExperienceContentViewModel(ExperienceContentResultDataSourceFactory experienceContentResultDataSourceFactory, AppsExecutor appsExecutor) {
         this.experienceContentResultDataSourceFactory = experienceContentResultDataSourceFactory;
+        this.appsExecutor = appsExecutor;
 
-        networkState = Transformations.switchMap(experienceContentResultDataSourceFactory.getItemKeyedExperienceContentDataSourceMutableLiveData(), new Function<ItemKeyedExperienceContentDataSource, LiveData<NetworkState>>() {
-            @Override
-            public LiveData<NetworkState> apply(ItemKeyedExperienceContentDataSource input) {
-                return input.getNetworkState();
-            }
-        });
+        networkState = Transformations.switchMap(experienceContentResultDataSourceFactory.getItemKeyedExperienceContentDataSourceMutableLiveData(), ItemKeyedExperienceContentDataSource::getNetworkState);
 
         initialLoading = Transformations.switchMap(experienceContentResultDataSourceFactory.getItemKeyedExperienceContentDataSourceMutableLiveData(),
-                new Function<ItemKeyedExperienceContentDataSource, LiveData<NetworkState>>() {
-                    @Override
-                    public LiveData<NetworkState> apply(ItemKeyedExperienceContentDataSource input) {
-                        return input.getInitialLoading();
-                    }
-                });
+                ItemKeyedExperienceContentDataSource::getInitialLoading);
 
         PagedList.Config config = new PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
@@ -46,13 +41,13 @@ public class ExperienceContentViewModel extends ViewModel {
                 .setPageSize(Constants.OFFSET_SIZE)//offset
                 .build();
 
-        exprienceResult = new LivePagedListBuilder<>(experienceContentResultDataSourceFactory, config)
-                .setFetchExecutor(AppsExecutor.networkIO())
+        experienceResult = new LivePagedListBuilder<>(experienceContentResultDataSourceFactory, config)
+                .setFetchExecutor(appsExecutor.networkIO())
                 .build();
     }
 
     public LiveData<PagedList<ExperienceResult>> getExperienceContentResult() {
-        return exprienceResult;
+        return experienceResult;
     }
 
     public LiveData<NetworkState> getNetworkState() {
@@ -71,15 +66,17 @@ public class ExperienceContentViewModel extends ViewModel {
                 .setPageSize(Constants.OFFSET_SIZE) //offset
                 .build();
 
-        exprienceResult = new LivePagedListBuilder<>(experienceContentResultDataSourceFactory, config)
-                .setFetchExecutor(AppsExecutor.networkIO())
+        experienceResult = new LivePagedListBuilder<>(experienceContentResultDataSourceFactory, config)
+                .setFetchExecutor(appsExecutor.networkIO())
                 .build();
 
-        return exprienceResult;
+        return experienceResult;
     }
 
     @Override
     protected void onCleared() {
+        experienceContentResultDataSourceFactory.getItemKeyedExperienceContentDataSource().clear();
+
         super.onCleared();
     }
 }

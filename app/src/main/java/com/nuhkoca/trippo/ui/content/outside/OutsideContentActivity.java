@@ -1,7 +1,7 @@
 package com.nuhkoca.trippo.ui.content.outside;
 
 import android.app.ActivityOptions;
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -21,19 +20,16 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.callback.IMenuItemIdListener;
+import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.callback.IPopupMenuClickListener;
 import com.nuhkoca.trippo.callback.IRetryClickListener;
 import com.nuhkoca.trippo.databinding.ActivityCommonContentBinding;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.second.OutsideResult;
-import com.nuhkoca.trippo.api.NetworkState;
+import com.nuhkoca.trippo.ui.WebViewActivity;
+import com.nuhkoca.trippo.ui.nearby.NearbyActivity;
 import com.nuhkoca.trippo.ui.settings.ActivityType;
 import com.nuhkoca.trippo.ui.settings.SettingsActivity;
-import com.nuhkoca.trippo.ui.WebViewActivity;
-import com.nuhkoca.trippo.ui.content.OutsideContentType;
-import com.nuhkoca.trippo.ui.content.outside.paging.OutsideContentResultDataSourceFactory;
-import com.nuhkoca.trippo.ui.nearby.NearbyActivity;
 import com.nuhkoca.trippo.util.ConnectionUtil;
 import com.nuhkoca.trippo.util.IntentUtils;
 import com.nuhkoca.trippo.util.PopupMenuUtils;
@@ -41,6 +37,8 @@ import com.nuhkoca.trippo.util.RecyclerViewItemDecoration;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 public class OutsideContentActivity extends AppCompatActivity implements IPopupMenuClickListener,
         IRetryClickListener,
@@ -64,10 +62,16 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
 
     private double mParentCountryLat, mParentCountryLng;
 
-    private String mTagLabels;
-    private String mScore;
-
     private boolean mIsExternalBrowserEnabled;
+
+    @Inject
+    ConnectionUtil connectionUtil;
+
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +88,7 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        int contentType = getIntent().getIntExtra(Constants.SECTION_TYPE_KEY, 0);
+        String contentType = sharedPreferenceUtil.getStringData(Constants.OUTSIDE_SECTION_TYPE_KEY, "");
         String countryName = getIntent().getStringExtra(Constants.CITY_OR_COUNTRY_NAME_KEY);
 
         mParentCountryLat = getIntent().getDoubleExtra(Constants.CATALOGUE_LAT_REQ, 0);
@@ -92,26 +96,19 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
 
         setTitle(setupTitle(contentType, countryName));
         setupRV();
-        setupContents(contentType, countryCode());
+        setupContents();
 
         mActivityCommonContentBinding.tvCommonDistanceInfo.setText(String.format(getString(R.string.distance_from_text), countryName));
     }
 
-    private String countryCode() {
-        String[] countryCodes = getResources().getStringArray(R.array.iso_codes);
-        int itemPosition = getIntent().getIntExtra(Constants.COUNTRY_CODE_KEY, 0);
-
-        return countryCodes[itemPosition];
-    }
-
-    private String setupTitle(int contentType, String countryName) {
-        if (contentType == OutsideContentType.SIGHTSEEING.getSectionId()) {
+    private String setupTitle(String contentType, String countryName) {
+        if (contentType.equals(getString(R.string.sightseeing_placeholder))) {
             return String.format(getString(R.string.sightseeing_in), countryName);
-        } else if (contentType == OutsideContentType.EAT_AND_DRINK.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.eat_and_drink_placeholder))) {
             return String.format(getString(R.string.eat_and_drink_in), countryName);
-        } else if (contentType == OutsideContentType.NIGHTLIFE.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.nightlife_placeholder))) {
             return String.format(getString(R.string.nightlife_in), countryName);
-        } else if (contentType == OutsideContentType.HOTEL.getSectionId()) {
+        } else if (contentType.equals(getString(R.string.hotel_placeholder))) {
             return String.format(getString(R.string.hotel_in), countryName);
         } else {
             return "";
@@ -123,104 +120,47 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
         mActivityCommonContentBinding.rvCommonContent.setLayoutManager(mLayoutManager);
 
         if (!getResources().getBoolean(R.bool.isTablet)) {
-            mActivityCommonContentBinding.rvCommonContent.addItemDecoration(new RecyclerViewItemDecoration(getApplicationContext(),
-                    1, 0));
+            mActivityCommonContentBinding.rvCommonContent.addItemDecoration(
+                    new RecyclerViewItemDecoration(1, 0));
         }
     }
 
-    private void setupContents(int contentType, String countryCode) {
-        if (contentType == OutsideContentType.SIGHTSEEING.getSectionId()) {
-            mOutsideContentViewModel = ViewModelProviders.of(this,
-                    new OutsideContentViewModelFactory(OutsideContentResultDataSourceFactory.getInstance(
-                            getString(R.string.sightseeing_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadSightseeingScore(this, mSharedPreferences),
-                            SharedPreferenceUtil.loadBookableOption(this, mSharedPreferences)))).get(OutsideContentViewModel.class);
-
-            mTagLabels = getString(R.string.sightseeing_placeholder);
-            mScore = SharedPreferenceUtil.loadSightseeingScore(this, mSharedPreferences);
-
-        } else if (contentType == OutsideContentType.EAT_AND_DRINK.getSectionId()) {
-            mOutsideContentViewModel = ViewModelProviders.of(this,
-                    new OutsideContentViewModelFactory(OutsideContentResultDataSourceFactory.getInstance(
-                            getString(R.string.eat_and_drink_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadEatAndDrinkScore(this, mSharedPreferences),
-                            SharedPreferenceUtil.loadBookableOption(this, mSharedPreferences)))).get(OutsideContentViewModel.class);
-
-            mTagLabels = getString(R.string.eat_and_drink_placeholder);
-            mScore = SharedPreferenceUtil.loadEatAndDrinkScore(this, mSharedPreferences);
-
-        } else if (contentType == OutsideContentType.NIGHTLIFE.getSectionId()) {
-            mOutsideContentViewModel = ViewModelProviders.of(this,
-                    new OutsideContentViewModelFactory(OutsideContentResultDataSourceFactory.getInstance(
-                            getString(R.string.nightlife_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadNightlifeScore(this, mSharedPreferences),
-                            SharedPreferenceUtil.loadBookableOption(this, mSharedPreferences)))).get(OutsideContentViewModel.class);
-
-            mTagLabels = getString(R.string.nightlife_placeholder);
-            mScore = SharedPreferenceUtil.loadNightlifeScore(this, mSharedPreferences);
-
-        } else if (contentType == OutsideContentType.HOTEL.getSectionId()) {
-            mOutsideContentViewModel = ViewModelProviders.of(this,
-                    new OutsideContentViewModelFactory(OutsideContentResultDataSourceFactory.getInstance(
-                            getString(R.string.hotel_placeholder),
-                            countryCode,
-                            SharedPreferenceUtil.loadHotelScore(this, mSharedPreferences),
-                            SharedPreferenceUtil.loadBookableOption(this, mSharedPreferences)))).get(OutsideContentViewModel.class);
-
-            mTagLabels = getString(R.string.hotel_placeholder);
-            mScore = SharedPreferenceUtil.loadHotelScore(this, mSharedPreferences);
-
-        } else {
-            return;
-        }
+    private void setupContents() {
+        mOutsideContentViewModel = ViewModelProviders.of(this, viewModelFactory).get(OutsideContentViewModel.class);
 
         mOutsideContentAdapter = new OutsideContentAdapter(this, this);
 
-        mOutsideContentViewModel.getOutsideContentResult().observe(this, new Observer<PagedList<OutsideResult>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<OutsideResult> outsideResults) {
-                mOutsideContentAdapter.submitList(outsideResults);
-                mOutsideContentAdapter.swapLatLng(mParentCountryLat, mParentCountryLng);
-                mOutsideResults = outsideResults;
-            }
+        mOutsideContentViewModel.getOutsideContentResult().observe(this, outsideResults -> {
+            mOutsideContentAdapter.submitList(outsideResults);
+            mOutsideContentAdapter.swapLatLng(mParentCountryLat, mParentCountryLng);
+            mOutsideResults = outsideResults;
         });
 
-        mOutsideContentViewModel.getNetworkState().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                mOutsideContentAdapter.setNetworkState(networkState);
-            }
-        });
+        mOutsideContentViewModel.getNetworkState().observe(this, networkState -> mOutsideContentAdapter.setNetworkState(networkState));
 
-        mOutsideContentViewModel.getInitialLoading().observe(this, new Observer<NetworkState>() {
-            @Override
-            public void onChanged(@Nullable NetworkState networkState) {
-                if (networkState != null) {
-                    if (networkState.getStatus() == NetworkState.Status.SUCCESS) {
-                        mActivityCommonContentBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentBinding.tvCommonContentErr.setVisibility(View.GONE);
-                        mActivityCommonContentBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                        mActivityCommonContentBinding.tvCommonDistanceInfo.setVisibility(View.VISIBLE);
-                    } else if (networkState.getStatus() == NetworkState.Status.FAILED) {
-                        mActivityCommonContentBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
-                        mActivityCommonContentBinding.tvCommonContentErrButton.setVisibility(View.VISIBLE);
-                        mActivityCommonContentBinding.tvCommonDistanceInfo.setVisibility(View.GONE);
-                        mActivityCommonContentBinding.tvCommonContentErr.setText(getString(R.string.response_error_text));
-                    } else if (networkState.getStatus() == NetworkState.Status.NO_ITEM) {
-                        mActivityCommonContentBinding.pbCommonContent.setVisibility(View.GONE);
-                        mActivityCommonContentBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
-                        mActivityCommonContentBinding.tvCommonContentErr.setText(getString(R.string.no_result_error_text));
-                        mActivityCommonContentBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                    } else {
-                        mActivityCommonContentBinding.pbCommonContent.setVisibility(View.VISIBLE);
-                        mActivityCommonContentBinding.tvCommonContentErr.setVisibility(View.GONE);
-                        mActivityCommonContentBinding.tvCommonContentErrButton.setVisibility(View.GONE);
-                        mActivityCommonContentBinding.tvCommonDistanceInfo.setVisibility(View.GONE);
-                    }
+        mOutsideContentViewModel.getInitialLoading().observe(this, networkState -> {
+            if (networkState != null) {
+                if (networkState.getStatus() == NetworkState.Status.SUCCESS) {
+                    mActivityCommonContentBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentBinding.tvCommonContentErr.setVisibility(View.GONE);
+                    mActivityCommonContentBinding.tvCommonContentErrButton.setVisibility(View.GONE);
+                    mActivityCommonContentBinding.tvCommonDistanceInfo.setVisibility(View.VISIBLE);
+                } else if (networkState.getStatus() == NetworkState.Status.FAILED) {
+                    mActivityCommonContentBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
+                    mActivityCommonContentBinding.tvCommonContentErrButton.setVisibility(View.VISIBLE);
+                    mActivityCommonContentBinding.tvCommonDistanceInfo.setVisibility(View.GONE);
+                    mActivityCommonContentBinding.tvCommonContentErr.setText(getString(R.string.response_error_text));
+                } else if (networkState.getStatus() == NetworkState.Status.NO_ITEM) {
+                    mActivityCommonContentBinding.pbCommonContent.setVisibility(View.GONE);
+                    mActivityCommonContentBinding.tvCommonContentErr.setVisibility(View.VISIBLE);
+                    mActivityCommonContentBinding.tvCommonContentErr.setText(getString(R.string.no_result_error_text));
+                    mActivityCommonContentBinding.tvCommonContentErrButton.setVisibility(View.GONE);
+                } else {
+                    mActivityCommonContentBinding.pbCommonContent.setVisibility(View.VISIBLE);
+                    mActivityCommonContentBinding.tvCommonContentErr.setVisibility(View.GONE);
+                    mActivityCommonContentBinding.tvCommonContentErrButton.setVisibility(View.GONE);
+                    mActivityCommonContentBinding.tvCommonDistanceInfo.setVisibility(View.GONE);
                 }
             }
         });
@@ -231,14 +171,11 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
     }
 
     private void invokeOutsideContentResultsInCaseActiveConnection() {
-        mOutsideContentViewModel.refreshOutsideContentResult().observe(this, new Observer<PagedList<OutsideResult>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<OutsideResult> outsideResults) {
-                mOutsideContentAdapter.submitList(null);
-                mOutsideContentAdapter.submitList(outsideResults);
-                mOutsideContentAdapter.swapLatLng(mParentCountryLat, mParentCountryLng);
-                mOutsideResults = outsideResults;
-            }
+        mOutsideContentViewModel.refreshOutsideContentResult().observe(this, outsideResults -> {
+            mOutsideContentAdapter.submitList(null);
+            mOutsideContentAdapter.submitList(outsideResults);
+            mOutsideContentAdapter.swapLatLng(mParentCountryLat, mParentCountryLng);
+            mOutsideResults = outsideResults;
         });
     }
 
@@ -321,7 +258,7 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
                 popupMenu.getMenu().findItem(R.id.book).setTitle(String.format(getString(R.string.book_via),
                         Objects.requireNonNull(mOutsideResults.get(position)).getBookingInfo().getVendor()));
 
-                mIsExternalBrowserEnabled = SharedPreferenceUtil.isInternalBrowserEnabled(this, mSharedPreferences);
+                mIsExternalBrowserEnabled = sharedPreferenceUtil.getBooleanData(getString(R.string.webview_key), false);
             } else {
                 popupMenu.getMenu().findItem(R.id.book).setVisible(false);
             }
@@ -330,46 +267,43 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
         }
 
         PopupMenuUtils.Builder builder = new PopupMenuUtils.Builder()
-                .listener(new IMenuItemIdListener() {
-                    @Override
-                    public void onIdReceived(int itemId) {
-                        switch (itemId) {
-                            case R.id.show_in_map_menu:
-                                Intent mapIntent = new Intent(OutsideContentActivity.this, NearbyActivity.class);
-                                mapIntent.putExtra(Constants.CATALOGUE_LAT_REQ,
-                                        Objects.requireNonNull(mOutsideResults.get(position)).getCoordinates().getLat());
-                                mapIntent.putExtra(Constants.CATALOGUE_LNG_REQ,
-                                        Objects.requireNonNull(mOutsideResults.get(position)).getCoordinates().getLng());
-                                mapIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY,
-                                        Objects.requireNonNull(mOutsideResults.get(position)).getName());
+                .listener(itemId -> {
+                    switch (itemId) {
+                        case R.id.show_in_map_menu:
+                            Intent mapIntent = new Intent(OutsideContentActivity.this, NearbyActivity.class);
+                            mapIntent.putExtra(Constants.CATALOGUE_LAT_REQ,
+                                    Objects.requireNonNull(mOutsideResults.get(position)).getCoordinates().getLat());
+                            mapIntent.putExtra(Constants.CATALOGUE_LNG_REQ,
+                                    Objects.requireNonNull(mOutsideResults.get(position)).getCoordinates().getLng());
+                            mapIntent.putExtra(Constants.CITY_OR_COUNTRY_NAME_KEY,
+                                    Objects.requireNonNull(mOutsideResults.get(position)).getName());
 
-                                startActivity(mapIntent,
+                            startActivity(mapIntent,
+                                    ActivityOptions.makeSceneTransitionAnimation(OutsideContentActivity.this).toBundle());
+
+                            break;
+
+                        case R.id.book:
+                            if (!mIsExternalBrowserEnabled) {
+                                Intent browserIntent = new Intent(OutsideContentActivity.this, WebViewActivity.class);
+                                browserIntent.putExtra(Constants.WEB_URL_KEY,
+                                        Objects.requireNonNull(mOutsideResults.get(position)).getBookingInfo().getVendorObjectUrl());
+
+                                startActivity(browserIntent,
                                         ActivityOptions.makeSceneTransitionAnimation(OutsideContentActivity.this).toBundle());
+                            } else {
+                                new IntentUtils.Builder()
+                                        .setContext(getApplicationContext())
+                                        .setUrl(Objects.requireNonNull(
+                                                mOutsideResults.get(position)).getBookingInfo().getVendorObjectUrl())
+                                        .setAction(IntentUtils.ActionType.WEB)
+                                        .create();
+                            }
 
-                                break;
+                            break;
 
-                            case R.id.book:
-                                if (!mIsExternalBrowserEnabled) {
-                                    Intent browserIntent = new Intent(OutsideContentActivity.this, WebViewActivity.class);
-                                    browserIntent.putExtra(Constants.WEB_URL_KEY,
-                                            Objects.requireNonNull(mOutsideResults.get(position)).getBookingInfo().getVendorObjectUrl());
-
-                                    startActivity(browserIntent,
-                                            ActivityOptions.makeSceneTransitionAnimation(OutsideContentActivity.this).toBundle());
-                                } else {
-                                    new IntentUtils.Builder()
-                                            .setContext(getApplicationContext())
-                                            .setUrl(Objects.requireNonNull(
-                                                    mOutsideResults.get(position)).getBookingInfo().getVendorObjectUrl())
-                                            .setAction(IntentUtils.ActionType.WEB)
-                                            .create();
-                                }
-
-                                break;
-
-                            default:
-                                break;
-                        }
+                        default:
+                            break;
                     }
                 });
 
@@ -382,7 +316,7 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
 
     @Override
     public void onRefresh() {
-        boolean isConnection = ConnectionUtil.sniff();
+        boolean isConnection = connectionUtil.sniff();
 
         if (isConnection) {
             invokeOutsideContentResultsInCaseActiveConnection();
@@ -410,31 +344,13 @@ public class OutsideContentActivity extends AppCompatActivity implements IPopupM
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        String score, bookable;
-
-        if (key.equals(getString(R.string.sightseeing_key))) {
-            score = SharedPreferenceUtil.loadSightseeingScore(this, sharedPreferences);
-            bookable = SharedPreferenceUtil.loadBookableOption(this, sharedPreferences);
-        } else if (key.equals(getString(R.string.eat_drink_key))) {
-            score = SharedPreferenceUtil.loadEatAndDrinkScore(this, sharedPreferences);
-            bookable = SharedPreferenceUtil.loadBookableOption(this, sharedPreferences);
-        } else if (key.equals(getString(R.string.nightlife_key))) {
-            score = SharedPreferenceUtil.loadNightlifeScore(this, sharedPreferences);
-            bookable = SharedPreferenceUtil.loadBookableOption(this, sharedPreferences);
-        } else if (key.equals(getString(R.string.hotel_key))) {
-            score = SharedPreferenceUtil.loadHotelScore(this, sharedPreferences);
-            bookable = SharedPreferenceUtil.loadBookableOption(this, sharedPreferences);
+        if (key.equals(getString(R.string.webview_key))) {
+            sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key, false));
         } else if (key.equals(getString(R.string.bookable_key))) {
-            bookable = SharedPreferenceUtil.loadBookableOption(this, sharedPreferences);
-            score = mScore;
+            sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key, false));
         } else {
-            return;
+            sharedPreferenceUtil.putStringData(getString(R.string.score_key), sharedPreferences.getString(getString(R.string.score_key), getString(R.string.seven_and_greater_value)));
         }
-
-        OutsideContentResultDataSourceFactory.getInstance(mTagLabels,
-                countryCode(),
-                score,
-                bookable);
 
         invokeOutsideContentResultsInCaseActiveConnection();
     }

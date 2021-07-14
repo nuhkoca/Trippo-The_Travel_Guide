@@ -1,5 +1,6 @@
 package com.nuhkoca.trippo.helper;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -14,6 +15,7 @@ public class TimberReleaseTree extends Timber.Tree {
         return true;
     }
 
+    @SuppressLint("LogNotTimber")
     @Override
     protected void log(int priority, String tag, @NonNull String message, Throwable t) {
         if (isLoggable(tag, priority)) {

@@ -7,32 +7,45 @@ import android.support.annotation.NonNull;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class AppsExecutor {
-    private final static Executor networkIO = Executors.newFixedThreadPool(Constants.EXECUTOR_THREAD_POOL_OFFSET);
 
-    private final static Executor mainThread = new MainThreadExecutor();
+    private final Executor networkIO;
+    private final Executor diskIO;
+    private final Executor mainIO;
 
-    private final static Executor backgroundThread = Executors.newSingleThreadExecutor();
-
-    private AppsExecutor() {}
-
-    public static Executor networkIO() {
-        return networkIO;
+    @Inject
+    public AppsExecutor() {
+        this(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(Constants.EXECUTOR_THREAD_POOL_OFFSET));
     }
 
-    public static Executor mainThread() {
-        return mainThread;
+    public AppsExecutor(Executor diskIO, Executor networkIO) {
+        this.diskIO = diskIO;
+        this.networkIO = networkIO;
+        this.mainIO = new MainThreadExecutor();
     }
 
-    public static Executor backgroundThread(){
-        return backgroundThread;
-    }
-
-    private static class MainThreadExecutor implements Executor {
+    static class MainThreadExecutor implements Executor {
         private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+
         @Override
         public void execute(@NonNull Runnable command) {
             mainThreadHandler.post(command);
         }
+    }
+
+    public Executor networkIO() {
+        return networkIO;
+    }
+
+    public Executor diskIO() {
+        return diskIO;
+    }
+
+    public Executor mainIO() {
+        return mainIO;
     }
 }

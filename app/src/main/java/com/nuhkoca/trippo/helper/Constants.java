@@ -2,7 +2,7 @@ package com.nuhkoca.trippo.helper;
 
 import android.Manifest;
 
-public class Constants {
+public final class Constants {
     public static final String TRIPPO_SHARED_PREF = "trippo-sharedpref";
     public static final String VERSION_CODE_KEY = "saved-version-code-key";
     public static final String IS_FIRST_AND_AUTH_REQUIRED = "is-first-and-auth-required-key";
@@ -46,7 +46,10 @@ public class Constants {
     public static final String PARENT_ACTIVITY_REQ_KEY = "parent-activity-req-key";
     public static final String CITY_OR_COUNTRY_NAME_KEY = "city-or-country-name-key";
     public static final String COUNTRY_CODE_KEY = "country-code-key";
-    public static final String SECTION_TYPE_KEY = "section-type-key";
+    public static final String OUTSIDE_SECTION_TYPE_KEY = "outside-section-type-key";
+    public static final String FEATURE_SECTION_TYPE_KEY = "feature-section-type-key";
+    public static final String EXPERIENCE_SECTION_TYPE_KEY = "experience-section-type-key";
+    public static final String ARTICLE_SECTION_TYPE_KEY = "article-section-type-key";
     public static final String COUNTRY_ID_KEY = "country-id-key";
     public static final int DEFAULT_TAG_NUMBER = 4;
     public static final int DEFAULT_TAG_LENGTH = 15;
@@ -67,6 +70,8 @@ public class Constants {
     public static final int MAP_INTERVAL = 1000;
     public static final String VERSION_COLUMN_NAME = "version";
     public static final String VERSION_DOCUMENT_ID = "zGpaMtxktC6SG3VXGIhO";
+    public static final int DB_START_VERSION = 2;
+    public static final int DB_END_VERSION = 3;
 
     private Constants() {
         throw new AssertionError();

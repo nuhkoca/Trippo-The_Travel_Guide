@@ -11,10 +11,8 @@ import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.MenuItem;
@@ -29,12 +27,11 @@ import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
 import com.nuhkoca.trippo.databinding.ActivityArticleDetailBinding;
+import com.nuhkoca.trippo.di.GlideApp;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.fifth.ArticleResult;
-import com.nuhkoca.trippo.module.GlideApp;
 import com.nuhkoca.trippo.ui.WebViewActivity;
 import com.nuhkoca.trippo.util.AlertDialogUtils;
 import com.nuhkoca.trippo.util.IntentUtils;
@@ -46,9 +43,12 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
 
-public class ArticleDetailActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class ArticleDetailActivity extends DaggerAppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private ActivityArticleDetailBinding mActivityArticleDetailBinding;
 
@@ -62,6 +62,15 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
     private SharedPreferences mSharedPreferences;
 
     private boolean mIsTTSInstanceCreated = false;
+
+    @Inject
+    AppsExecutor appsExecutor;
+
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
+
+    @Inject
+    AdRequest adRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +107,6 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
     }
 
     private void initAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
         mActivityArticleDetailBinding.detailContentAd.adView.loadAd(adRequest);
 
         mActivityArticleDetailBinding.detailContentAd.adView.setAdListener(new AdListener() {
@@ -158,34 +166,31 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
     }
 
     private void animatePlayPauseButton() {
-        mActivityArticleDetailBinding.aplArticleDetail.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (mMaxScrollSize == 0)
-                    mMaxScrollSize = appBarLayout.getTotalScrollRange();
+        mActivityArticleDetailBinding.aplArticleDetail.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            if (mMaxScrollSize == 0)
+                mMaxScrollSize = appBarLayout.getTotalScrollRange();
 
-                int percentage = (Math.abs(verticalOffset)) * 100 / mMaxScrollSize;
+            int percentage = (Math.abs(verticalOffset)) * 100 / mMaxScrollSize;
 
-                if (percentage >= Constants.PERCENTAGE_TO_ANIMATE_FAB && mIsFabShown) {
-                    mIsFabShown = false;
+            if (percentage >= Constants.PERCENTAGE_TO_ANIMATE_FAB && mIsFabShown) {
+                mIsFabShown = false;
 
-                    mActivityArticleDetailBinding.fabArticleDetail.animate()
-                            .scaleY(0).scaleX(0)
-                            .setDuration(200)
-                            .start();
+                mActivityArticleDetailBinding.fabArticleDetail.animate()
+                        .scaleY(0).scaleX(0)
+                        .setDuration(200)
+                        .start();
 
-                    mActivityArticleDetailBinding.fabArticleDetail.setClickable(false);
-                }
+                mActivityArticleDetailBinding.fabArticleDetail.setClickable(false);
+            }
 
-                if (percentage <= Constants.PERCENTAGE_TO_ANIMATE_FAB && !mIsFabShown) {
-                    mIsFabShown = true;
+            if (percentage <= Constants.PERCENTAGE_TO_ANIMATE_FAB && !mIsFabShown) {
+                mIsFabShown = true;
 
-                    mActivityArticleDetailBinding.fabArticleDetail.animate()
-                            .scaleY(1).scaleX(1)
-                            .start();
+                mActivityArticleDetailBinding.fabArticleDetail.animate()
+                        .scaleY(1).scaleX(1)
+                        .start();
 
-                    mActivityArticleDetailBinding.fabArticleDetail.setClickable(true);
-                }
+                mActivityArticleDetailBinding.fabArticleDetail.setClickable(true);
             }
         });
     }
@@ -270,16 +275,13 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
 
                 mIsTTSInstanceCreated = true;
             } else {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mTTS.isSpeaking()) {
-                            mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_play_arrow_white_72dp);
-                            mTTS.stop();
-                        } else {
-                            mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_stop_white_72dp);
-                            speakPartially(mActivityArticleDetailBinding.tvArticleDetailSection.getText().toString());
-                        }
+                new Handler().postDelayed(() -> {
+                    if (mTTS.isSpeaking()) {
+                        mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_play_arrow_white_72dp);
+                        mTTS.stop();
+                    } else {
+                        mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_stop_white_72dp);
+                        speakPartially(mActivityArticleDetailBinding.tvArticleDetailSection.getText().toString());
                     }
                 }, 1000);
             }
@@ -290,26 +292,23 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
                         String.format(getString(R.string.license_dialog),
                                 mArticleResult.getContent().getImages().get(0).getOwner(),
                                 mArticleResult.getContent().getImages().get(0).getLicense()),
-                        new IAlertDialogItemClickListener.Alert() {
-                            @Override
-                            public void onPositiveButtonClicked() {
-                                boolean isExternalBrowserEnabled =
-                                        SharedPreferenceUtil.isInternalBrowserEnabled(getApplicationContext(), mSharedPreferences);
+                        () -> {
+                            boolean isExternalBrowserEnabled =
+                                    sharedPreferenceUtil.getBooleanData(getString(R.string.webview_key), false);
 
-                                if (!isExternalBrowserEnabled) {
-                                    Intent browserIntent = new Intent(ArticleDetailActivity.this, WebViewActivity.class);
-                                    browserIntent.putExtra(Constants.WEB_URL_KEY,
-                                            mArticleResult.getContent().getImages().get(0).getSourceUrl());
+                            if (!isExternalBrowserEnabled) {
+                                Intent browserIntent = new Intent(ArticleDetailActivity.this, WebViewActivity.class);
+                                browserIntent.putExtra(Constants.WEB_URL_KEY,
+                                        mArticleResult.getContent().getImages().get(0).getSourceUrl());
 
-                                    startActivity(browserIntent,
-                                            ActivityOptions.makeSceneTransitionAnimation(ArticleDetailActivity.this).toBundle());
-                                } else {
-                                    new IntentUtils.Builder()
-                                            .setContext(getApplicationContext())
-                                            .setUrl(mArticleResult.getContent().getImages().get(0).getSourceUrl())
-                                            .setAction(IntentUtils.ActionType.WEB)
-                                            .create();
-                                }
+                                startActivity(browserIntent,
+                                        ActivityOptions.makeSceneTransitionAnimation(ArticleDetailActivity.this).toBundle());
+                            } else {
+                                new IntentUtils.Builder()
+                                        .setContext(getApplicationContext())
+                                        .setUrl(mArticleResult.getContent().getImages().get(0).getSourceUrl())
+                                        .setAction(IntentUtils.ActionType.WEB)
+                                        .create();
                             }
                         });
             }
@@ -320,57 +319,46 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.TTS_REQ_CODE) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                mTTS = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(int status) {
-                        if (status == TextToSpeech.SUCCESS) {
-                            int result = mTTS.setLanguage(
-                                    SharedPreferenceUtil.loadTTSOption(
-                                            getApplicationContext(), mSharedPreferences)
-                                            .equals(getString(R.string.tts_us_language_value)) ? Locale.US : Locale.UK);
+                mTTS = new TextToSpeech(getApplicationContext(), status -> {
+                    if (status == TextToSpeech.SUCCESS) {
+                        int result = mTTS.setLanguage(
+                                sharedPreferenceUtil.getStringData(getString(R.string.tts_key), getString(R.string.tts_us_language_value)).equals(getString(R.string.tts_us_language_value)) ? Locale.US : Locale.UK);
 
-                            if (result == TextToSpeech.LANG_MISSING_DATA
-                                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                                Timber.d("Lang is not supported");
-
-                                new SnackbarUtils.Builder()
-                                        .setView(mActivityArticleDetailBinding.clArticleDetail)
-                                        .setLength(SnackbarUtils.Length.LONG)
-                                        .setMessage(getString(R.string.tts_lang_not_supported_warning_text))
-                                        .show(getString(R.string.settings_action_text), new IAlertDialogItemClickListener.Snackbar() {
-                                            @Override
-                                            public void onActionListen() {
-                                                Intent installIntent = new Intent();
-                                                installIntent.setAction(
-                                                        TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                                                startActivityForResult(installIntent, Constants.TTS_REQ_CODE);
-                                            }
-                                        })
-                                        .build();
-
-                            } else {
-                                // Speaking
-                                speakPartially(mActivityArticleDetailBinding.tvArticleDetailSection.getText().toString());
-                                mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_stop_white_72dp);
-                            }
-                        } else {
-                            Timber.d("Init failed");
+                        if (result == TextToSpeech.LANG_MISSING_DATA
+                                || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                            Timber.d("Lang is not supported");
 
                             new SnackbarUtils.Builder()
                                     .setView(mActivityArticleDetailBinding.clArticleDetail)
                                     .setLength(SnackbarUtils.Length.LONG)
-                                    .setMessage(getString(R.string.tts_init_failed_warning_text))
-                                    .show(getString(R.string.settings_action_text), new IAlertDialogItemClickListener.Snackbar() {
-                                        @Override
-                                        public void onActionListen() {
-                                            Intent installIntent = new Intent();
-                                            installIntent.setAction(
-                                                    TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                                            startActivityForResult(installIntent, Constants.TTS_REQ_CODE);
-                                        }
+                                    .setMessage(getString(R.string.tts_lang_not_supported_warning_text))
+                                    .show(getString(R.string.settings_action_text), () -> {
+                                        Intent installIntent = new Intent();
+                                        installIntent.setAction(
+                                                TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                                        startActivityForResult(installIntent, Constants.TTS_REQ_CODE);
                                     })
                                     .build();
+
+                        } else {
+                            // Speaking
+                            speakPartially(mActivityArticleDetailBinding.tvArticleDetailSection.getText().toString());
+                            mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_stop_white_72dp);
                         }
+                    } else {
+                        Timber.d("Init failed");
+
+                        new SnackbarUtils.Builder()
+                                .setView(mActivityArticleDetailBinding.clArticleDetail)
+                                .setLength(SnackbarUtils.Length.LONG)
+                                .setMessage(getString(R.string.tts_init_failed_warning_text))
+                                .show(getString(R.string.settings_action_text), () -> {
+                                    Intent installIntent = new Intent();
+                                    installIntent.setAction(
+                                            TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                                    startActivityForResult(installIntent, Constants.TTS_REQ_CODE);
+                                })
+                                .build();
                     }
                 });
             } else {
@@ -431,12 +419,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
                     Timber.d("Utterance completed");
 
                     if (utteranceId.equals(Constants.TRIPPO_UTTRANCE_ID)) {
-                        AppsExecutor.mainThread().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_play_arrow_white_72dp);
-                            }
-                        });
+                        appsExecutor.mainIO().execute(() -> mActivityArticleDetailBinding.fabArticleDetail.setImageResource(R.drawable.ic_play_arrow_white_72dp));
                     }
                 }
 
@@ -496,6 +479,11 @@ public class ArticleDetailActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
+        if (key.equals(getString(R.string.tts_key))) {
+            sharedPreferenceUtil.putStringData(key, sharedPreferences.getString(key, getString(R.string.tts_us_language_value)));
+        }
+        if (key.equals(getString(R.string.webview_key))){
+            sharedPreferenceUtil.putBooleanData(key, sharedPreferences.getBoolean(key, false));
+        }
     }
 }

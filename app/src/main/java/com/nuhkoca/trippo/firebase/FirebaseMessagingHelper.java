@@ -7,16 +7,44 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.text.TextUtils;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.ui.MainActivity;
+import com.nuhkoca.trippo.util.DeviceUtils;
+import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.Objects;
 
+import javax.inject.Inject;
+
+import timber.log.Timber;
+
 public class FirebaseMessagingHelper extends FirebaseMessagingService {
+
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
+
+    @Override
+    public void onNewToken(String s) {
+        super.onNewToken(s);
+
+        Timber.d(s);
+
+        if (!BuildConfig.DEBUG && !DeviceUtils.isEmulator()) {
+            if (!TextUtils.isEmpty(s)) {
+                if (sharedPreferenceUtil.getStringData(Constants.FIRESTORE_TOKEN_KEY, "").equals(s)) {
+                    sharedPreferenceUtil.updateToken(s);
+                } else {
+                    sharedPreferenceUtil.storeToFirestore(s,1);
+                }
+            }
+        }
+    }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {

@@ -1,4 +1,4 @@
-package com.nuhkoca.trippo.test;
+package com.nuhkoca.trippo.util.test;
 
 import android.support.annotation.Nullable;
 import android.support.test.espresso.IdlingResource;

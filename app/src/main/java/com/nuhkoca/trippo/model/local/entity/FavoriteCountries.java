@@ -123,4 +123,15 @@ public class FavoriteCountries {
     public void setLng(double lng) {
         this.lng = lng;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (getClass() == obj.getClass()) {
+            return true;
+        }
+
+        FavoriteCountries favoriteCountries = (FavoriteCountries) obj;
+
+        return favoriteCountries.id == this.id;
+    }
 }

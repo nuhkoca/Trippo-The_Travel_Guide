@@ -1,43 +1,38 @@
 package com.nuhkoca.trippo.ui.content.feature;
 
-import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
 
+import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.helper.AppsExecutor;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.model.remote.content.first.ContentResult;
-import com.nuhkoca.trippo.api.NetworkState;
 import com.nuhkoca.trippo.ui.content.feature.paging.ContentResultDataSourceFactory;
 import com.nuhkoca.trippo.ui.content.feature.paging.ItemKeyedContentDataSource;
+
+import javax.inject.Inject;
 
 public class ContentViewModel extends ViewModel {
 
     private LiveData<NetworkState> networkState;
     private LiveData<NetworkState> initialLoading;
     private LiveData<PagedList<ContentResult>> contentResult;
+
     private ContentResultDataSourceFactory contentResultDataSourceFactory;
+    private AppsExecutor appsExecutor;
 
-    ContentViewModel(ContentResultDataSourceFactory contentResultDataSourceFactory) {
+    @Inject
+    ContentViewModel(ContentResultDataSourceFactory contentResultDataSourceFactory, AppsExecutor appsExecutor) {
         this.contentResultDataSourceFactory = contentResultDataSourceFactory;
+        this.appsExecutor = appsExecutor;
 
-        networkState = Transformations.switchMap(contentResultDataSourceFactory.getItemKeyedContentDataSourceMutableLiveData(), new Function<ItemKeyedContentDataSource, LiveData<NetworkState>>() {
-            @Override
-            public LiveData<NetworkState> apply(ItemKeyedContentDataSource input) {
-                return input.getNetworkState();
-            }
-        });
+        networkState = Transformations.switchMap(contentResultDataSourceFactory.getItemKeyedContentDataSourceMutableLiveData(), ItemKeyedContentDataSource::getNetworkState);
 
         initialLoading = Transformations.switchMap(contentResultDataSourceFactory.getItemKeyedContentDataSourceMutableLiveData(),
-                new Function<ItemKeyedContentDataSource, LiveData<NetworkState>>() {
-                    @Override
-                    public LiveData<NetworkState> apply(ItemKeyedContentDataSource input) {
-                        return input.getInitialLoading();
-                    }
-                });
+                ItemKeyedContentDataSource::getInitialLoading);
 
         PagedList.Config config = new PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
@@ -47,7 +42,7 @@ public class ContentViewModel extends ViewModel {
                 .build();
 
         contentResult = new LivePagedListBuilder<>(contentResultDataSourceFactory, config)
-                .setFetchExecutor(AppsExecutor.networkIO())
+                .setFetchExecutor(appsExecutor.networkIO())
                 .build();
     }
 
@@ -72,7 +67,7 @@ public class ContentViewModel extends ViewModel {
                 .build();
 
         contentResult = new LivePagedListBuilder<>(contentResultDataSourceFactory, config)
-                .setFetchExecutor(AppsExecutor.networkIO())
+                .setFetchExecutor(appsExecutor.networkIO())
                 .build();
 
         return contentResult;
@@ -80,6 +75,8 @@ public class ContentViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
+        contentResultDataSourceFactory.getItemKeyedContentDataSource().clear();
+
         super.onCleared();
     }
 }

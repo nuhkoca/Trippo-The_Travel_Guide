@@ -1,22 +1,11 @@
 package com.nuhkoca.trippo.util;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.nuhkoca.trippo.BuildConfig;
-import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.TrippoApp;
 import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
 import com.nuhkoca.trippo.helper.Constants;
 
@@ -24,45 +13,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import timber.log.Timber;
 
-import static android.content.Context.MODE_PRIVATE;
-
+@Singleton
 public class SharedPreferenceUtil {
 
-    private static SharedPreferences mSharedPref;
-    private static String mFirebaseToken;
-    private static int mIsNotifyTheDevice;
+    private SharedPreferences sharedPreferences;
+    private FirebaseFirestore firebaseFirestore;
 
-    private static SharedPreferenceUtil INSTANCE;
-
-    public static synchronized SharedPreferenceUtil getInstance() {
-        mSharedPref = TrippoApp.getInstance().getSharedPreferences(Constants.TRIPPO_SHARED_PREF, MODE_PRIVATE);
-
-        if (INSTANCE == null) {
-            INSTANCE = new SharedPreferenceUtil();
-        }
-
-        return INSTANCE;
-    }
-
-    public static synchronized SharedPreferenceUtil getInstance(String firebaseToken, int isNotifyTheDevice) {
-        mSharedPref = TrippoApp.getInstance().getSharedPreferences(Constants.TRIPPO_SHARED_PREF, MODE_PRIVATE);
-
-        mFirebaseToken = firebaseToken;
-        mIsNotifyTheDevice = isNotifyTheDevice;
-
-        if (INSTANCE == null) {
-            INSTANCE = new SharedPreferenceUtil();
-        }
-
-        return INSTANCE;
+    @Inject
+    public SharedPreferenceUtil(SharedPreferences sharedPreferences, FirebaseFirestore firebaseFirestore) {
+        this.sharedPreferences = sharedPreferences;
+        this.firebaseFirestore = firebaseFirestore;
     }
 
     public boolean isFirstRun() {
-        int savedVersionCode = mSharedPref.getInt(Constants.VERSION_CODE_KEY, -1);
+        int savedVersionCode = sharedPreferences.getInt(Constants.VERSION_CODE_KEY, -1);
 
         if (BuildConfig.VERSION_CODE == savedVersionCode) {
             // normal run
@@ -78,210 +47,104 @@ public class SharedPreferenceUtil {
         }
     }
 
-    public void checkAndSaveToken() {
-        FirebaseFirestore db = TrippoApp.provideFirestore();
-
-        if (!TextUtils.isEmpty(getDocumentId())) {
-            db.collection(Constants.FIRESTORE_COLLECTION_NAME)
-                    .document(getDocumentId())
+    public void checkAndSaveToken(String token, int isNotify) {
+        if (!TextUtils.isEmpty(getStringData(Constants.FIRESTORE_DOC_ID_KEY, ""))) {
+            firebaseFirestore.collection(Constants.FIRESTORE_COLLECTION_NAME)
+                    .document(getStringData(Constants.FIRESTORE_DOC_ID_KEY, ""))
                     .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            DocumentSnapshot documentSnapshot = task.getResult();
+                    .addOnCompleteListener(task -> {
+                        DocumentSnapshot documentSnapshot = task.getResult();
 
-                            if (documentSnapshot.exists()) {
-                                Timber.d("document exists");
-                            } else {
-                                storeToFirestore();
-                                Timber.d("new data added");
-                            }
+                        if (documentSnapshot.exists()) {
+                            Timber.d("document exists");
+                        } else {
+                            storeToFirestore(token, isNotify);
+                            Timber.d("new data added");
                         }
                     });
         } else {
-            storeToFirestore();
+            storeToFirestore(token, isNotify);
         }
     }
 
-    public void storeToFirestore() {
-        FirebaseFirestore db = TrippoApp.provideFirestore();
-
+    public void storeToFirestore(String token, int isNotify) {
         Map<String, Object> userToken = new HashMap<>();
-        userToken.put(Constants.FIRESTORE_KEY, mFirebaseToken);
-        userToken.put(Constants.FIRESTORE_PUSH_KEY, mIsNotifyTheDevice);
+        userToken.put(Constants.FIRESTORE_KEY, token);
+        userToken.put(Constants.FIRESTORE_PUSH_KEY, isNotify);
         userToken.put(Constants.FIRESTORE_DEVICE_MODEL_KEY, DeviceUtils.model());
         userToken.put(Constants.FIRESTORE_DEVICE_PRODUCT_KEY, DeviceUtils.product());
         userToken.put(Constants.FIRESTORE_DEVICE_API_KEY, DeviceUtils.api());
         userToken.put(Constants.FIRESTORE_DEVICE_DEVICE_KEY, DeviceUtils.device());
         userToken.put(Constants.FIRESTORE_DEVICE_BRAND_KEY, DeviceUtils.brand());
 
-        db.collection(Constants.FIRESTORE_COLLECTION_NAME)
+        firebaseFirestore.collection(Constants.FIRESTORE_COLLECTION_NAME)
                 .add(userToken)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Timber.d("token saved successfully.");
-                        Timber.d("Token: %s", mFirebaseToken);
+                .addOnSuccessListener(documentReference -> {
+                    Timber.d("token saved successfully.");
+                    Timber.d("Token: %s", token);
 
-                        addDocumentIdToSharedPreference(documentReference.getId());
-                    }
+                    putStringData(Constants.FIRESTORE_DOC_ID_KEY, documentReference.getId());
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Timber.d(e);
-                    }
-                });
+                .addOnFailureListener(Timber::d);
     }
 
     public void updateNotification(int isNotifyTheDevice) {
-        FirebaseFirestore db = TrippoApp.provideFirestore();
-
-        db.collection(Constants.FIRESTORE_COLLECTION_NAME)
-                .document(getDocumentId())
+        firebaseFirestore.collection(Constants.FIRESTORE_COLLECTION_NAME)
+                .document(getStringData(Constants.FIRESTORE_DOC_ID_KEY, ""))
                 .update(Constants.FIRESTORE_PUSH_KEY, isNotifyTheDevice)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Timber.d("notification update success");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Timber.d(e);
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Timber.d("notification update success"))
+                .addOnFailureListener(Timber::d);
     }
 
     public void updateToken(String token) {
-        FirebaseFirestore db = TrippoApp.provideFirestore();
-
-        db.collection(Constants.FIRESTORE_COLLECTION_NAME)
-                .document(getDocumentId())
+        firebaseFirestore.collection(Constants.FIRESTORE_COLLECTION_NAME)
+                .document(getStringData(Constants.FIRESTORE_DOC_ID_KEY, ""))
                 .update(Constants.FIRESTORE_TOKEN_KEY, token)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Timber.d("token update success");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Timber.d(e);
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Timber.d("token update success"))
+                .addOnFailureListener(Timber::d);
     }
 
-    public static void checkAppVersion(final IAlertDialogItemClickListener.Version iAlertDialogItemClickListener) {
-        FirebaseFirestore db = TrippoApp.provideFirestore();
-
-        db.collection(Constants.FIRESTORE_APP_COLLECTION_NAME)
+    public void checkAppVersion(final IAlertDialogItemClickListener.Version iAlertDialogItemClickListener) {
+        firebaseFirestore.collection(Constants.FIRESTORE_APP_COLLECTION_NAME)
                 .document(Constants.VERSION_DOCUMENT_ID)
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Timber.e(e);
-                        } else {
+                .addSnapshotListener((documentSnapshot, e) -> {
+                    if (e != null) {
+                        Timber.e(e);
+                    } else {
 
-                            if (documentSnapshot != null && documentSnapshot.exists()) {
-                                iAlertDialogItemClickListener.onVersionReceived(
-                                        Integer.parseInt(
-                                                Objects.requireNonNull(documentSnapshot.get(Constants.VERSION_COLUMN_NAME)).toString())
-                                );
-                            } else {
-                                Timber.d("document not exists");
-                            }
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            iAlertDialogItemClickListener.onVersionReceived(
+                                    Integer.parseInt(
+                                            Objects.requireNonNull(documentSnapshot.get(Constants.VERSION_COLUMN_NAME)).toString())
+                            );
+                        } else {
+                            Timber.d("document not exists");
                         }
                     }
                 });
     }
 
-    public String getTokenFromSharedPreference() {
-        return mSharedPref.getString(Constants.FIRESTORE_TOKEN_KEY, "");
+    public void putIntData(String key, int val) {
+        sharedPreferences.edit().putInt(key, val).apply();
     }
 
-    public String getIsNotifyMeFromSharedPreference() {
-        return mSharedPref.getString(Constants.FIRESTORE_IS_NOTIFY_ME_KEY, "0");
+    public int getIntData(String key, int defVal) {
+        return sharedPreferences.getInt(key, defVal);
     }
 
-    private String getDocumentId() {
-        return mSharedPref.getString(Constants.FIRESTORE_DOC_ID_KEY, "");
+    public void putStringData(String key, String val) {
+        sharedPreferences.edit().putString(key, val).apply();
     }
 
-    public void addTokenToSharedPreference(String token) {
-        SharedPreferences.Editor editor = mSharedPref.edit();
-
-        editor.putString(Constants.FIRESTORE_TOKEN_KEY, token);
-
-        Timber.d("Token %s", token);
-
-        editor.apply();
+    public String getStringData(String key, String defVal) {
+        return sharedPreferences.getString(key, defVal);
     }
 
-    private void addDocumentIdToSharedPreference(String documentId) {
-        SharedPreferences.Editor editor = mSharedPref.edit();
-
-        editor.putString(Constants.FIRESTORE_DOC_ID_KEY, documentId);
-
-        Timber.d("Document Id %s", documentId);
-
-        editor.apply();
+    public void putBooleanData(String key, boolean val) {
+        sharedPreferences.edit().putBoolean(key, val).apply();
     }
 
-    public static String loadToursScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.tours_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadActivitiesScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.activities_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadMultiDayToursScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.multi_day_tours_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadDayTripsScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.day_trips_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadCityWalkingScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.city_walking_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadSightseeingScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.sightseeing_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadEatAndDrinkScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.eat_drink_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadNightlifeScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.nightlife_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadHotelScore(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.hotel_key), context.getString(R.string.seven_and_greater_value));
-    }
-
-    public static String loadBookableOption(Context context, SharedPreferences sharedPreferences) {
-        boolean isBookable = sharedPreferences.getBoolean(context.getString(R.string.bookable_key), false);
-
-        if (isBookable) {
-            return context.getString(R.string.bookable_enabled_value);
-        } else {
-            return context.getString(R.string.bookable_disabled_value);
-        }
-    }
-
-    public static boolean isInternalBrowserEnabled(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getBoolean(context.getString(R.string.webview_key), false);
-    }
-
-    public static String loadTTSOption(Context context, SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(context.getString(R.string.tts_key), context.getString(R.string.tts_us_language_value));
+    public boolean getBooleanData(String key, boolean defVal) {
+        return sharedPreferences.getBoolean(key, defVal);
     }
 }

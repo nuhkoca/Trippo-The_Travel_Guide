@@ -1,12 +1,10 @@
 package com.nuhkoca.trippo.ui;
 
 import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,11 +14,9 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.nuhkoca.trippo.BuildConfig;
 import com.nuhkoca.trippo.R;
-import com.nuhkoca.trippo.callback.IAlertDialogItemClickListener;
 import com.nuhkoca.trippo.databinding.ActivityMainBinding;
 import com.nuhkoca.trippo.helper.Constants;
 import com.nuhkoca.trippo.ui.nearby.NearbyActivity;
@@ -31,12 +27,20 @@ import com.nuhkoca.trippo.util.AppWidgetUtils;
 import com.nuhkoca.trippo.util.IntentUtils;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class MainActivity extends DaggerAppCompatActivity implements View.OnClickListener {
 
     private ActivityMainBinding mActivityMainBinding;
     private long mBackPressed;
 
-    private InterstitialAd mInterstitialAd;
+    @Inject
+    InterstitialAd interstitialAd;
+
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,50 +59,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void checkAppVersion() {
-        SharedPreferenceUtil.checkAppVersion(new IAlertDialogItemClickListener.Version() {
-            @Override
-            public void onVersionReceived(int versionCode) {
-                if (versionCode > BuildConfig.VERSION_CODE) {
+        sharedPreferenceUtil.checkAppVersion(versionCode -> {
+            if (versionCode > BuildConfig.VERSION_CODE) {
 
-                    new AlertDialog.Builder(MainActivity.this)
-                            .setTitle(getString(R.string.app_update_title))
-                            .setMessage(getString(R.string.app_update_text))
-                            .setCancelable(false)
-                            .setPositiveButton(getString(R.string.update_button), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    finish();
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(getString(R.string.app_update_title))
+                        .setMessage(getString(R.string.app_update_text))
+                        .setCancelable(false)
+                        .setPositiveButton(getString(R.string.update_button), (dialog, which) -> {
+                            dialog.dismiss();
+                            finish();
 
-                                    new IntentUtils.Builder()
-                                            .setContext(getApplicationContext())
-                                            .setAction(IntentUtils.ActionType.GOOGLE_PLAY)
-                                            .create();
-                                }
-                            })
-                            .setNegativeButton(getString(R.string.exit_button), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    finish();
-                                }
-                            })
-                            .create().show();
-                }
+                            new IntentUtils.Builder()
+                                    .setContext(getApplicationContext())
+                                    .setAction(IntentUtils.ActionType.GOOGLE_PLAY)
+                                    .create();
+                        })
+                        .setNegativeButton(getString(R.string.exit_button), (dialog, which) -> {
+                            dialog.dismiss();
+                            finish();
+                        })
+                        .create().show();
             }
         });
     }
 
     private void setupInterstitialAd() {
-        mInterstitialAd = new InterstitialAd(getApplicationContext());
-        mInterstitialAd.setAdUnitId(getString(R.string.admob_interstitial_unit_id));
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-
-        mInterstitialAd.setAdListener(new AdListener() {
+        interstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
-                if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
-                    mInterstitialAd = null;
+                if (interstitialAd != null && interstitialAd.isLoaded()) {
+                    interstitialAd = null;
                     MainActivity.super.onBackPressed();
                 } else {
                     MainActivity.super.onBackPressed();
@@ -110,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void disposeInterstitialAd() {
-        if (mInterstitialAd != null) {
-            mInterstitialAd = null;
+        if (interstitialAd != null) {
+            interstitialAd = null;
         }
     }
 
@@ -179,8 +170,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mBackPressed + timeDelay > System.currentTimeMillis()) {
             supportFinishAfterTransition();
 
-            if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
-                mInterstitialAd.show();
+            if (interstitialAd != null && interstitialAd.isLoaded()) {
+                interstitialAd.show();
             } else {
                 super.onBackPressed();
             }
@@ -251,8 +242,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onPause() {
-        disposeInterstitialAd();
         super.onPause();
+        disposeInterstitialAd();
     }
 
     @Override

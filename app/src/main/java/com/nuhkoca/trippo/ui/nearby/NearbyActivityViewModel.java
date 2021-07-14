@@ -1,66 +1,55 @@
 package com.nuhkoca.trippo.ui.nearby;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.widget.Toast;
 
-import com.nuhkoca.trippo.helper.Constants;
-import com.nuhkoca.trippo.repository.api.PlacesEndpointRepository;
+import com.nuhkoca.trippo.api.repository.PlacesEndpointRepository;
 import com.nuhkoca.trippo.model.remote.places.PlacesWrapper;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import javax.inject.Inject;
 
-public class NearbyActivityViewModel extends AndroidViewModel {
+import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
-    private PlacesEndpointRepository mPlacesEndpointRepository;
+public class NearbyActivityViewModel extends ViewModel {
+
+    private PlacesEndpointRepository placesEndpointRepository;
+
     private MutableLiveData<PlacesWrapper> mPlaces;
 
     private Application application;
 
-    NearbyActivityViewModel(Application application, PlacesEndpointRepository placesEndpointRepository) {
-        super(application);
+    private CompositeDisposable compositeDisposable;
+
+    @Inject
+    public NearbyActivityViewModel(PlacesEndpointRepository placesEndpointRepository, Application application) {
+        this.placesEndpointRepository = placesEndpointRepository;
         this.application = application;
-        this.mPlacesEndpointRepository = placesEndpointRepository;
 
         mPlaces = new MutableLiveData<>();
+
+        compositeDisposable = new CompositeDisposable();
     }
 
     public void findNearbyPlaces(String location, String radius, String type) {
-        Observable<PlacesWrapper> places = mPlacesEndpointRepository.getNearbyPlaces(location, radius, type);
+        Observable<PlacesWrapper> places = placesEndpointRepository.getNearbyPlaces(location, radius, type);
 
-        places.subscribeOn(Schedulers.io())
-                .retry(Constants.DEFAULT_RETRY_COUNT)
-                .observeOn(AndroidSchedulers.mainThread())
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends PlacesWrapper>>() {
-                    @Override
-                    public Observable<? extends PlacesWrapper> call(Throwable throwable) {
-                        return Observable.error(throwable);
-                    }
-                })
-                .subscribe(new Subscriber<PlacesWrapper>() {
-                    @Override
-                    public void onCompleted() {
+        Disposable placesList = places.subscribe(placesWrapper -> onSuccess(placesWrapper, mPlaces), this::onError);
 
-                    }
+        compositeDisposable.add(placesList);
+    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(application, e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
+    private void onError(Throwable throwable) {
+        Toast.makeText(application, throwable.getMessage(), Toast.LENGTH_LONG).show();
+    }
 
-                    @Override
-                    public void onNext(PlacesWrapper placesWrapper) {
-                        if (placesWrapper.getStatus().equals("OK")) {
-                            mPlaces.setValue(placesWrapper);
-                        }
-                    }
-                });
-
+    private void onSuccess(PlacesWrapper placesWrapper, MutableLiveData<PlacesWrapper> places) {
+        if (placesWrapper.getStatus().equals("OK")) {
+            mPlaces.setValue(placesWrapper);
+        }
     }
 
     public MutableLiveData<PlacesWrapper> getNearbyPlaces() {
@@ -69,6 +58,8 @@ public class NearbyActivityViewModel extends AndroidViewModel {
 
     @Override
     protected void onCleared() {
+        compositeDisposable.clear();
+
         super.onCleared();
     }
 }

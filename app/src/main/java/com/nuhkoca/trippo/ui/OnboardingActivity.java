@@ -2,7 +2,6 @@ package com.nuhkoca.trippo.ui;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,23 +18,20 @@ import com.nuhkoca.trippo.util.SharedPreferenceUtil;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class OnboardingActivity extends AppIntro implements EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
 
-    private SharedPreferences.Editor mEditor;
-    private SharedPreferences mSharedPreferences;
-
-    private SharedPreferenceUtil mSharedPreferenceUtil;
+    @Inject
+    SharedPreferenceUtil sharedPreferenceUtil;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mSharedPreferences = getSharedPreferences(Constants.TRIPPO_SHARED_PREF, MODE_PRIVATE);
-        mSharedPreferenceUtil = SharedPreferenceUtil.getInstance();
 
         addSlide(OnboardingFragment.newInstance(getString(R.string.onboarding_first_title),
                 getString(R.string.onboarding_first_desc),
@@ -72,7 +68,6 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
     @Override
     public void onDonePressed(Fragment currentFragment) {
         super.onDonePressed(currentFragment);
-        mEditor = mSharedPreferences.edit();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(OnboardingActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -81,17 +76,15 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
                     != PackageManager.PERMISSION_GRANTED) {
                 locationPermissionsTask();
             } else {
-                mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
+                sharedPreferenceUtil.putIntData(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
 
                 Intent mainIntent;
 
-                if (mSharedPreferenceUtil.isFirstRun()) {
+                if (sharedPreferenceUtil.isFirstRun()) {
                     mainIntent = new Intent(OnboardingActivity.this, AuthActivity.class);
                 } else {
                     mainIntent = new Intent(OnboardingActivity.this, MainActivity.class);
                 }
-
-                mEditor.apply();
 
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -99,18 +92,16 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
                 startActivity(mainIntent);
             }
         } else {
-            mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
+            sharedPreferenceUtil.putIntData(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
 
             Intent mainIntent;
 
-            if (mSharedPreferences.getBoolean(Constants.IS_FIRST_AND_AUTH_REQUIRED, true)) {
+            if (sharedPreferenceUtil.getBooleanData(Constants.IS_FIRST_AND_AUTH_REQUIRED, true)) {
                 mainIntent = new Intent(OnboardingActivity.this, AuthActivity.class);
             } else {
 
                 mainIntent = new Intent(OnboardingActivity.this, MainActivity.class);
             }
-
-            mEditor.apply();
 
             mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -137,12 +128,10 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
                     Constants.LOCATION_PERMISSIONS_REQ_CODE,
                     Constants.LOCATION_PERMISSIONS);
 
-            mEditor.putInt(Constants.VERSION_CODE_KEY, -1);
+            sharedPreferenceUtil.putIntData(Constants.VERSION_CODE_KEY, -1);
         } else {
-            mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
+            sharedPreferenceUtil.putIntData(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
         }
-
-        mEditor.apply();
     }
 
     @Override
@@ -154,17 +143,15 @@ public class OnboardingActivity extends AppIntro implements EasyPermissions.Perm
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        mEditor.putInt(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
+        sharedPreferenceUtil.putIntData(Constants.VERSION_CODE_KEY, BuildConfig.VERSION_CODE);
 
         Intent mainIntent;
 
-        if (mSharedPreferenceUtil.isFirstRun()) {
+        if (sharedPreferenceUtil.isFirstRun()) {
             mainIntent = new Intent(OnboardingActivity.this, AuthActivity.class);
         } else {
             mainIntent = new Intent(OnboardingActivity.this, MainActivity.class);
         }
-
-        mEditor.apply();
 
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

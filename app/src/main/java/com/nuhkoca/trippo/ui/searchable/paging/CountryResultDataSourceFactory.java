@@ -5,26 +5,23 @@ import android.arch.paging.DataSource;
 
 import com.nuhkoca.trippo.model.remote.country.CountryResult;
 
-public class CountryResultDataSourceFactory extends DataSource.Factory<Integer, CountryResult> {
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
+public class CountryResultDataSourceFactory extends DataSource.Factory<Long, CountryResult> {
 
     private MutableLiveData<ItemKeyedCountryDataSource> mItemKeyedCountryDataSourceMutableLiveData;
-    private static CountryResultDataSourceFactory INSTANCE;
+    private ItemKeyedCountryDataSource itemKeyedCountryDataSource;
 
-    private CountryResultDataSourceFactory() {
+    @Inject
+    public CountryResultDataSourceFactory(ItemKeyedCountryDataSource itemKeyedCountryDataSource) {
+        this.itemKeyedCountryDataSource = itemKeyedCountryDataSource;
         mItemKeyedCountryDataSourceMutableLiveData = new MutableLiveData<>();
     }
 
-    public static CountryResultDataSourceFactory getInstance(){
-        if (INSTANCE == null){
-            INSTANCE = new CountryResultDataSourceFactory();
-        }
-
-        return INSTANCE;
-    }
-
     @Override
-    public DataSource<Integer, CountryResult> create() {
-        ItemKeyedCountryDataSource itemKeyedCountryDataSource = new ItemKeyedCountryDataSource();
+    public DataSource<Long, CountryResult> create() {
         mItemKeyedCountryDataSourceMutableLiveData.postValue(itemKeyedCountryDataSource);
 
         return itemKeyedCountryDataSource;
@@ -32,5 +29,9 @@ public class CountryResultDataSourceFactory extends DataSource.Factory<Integer, 
 
     public MutableLiveData<ItemKeyedCountryDataSource> getItemKeyedCountryDataSourceMutableLiveData() {
         return mItemKeyedCountryDataSourceMutableLiveData;
+    }
+
+    public ItemKeyedCountryDataSource getItemKeyedCountryDataSource() {
+        return itemKeyedCountryDataSource;
     }
 }

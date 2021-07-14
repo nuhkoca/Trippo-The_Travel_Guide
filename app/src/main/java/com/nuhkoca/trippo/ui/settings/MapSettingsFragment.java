@@ -49,25 +49,17 @@ public class MapSettingsFragment extends PreferenceFragmentCompat implements Sha
         super.onCreate(savedInstanceState);
 
         SwitchPreference sensorPref = (SwitchPreference) findPreference(getString(R.string.sensor_key));
-        sensorPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
+        sensorPref.setOnPreferenceClickListener(preference -> {
 
-                View view = getView();
+            View view = getView();
 
-                final Snackbar snackbar = Snackbar.make(Objects.requireNonNull(view),
-                        getString(R.string.sensor_warning_text),
-                        Snackbar.LENGTH_LONG);
+            final Snackbar snackbar = Snackbar.make(Objects.requireNonNull(view),
+                    getString(R.string.sensor_warning_text),
+                    Snackbar.LENGTH_LONG);
 
-                snackbar.setAction(getString(R.string.dismiss_action_text), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        snackbar.dismiss();
-                    }
-                }).show();
+            snackbar.setAction(getString(R.string.dismiss_action_text), v -> snackbar.dismiss()).show();
 
-                return false;
-            }
+            return false;
         });
     }
 
