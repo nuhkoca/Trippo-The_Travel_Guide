@@ -11,7 +11,7 @@ on:
 
 jobs:
   setup:
-    name: Setup
+    name: Build & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -39,15 +39,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Unit Tests
-        run: ./gradlew testDebugUnitTest
-
       - name: Build App
         uses: ./gradlew assembleDebug
 
+      - name: Unit Tests
+        run: ./gradlew testDebugUnitTest
+
       - name: Upload Sample Artifacts
         uses: actions/upload-artifact@v2
-        if: always()
         with:
           name: apk
           path: app/build/outputs/apk/debug/*.apk
