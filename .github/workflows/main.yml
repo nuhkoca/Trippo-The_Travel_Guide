@@ -12,7 +12,7 @@ on:
 jobs:
   setup:
     name: Build & Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
         run: ./gradlew testDebugUnitTest
 
       - name: Build App
-        uses: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload Sample Artifacts
         uses: actions/upload-artifact@v2
