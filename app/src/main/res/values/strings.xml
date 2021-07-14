@@ -1,4 +1,11 @@
 <resources>
+    <string name="google_maps_key">AIzafake</string>
+    <string name="admob_id">ca-app-pub-fake</string>
+    <string name="admob_banner_unit_id">ca-app-pub-fake</string>
+    <string name="admob_interstitial_unit_id">ca-app-pub-fake</string>
+    <string name="oauth_token">fakeapp.apps.googleusercontent.com</string>
+    <string name="browser_key">AIzafake</string>
+
     <string name="app_name">Trippo</string>
     <string name="catalogue_name">Catalogue</string>
     <string name="nearby_name">Nearby Places</string>
