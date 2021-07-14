@@ -1,0 +1,65 @@
+{
+  "project_info": {
+    "project_number": "980494980498",
+    "firebase_url": "https://fakeapp.firebaseio.com",
+    "project_id": "fake-android-app",
+    "storage_bucket": "fake-android-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:980494980498:android:63b7de173384ddab",
+        "android_client_info": {
+          "package_name": "com.nuhkoca.trippo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "FAKEfakeFAKE",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nuhkoca.trippo",
+            "certificate_hash": "FAKEfakeFAKE"
+          }
+        },
+        {
+          "client_id": "FAKEfakeFAKE",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nuhkoca.trippo",
+            "certificate_hash": "FAKEfakeFAKE"
+          }
+        },
+        {
+          "client_id": "FAKEfakeFAKE",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nuhkoca.trippo",
+            "certificate_hash": "FAKEfakeFAKE"
+          }
+        },
+        {
+          "client_id": "FAKEfakeFAKE",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "FAKEfakeFAKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "FAKEfakeFAKE",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "FAKEfakeFAKE"
+    }
+  ],
+  "configuration_version": "1"
+}

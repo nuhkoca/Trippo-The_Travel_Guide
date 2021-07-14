@@ -5,16 +5,17 @@ on:
     branches:
       - master
 
+  pull_request:
+    branches:
+      - master
+
 jobs:
   setup:
-    name: Setup
-    runs-on: ubuntu-latest
+    name: Build & Test
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Make checksum executable
-        run: chmod +x ./checksum.sh
 
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1
@@ -24,6 +25,9 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '8'
+
+      - name: Make checksum executable
+        run: chmod +x ./checksum.sh
 
       - name: Generate cache key
         run: ./checksum.sh checksum.txt
@@ -42,11 +46,10 @@ jobs:
         run: ./gradlew testDebugUnitTest
 
       - name: Build App
-        uses: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload Sample Artifacts
         uses: actions/upload-artifact@v2
-        if: always()
         with:
           name: apk
           path: app/build/outputs/apk/debug/*.apk
