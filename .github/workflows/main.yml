@@ -17,9 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Make checksum executable
-        run: chmod +x ./checksum.sh
-
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1
 
