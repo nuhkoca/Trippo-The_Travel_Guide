@@ -27,7 +27,7 @@ jobs:
           java-version: '8'
 
       - name: Generate cache key
-        run: ./checksum.sh checksum.txt
+        run: chmod+x ./checksum.sh checksum.txt
 
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
