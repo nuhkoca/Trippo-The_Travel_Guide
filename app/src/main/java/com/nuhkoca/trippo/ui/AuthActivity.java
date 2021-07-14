@@ -177,7 +177,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Timber.d(e);
+            Timber.e(e);
             updateUI(null);
         }
     }

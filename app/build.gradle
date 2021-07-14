@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
@@ -18,13 +20,7 @@ android {
     }
 
     signingConfigs {
-        releaseConfig {
-            keyAlias 'Mobile Movement Team'
-            keyPassword 'nuhkoca'
-            storeFile file("$rootDir/keystore/trippo_keystore.jks")
-            storePassword 'nuhkoca'
-        }
-        debugConfig {
+        release {
             keyAlias 'Mobile Movement Team'
             keyPassword 'nuhkoca'
             storeFile file("$rootDir/keystore/trippo_keystore.jks")
@@ -34,12 +30,12 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.releaseConfig
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            signingConfig signingConfigs.debugConfig
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -93,8 +89,6 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.rxJavaVersion"
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.ext.rxJavaVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okHttpVersion"
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$rootProject.ext.leakCanaryVersion"
-    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leakCanaryVersion"
 
     //RxJava
     implementation "io.reactivex:rxjava:$rootProject.ext.rxJavaLibVersion"
@@ -138,6 +132,13 @@ dependencies {
     androidTestImplementation "com.android.support.test.espresso:espresso-intents:$rootProject.ext.espressoVersion"
     testImplementation "junit:junit:$rootProject.ext.JUnitVersion"
     implementation "com.android.support.test.espresso:espresso-idling-resource:$rootProject.ext.espressoVersion"
+}
+
+def googleServices = file("google-services.json")
+if (!googleServices.exists()) {
+    // If there isn't a google-services.json available, we'll copy our fake version to the
+    // google-services.json
+    Files.copy(file("fake-google-services.json").toPath(), googleServices.toPath())
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -15,7 +15,6 @@ import com.google.gson.GsonBuilder;
 import com.nuhkoca.trippo.helper.TimberReleaseTree;
 import com.nuhkoca.trippo.util.DeviceUtils;
 import com.nuhkoca.trippo.util.SharedPreferenceUtil;
-import com.squareup.leakcanary.LeakCanary;
 
 import java.util.concurrent.TimeUnit;
 
@@ -43,7 +42,7 @@ public class TrippoApp extends Application {
             INSTANCE = this;
         }
 
-        provideLeakCanary();
+        setupLibraries();
     }
 
     private void provideFabric() {
@@ -58,14 +57,7 @@ public class TrippoApp extends Application {
         }
     }
 
-    private void provideLeakCanary() {
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return;
-        }
-
-        LeakCanary.install(this);
-
-        //Other invokes
+    private void setupLibraries() {
         provideFabric();
         provideTimber();
         provideStetho();
