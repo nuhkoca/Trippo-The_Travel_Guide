@@ -26,9 +26,6 @@ jobs:
           distribution: 'adopt'
           java-version: '8'
 
-      - name: Make checksum executable
-        run: chmod +x ./checksum.sh
-
       - name: Generate cache key
         run: ./checksum.sh checksum.txt
 
